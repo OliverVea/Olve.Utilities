@@ -20,6 +20,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github", "github", "{4FEBB5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{70431A57-4F24-4AF1-9EB9-85B5D9840E9B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Utilities.Tests", "tests\Olve.Utilities.Tests\Olve.Utilities.Tests.csproj", "{B516E9B3-6410-4EFA-8238-2521C94808B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,9 +32,14 @@ Global
 		{28330216-7401-427E-B8BA-8D1466DA6F9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{28330216-7401-427E-B8BA-8D1466DA6F9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{28330216-7401-427E-B8BA-8D1466DA6F9F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B516E9B3-6410-4EFA-8238-2521C94808B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B516E9B3-6410-4EFA-8238-2521C94808B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B516E9B3-6410-4EFA-8238-2521C94808B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B516E9B3-6410-4EFA-8238-2521C94808B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4FEBB57E-EADB-4079-8708-BA17DF0EB403} = {853B9358-CBF7-4B29-8824-9169C5D640AC}
 		{28330216-7401-427E-B8BA-8D1466DA6F9F} = {6AE53E7D-3FEB-459A-B821-AD2F5D52DBE4}
+		{B516E9B3-6410-4EFA-8238-2521C94808B9} = {70431A57-4F24-4AF1-9EB9-85B5D9840E9B}
 	EndGlobalSection
 EndGlobal

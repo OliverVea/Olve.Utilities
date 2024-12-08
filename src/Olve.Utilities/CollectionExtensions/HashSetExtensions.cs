@@ -1,4 +1,4 @@
-namespace Olve.Operations.CollectionExtensions;
+namespace Olve.Utilities.CollectionExtensions;
 
 public static class HashSetExtensions
 {

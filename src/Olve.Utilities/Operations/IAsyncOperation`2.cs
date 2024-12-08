@@ -1,4 +1,4 @@
-﻿namespace Olve.Operations.Operations;
+﻿namespace Olve.Utilities.Operations;
 
 public interface IAsyncOperation<in TRequest, TResult>
 {

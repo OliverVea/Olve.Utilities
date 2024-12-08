@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Olve.Operations.AsyncOnStartup;
+namespace Olve.Utilities.AsyncOnStartup;
 
 public static class ServiceProviderExtensions
 {

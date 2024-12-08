@@ -1,4 +1,4 @@
-namespace Olve.Operations.AsyncOnStartup;
+namespace Olve.Utilities.AsyncOnStartup;
 
 public interface IAsyncOnStartup
 {
