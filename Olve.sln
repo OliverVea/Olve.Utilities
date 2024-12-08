@@ -1,0 +1,21 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Operations", "Olve.Operations\Olve.Operations.csproj", "{28330216-7401-427E-B8BA-8D1466DA6F9F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "repo", "repo", "{853B9358-CBF7-4B29-8824-9169C5D640AC}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{28330216-7401-427E-B8BA-8D1466DA6F9F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{28330216-7401-427E-B8BA-8D1466DA6F9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{28330216-7401-427E-B8BA-8D1466DA6F9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{28330216-7401-427E-B8BA-8D1466DA6F9F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
