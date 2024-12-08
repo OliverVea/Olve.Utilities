@@ -1,4 +1,4 @@
-﻿namespace Olve.Operations;
+﻿namespace Olve.Operations.Operations;
 
 public interface IOperation<in TInput>
 {
