@@ -2,7 +2,7 @@ namespace Olve.Utilities.CollectionExtensions;
 
 public static class HashSetExtensions
 {
-    public static bool Toggle<T>(this HashSet<T> set, T item)
+    public static bool Toggle<T>(this ISet<T> set, T item)
     {
         if (set.Add(item)) return true;
         
@@ -10,9 +10,9 @@ public static class HashSetExtensions
         return false;
     }
     
-    public static void Toggle<T>(this HashSet<T> set, T item, bool value)
+    public static bool Set<T>(this ISet<T> set, T item, bool value)
     {
-        if (value) set.Add(item);
-        else set.Remove(item);
+        if (value) return set.Add(item);
+        return set.Remove(item);
     }
 }
