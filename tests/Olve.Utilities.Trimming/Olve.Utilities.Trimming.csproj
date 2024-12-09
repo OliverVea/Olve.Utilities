@@ -1,15 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>Exe</OutputType>
+        <PublishTrimmed>true</PublishTrimmed>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="TUnit"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\..\src\Olve.Utilities\Olve.Utilities.csproj"/>
+        <TrimmerRootAssembly Include="Olve.Utilities"/>
     </ItemGroup>
 
 </Project>

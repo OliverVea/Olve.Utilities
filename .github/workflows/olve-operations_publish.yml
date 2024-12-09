@@ -14,7 +14,7 @@ env:
 
 defaults:
   run:
-    working-directory: src/Olve.Utilities
+    working-directory: .
 
 jobs:
   build:
@@ -39,11 +39,14 @@ jobs:
       - name: Build
         run: dotnet build --no-restore -c Release /p:Version=$VERSION
         
+      - name: Verify trimming
+        run: dotnet publish ./tests/Olve.Utilities.Trimming --no-restore -c Release -r linux-x64 --self-contained
+      
       - name: Test
         run: dotnet test --no-build -c Release --verbosity normal
         
       - name: pack nuget packages
-        run: dotnet pack --output nupkgs --no-restore --no-build -c Release /p:PackageVersion=$VERSION
+        run: dotnet pack ./src/Olve.Utilities --output nupkgs --no-restore --no-build -c Release /p:PackageVersion=$VERSION
         
       - name: upload nuget package
         if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')

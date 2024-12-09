@@ -13,6 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "repo", "repo", "{853B9358-C
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6AE53E7D-3FEB-459A-B821-AD2F5D52DBE4}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github", "github", "{4FEBB57E-EADB-4079-8708-BA17DF0EB403}"
 	ProjectSection(SolutionItems) = preProject
@@ -22,6 +25,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{70431A57-4F24-4AF1-9EB9-85B5D9840E9B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Utilities.Tests", "tests\Olve.Utilities.Tests\Olve.Utilities.Tests.csproj", "{B516E9B3-6410-4EFA-8238-2521C94808B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Utilities.Trimming", "tests\Olve.Utilities.Trimming\Olve.Utilities.Trimming.csproj", "{7BBDB4BF-3D24-4DF5-BE1B-AF86731E2845}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +42,15 @@ Global
 		{B516E9B3-6410-4EFA-8238-2521C94808B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B516E9B3-6410-4EFA-8238-2521C94808B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B516E9B3-6410-4EFA-8238-2521C94808B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7BBDB4BF-3D24-4DF5-BE1B-AF86731E2845}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7BBDB4BF-3D24-4DF5-BE1B-AF86731E2845}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7BBDB4BF-3D24-4DF5-BE1B-AF86731E2845}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7BBDB4BF-3D24-4DF5-BE1B-AF86731E2845}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{4FEBB57E-EADB-4079-8708-BA17DF0EB403} = {853B9358-CBF7-4B29-8824-9169C5D640AC}
 		{28330216-7401-427E-B8BA-8D1466DA6F9F} = {6AE53E7D-3FEB-459A-B821-AD2F5D52DBE4}
 		{B516E9B3-6410-4EFA-8238-2521C94808B9} = {70431A57-4F24-4AF1-9EB9-85B5D9840E9B}
+		{7BBDB4BF-3D24-4DF5-BE1B-AF86731E2845} = {70431A57-4F24-4AF1-9EB9-85B5D9840E9B}
 	EndGlobalSection
 EndGlobal
