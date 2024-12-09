@@ -7,4 +7,3 @@ The purpose of this library is to provide a set of utilities that can be used in
 ## Overview
 
 * **[Olve.Utilities.Operations](docs/olve-operations/index.md)** - Interface definitions for operations with a single responsibility.
-
