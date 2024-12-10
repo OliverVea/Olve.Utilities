@@ -1,4 +1,6 @@
-﻿namespace Olve.Utilities.Collections;
+﻿using System.Collections;
+
+namespace Olve.Utilities.Collections;
 
 /// <summary>
 /// Represents a many-to-many collection of value pairs.
@@ -15,12 +17,21 @@ public class ManyToManyLookup<TLeft, TRight> : IManyToManyLookup<TLeft, TRight>
     /// <summary>
     /// Initializes a new instance of the <see cref="ManyToManyLookup{TLeft, TRight}" /> class.
     /// </summary>
+    /// <param name="initialItems">The initial items to populate the lookup with.</param>
     /// <param name="leftComparer">The equality comparer for left-hand elements.</param>
     /// <param name="rightComparer">The equality comparer for right-hand elements.</param>
-    public ManyToManyLookup(IEqualityComparer<TLeft>? leftComparer = null, IEqualityComparer<TRight>? rightComparer = null)
+    public ManyToManyLookup(IEnumerable<KeyValuePair<TLeft, TRight>>? initialItems = null, IEqualityComparer<TLeft>? leftComparer = null, IEqualityComparer<TRight>? rightComparer = null)
     {
         _leftToRights = new Dictionary<TLeft, HashSet<TRight>>(leftComparer);
         _rightToLefts = new Dictionary<TRight, HashSet<TLeft>>(rightComparer);
+
+        if (initialItems != null)
+        {
+            foreach (var (left, right) in initialItems)
+            {
+                Set(left, right, true);
+            }
+        }
     }
 
     /// <inheritdoc />
@@ -197,5 +208,23 @@ public class ManyToManyLookup<TLeft, TRight> : IManyToManyLookup<TLeft, TRight>
         }
         _rightToLefts.Remove(right);
         return true;
+    }
+    
+    /// <inheritdoc />
+    public IEnumerator<KeyValuePair<TLeft, TRight>> GetEnumerator()
+    {
+        foreach (var (left, rights) in _leftToRights)
+        {
+            foreach (var right in rights)
+            {
+                yield return new KeyValuePair<TLeft, TRight>(left, right);
+            }
+        }
+    }
+    
+    /// <inheritdoc />
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
     }
 }

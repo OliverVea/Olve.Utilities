@@ -5,7 +5,9 @@
 /// </summary>
 /// <typeparam name="TLeft">The type of the left-hand elements.</typeparam>
 /// <typeparam name="TRight">The type of the right-hand elements.</typeparam>
-public interface IManyToManyLookup<TLeft, TRight>
+public interface IManyToManyLookup<TLeft, TRight> : IEnumerable<KeyValuePair<TLeft, TRight>>
+    where TLeft : notnull
+    where TRight : notnull
 {
     /// <summary>
     /// Determines whether the specified pair exists in the lookup.

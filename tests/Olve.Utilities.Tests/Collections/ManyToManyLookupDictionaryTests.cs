@@ -313,4 +313,70 @@ public class ManyToManyLookupTests
         var result = lookup.Get("one");
         await Assert.That(result.IsT1).IsTrue();
     }
+    
+    [Test]
+    public async Task Enumeration_EmptyLookup_YieldsNoResults()
+    {
+        // Arrange
+        var lookup = GetNewBidirectionalDictionary<int, string>();
+
+        // Act
+        var result = lookup.ToList();
+
+        // Assert
+        await Assert.That(result).IsEmpty();
+    }
+
+    [Test]
+    public async Task Enumeration_SingleMapping_YieldsCorrectPair()
+    {
+        // Arrange
+        var lookup = GetNewBidirectionalDictionary<int, string>();
+        lookup.Set(1, "one", true);
+
+        // Act
+        var result = lookup.ToList();
+
+        // Assert
+        await Assert.That(result.Count).IsEqualTo(1);
+        await Assert.That(result[0].Key).IsEqualTo(1);
+        await Assert.That(result[0].Value).IsEqualTo("one");
+    }
+
+    [Test]
+    public async Task Enumeration_MultipleMappings_YieldsAllPairs()
+    {
+        // Arrange
+        var lookup = GetNewBidirectionalDictionary<int, string>();
+        lookup.Set(1, "one", true);
+        lookup.Set(2, "two", true);
+        lookup.Set(3, "three", true);
+
+        // Act
+        var result = lookup.ToList();
+
+        // Assert
+        await Assert.That(result.Count).IsEqualTo(3);
+        await Assert.That(result).Contains(new KeyValuePair<int, string>(1, "one"));
+        await Assert.That(result).Contains(new KeyValuePair<int, string>(2, "two"));
+        await Assert.That(result).Contains(new KeyValuePair<int, string>(3, "three"));
+    }
+
+    [Test]
+    public async Task Enumeration_AfterRemove_DoesNotYieldRemovedPairs()
+    {
+        // Arrange
+        var lookup = GetNewBidirectionalDictionary<int, string>();
+        lookup.Set(1, "one", true);
+        lookup.Set(2, "two", true);
+
+        // Act
+        lookup.Remove(1);
+        var result = lookup.ToList();
+
+        // Assert
+        await Assert.That(result.Count).IsEqualTo(1);
+        await Assert.That(result).Contains(new KeyValuePair<int, string>(2, "two"));
+        await Assert.That(result).DoesNotContain(new KeyValuePair<int, string>(1, "one"));
+    }
 }
