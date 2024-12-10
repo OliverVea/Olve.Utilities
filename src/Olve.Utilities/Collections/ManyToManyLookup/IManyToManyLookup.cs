@@ -87,4 +87,14 @@ public interface IManyToManyLookup<TLeft, TRight> : IEnumerable<KeyValuePair<TLe
     /// <param name="right">The right-hand element.</param>
     /// <returns><see langword="true"/> if mappings were removed; otherwise, <see langword="false"/>.</returns>
     bool Remove(TRight right);
+    
+    /// <summary>
+    /// Gets all left-hand elements in the lookup.
+    /// </summary>
+    IEnumerable<TLeft> Lefts { get; }
+    
+    /// <summary>
+    /// Gets all right-hand elements in the lookup.
+    /// </summary>
+    IEnumerable<TRight> Rights { get; }
 }

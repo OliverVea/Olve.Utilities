@@ -209,7 +209,13 @@ public class ManyToManyLookup<TLeft, TRight> : IManyToManyLookup<TLeft, TRight>
         _rightToLefts.Remove(right);
         return true;
     }
+
+    /// <inheritdoc />
+    public IEnumerable<TLeft> Lefts => _leftToRights.Keys;
     
+    /// <inheritdoc />
+    public IEnumerable<TRight> Rights => _rightToLefts.Keys;
+
     /// <inheritdoc />
     public IEnumerator<KeyValuePair<TLeft, TRight>> GetEnumerator()
     {
