@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿// Code inspired by: https://github.com/TwentyFourMinutes/BidirectionalDict/tree/master
+
+using System.Collections;
 using System.Collections.ObjectModel;
 
 namespace Olve.Utilities.Collections;

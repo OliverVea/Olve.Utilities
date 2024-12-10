@@ -1,3 +1,5 @@
+// Code inspired by: https://github.com/TwentyFourMinutes/BidirectionalDict/tree/master
+
 namespace Olve.Utilities.Collections;
 
 /// <summary>

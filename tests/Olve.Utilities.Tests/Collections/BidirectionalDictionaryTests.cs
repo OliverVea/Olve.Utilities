@@ -4,11 +4,16 @@ namespace Olve.Utilities.Tests.Collections;
 
 public class BidirectionalDictionaryTests
 {
+    private static IBidirectionalDictionary<T1, T2> GetNewBidirectionalDictionary<T1, T2>() where T1 : notnull where T2 : notnull
+    {
+        return new BidirectionalDictionary<T1, T2>();
+    }
+    
     [Test]
     public async Task Set_WithNewKeyValuePair_PairIsAdded()
     {
         // Arrange
-        IBidirectionalDictionary<int, string> dictionary = new BidirectionalDictionary<int, string>();
+        var dictionary = GetNewBidirectionalDictionary<int, string>();
 
         // Act
         dictionary.Set(1, "one");
@@ -26,7 +31,7 @@ public class BidirectionalDictionaryTests
         const string invalidSecond = "one";
         
         // Arrange
-        IBidirectionalDictionary<int, string> dictionary = new BidirectionalDictionary<int, string>();
+        var dictionary = GetNewBidirectionalDictionary<int, string>();
         dictionary.Set(first, invalidSecond);
 
         // Act
@@ -54,7 +59,7 @@ public class BidirectionalDictionaryTests
     public async Task Remove_ByKey_PairIsRemoved()
     {
         // Arrange
-        IBidirectionalDictionary<int, string> dictionary = new BidirectionalDictionary<int, string>();
+        var dictionary = GetNewBidirectionalDictionary<int, string>();
         dictionary.Set(1, "one");
 
         // Act
@@ -70,7 +75,7 @@ public class BidirectionalDictionaryTests
     public async Task Remove_ByValue_PairIsRemoved()
     {
         // Arrange
-        IBidirectionalDictionary<int, string> dictionary = new BidirectionalDictionary<int, string>();
+        var dictionary = GetNewBidirectionalDictionary<int, string>();
         dictionary.Set(2, "two");
 
         // Act
@@ -86,7 +91,7 @@ public class BidirectionalDictionaryTests
     public async Task ContainsKey_WithExistingKey_ReturnsTrue()
     {
         // Arrange
-        IBidirectionalDictionary<int, string> dictionary = new BidirectionalDictionary<int, string>();
+        var dictionary = GetNewBidirectionalDictionary<int, string>();
         dictionary.Set(3, "three");
 
         // Act
@@ -100,7 +105,7 @@ public class BidirectionalDictionaryTests
     public async Task ContainsValue_WithExistingValue_ReturnsTrue()
     {
         // Arrange
-        IBidirectionalDictionary<int, string> dictionary = new BidirectionalDictionary<int, string>();
+        var dictionary = GetNewBidirectionalDictionary<int, string>();
         dictionary.Set(4, "four");
 
         // Act
@@ -114,7 +119,7 @@ public class BidirectionalDictionaryTests
     public async Task Set_WithNullKey_ThrowsArgumentNullException()
     {
         // Arrange
-        IBidirectionalDictionary<string, string> dictionary = new BidirectionalDictionary<string, string>();
+        var dictionary = GetNewBidirectionalDictionary<string, string>();
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() => Task.Run(() => dictionary.Set(null!, "value")));
@@ -124,7 +129,7 @@ public class BidirectionalDictionaryTests
     public async Task Set_WithNullValue_ThrowsArgumentNullException()
     {
         // Arrange
-        IBidirectionalDictionary<string, string> dictionary = new BidirectionalDictionary<string, string>();
+        var dictionary = GetNewBidirectionalDictionary<string, string>();
 
         // Act & Assert
         await Assert.ThrowsAsync<ArgumentNullException>(() => Task.Run(() => dictionary.Set("key", null!)));
@@ -134,7 +139,7 @@ public class BidirectionalDictionaryTests
     public async Task Get_WithNonExistentKey_ReturnsFailure()
     {
         // Arrange
-        IBidirectionalDictionary<int, string> dictionary = new BidirectionalDictionary<int, string>();
+        var dictionary = GetNewBidirectionalDictionary<int, string>();
 
         // Act
         var result = dictionary.Get(5);
@@ -147,7 +152,7 @@ public class BidirectionalDictionaryTests
     public async Task Get_WithNonExistentValue_ReturnsFailure()
     {
         // Arrange
-        IBidirectionalDictionary<int, string> dictionary = new BidirectionalDictionary<int, string>();
+        var dictionary = GetNewBidirectionalDictionary<int, string>();
 
         // Act
         var result = dictionary.Get("non-existent");
@@ -160,7 +165,7 @@ public class BidirectionalDictionaryTests
     public async Task Clear_RemovesAllPairs()
     {
         // Arrange
-        IBidirectionalDictionary<int, string> dictionary = new BidirectionalDictionary<int, string>();
+        var dictionary = GetNewBidirectionalDictionary<int, string>();
         dictionary.Set(1, "one");
         dictionary.Set(2, "two");
 
