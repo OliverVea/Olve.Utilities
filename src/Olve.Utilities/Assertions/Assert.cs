@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Olve.Utilities.Assertions;
 
@@ -18,11 +19,24 @@ public static class Assert
     [Conditional("DEBUG")]
     public static void That(Func<bool> assertion, string message)
     {
-#if DEBUG
         if (!assertion())
         {
             throw new AssertionError(message);
         }
-#endif
+    }
+    
+    /// <summary>
+    /// Throws an <see cref="AssertionError"/> if the value is null.
+    /// </summary>
+    /// <param name="value">Value to check.</param>
+    /// <param name="message">The message to include in the exception.</param>
+    /// <typeparam name="T">Type of the value.</typeparam>
+    [Conditional("DEBUG")]
+    public static void NotNull<T>([NotNull] T? value, string message = "Value cannot be null.") where T : class
+    {
+        if (value is null)
+        {
+            throw new AssertionError(message);
+        }
     }
 }
