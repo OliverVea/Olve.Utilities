@@ -8,14 +8,14 @@ inputs:
 outputs:
   version:
     description: Version number
-    value: ${{ steps.version.outputs.VERSION }}
+    value: ${{ runner.os == 'Linux' || runner.os == 'macOS' && steps.version-linux_macos.outputs.VERSION || steps.version-windows.outputs.VERSION }}
 
 runs:
   using: "composite"
   steps:
     - if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
       name: Load version (Linux/macOS)
-      id: version
+      id: version-linux_macos
       shell: bash
       working-directory: ./scripts
       run: |
@@ -25,7 +25,7 @@ runs:
 
     - if: ${{ runner.os == 'Windows' }}
       name: Load version (Windows)
-      id: version
+      id: version-windows
       shell: pwsh
       working-directory: ./scripts
       run: |
