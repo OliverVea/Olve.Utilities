@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
+        <PackageId>Olve.SG.CopyProperties</PackageId>
         <Title>Olve.SG.CopyProperties</Title>
         <Authors>Oliver Vea</Authors>
         <Description>Source generator for copying properties from one type declaration to another.</Description>
