@@ -14,3 +14,4 @@ package = true
 
 [project.scripts]
 version = "version.__main__:app"
+hvem = "gcm.gcm:gcm"
