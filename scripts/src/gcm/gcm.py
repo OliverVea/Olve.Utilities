@@ -1,9 +1,47 @@
 import subprocess
 
+MODEL = "llama3.1:8b"
+TIMEOUT = 24 * 60 * 60
+
+def query_llm(prompt, print_to_console: bool = False) -> str:
+    args = ["ollama", "run", MODEL, prompt]
+
+    if print_to_console:
+        print("Running LLM: ", args)
+        print()
+        print('---')
+        print()
+
+    process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+    output = []
+    try:
+        # Stream output line by line
+        for line in iter(process.stdout.readline, ''):
+            if print_to_console:
+                print(line, end="")  # Print to console without adding extra newlines
+            output.append(line)
+
+        # Wait for the process to complete
+        process.stdout.close()
+        process.wait(timeout=TIMEOUT)
+
+    except subprocess.TimeoutExpired:
+        process.kill()
+        print("Error: LLM query timed out.")
+        return ""
+
+    if process.returncode != 0:
+        error_message = process.stderr.read()
+        print("Error running LLM: ", error_message)
+        return ""
+
+    return ''.join(output).strip()
+
 def generate_commit_message():
     """Function to generate commit message"""
     diff_output = subprocess.check_output(['git', 'diff', '--cached'], text=True)
-    # Assuming you have an API or method to run the LLM. Replace this with the actual LLM call.
+
     llm_prompt = f"""
     Below is a diff of all staged changes, coming from the command:
 
@@ -13,9 +51,8 @@ def generate_commit_message():
 
     Please generate a concise, one-line commit message for these changes.
     """
-    # Replace this with the LLM API call (e.g., requests.post() or similar).
-    # For now, just return a placeholder.
-    return "Generated commit message based on the diff"
+
+    return query_llm(llm_prompt, print_to_console=True)
 
 def read_input(prompt):
     """Function to read user input"""
