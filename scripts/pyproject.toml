@@ -1,0 +1,16 @@
+[project]
+name = "scripts"
+version = "0.1.0"
+description = "CI/CD scripts for Olve.Utilities"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "gitpython>=3.1.43",
+    "typer>=0.15.1",
+]
+
+[tool.uv]
+package = true
+
+[project.scripts]
+version = "version.__main__:app"

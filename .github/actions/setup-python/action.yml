@@ -1,0 +1,23 @@
+name: 'Setup Python 🐍'
+description: 'Sets up python environment'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Install the latest version of uv
+      uses: astral-sh/setup-uv@v4
+      with:
+        enable-cache: true
+        # Install a specific version of uv.
+        version: "0.5.10"
+
+    - name: Install Python 3.12 using UV from ./scripts
+      shell: bash
+      run: uv python install
+      working-directory: ./scripts
+
+    - name: Install dependencies using UV
+      shell: bash
+      run: uv sync --all-extras --dev
+      working-directory: ./scripts
+
