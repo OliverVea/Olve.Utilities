@@ -53,6 +53,10 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Echo Version variable
+      shell: bash
+      run: echo ${{ needs.resolve-version.outputs.VERSION }}
+
     - name: Setup .NET
       uses: ./.github/actions/setup-dotnet
 

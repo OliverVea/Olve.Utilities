@@ -50,6 +50,7 @@ def generate_commit_message():
     ```
 
     Please generate a concise, one-line commit message for these changes.
+    Your only output should be a single line containing the commit message.
     """
 
     return query_llm(llm_prompt, print_to_console=True)
