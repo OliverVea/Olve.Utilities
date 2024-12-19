@@ -12,6 +12,9 @@ inputs:
     description: 'Whether to perform a dry run'
     required: false
     default: 'false'
+  pypi-api-key:
+    description: 'The PyPI API key'
+    required: true
 
 runs:
   using: "composite"
@@ -36,7 +39,7 @@ runs:
     - name: Publish
       if: ${{ inputs.dry-run == 'false' }}
       shell: bash
-      run: uv publish
+      run: uv publish -u "__token__" -p ${{ inputs.pypi-api-key }}
       working-directory: ${{ inputs.directory }}
 
     - name: Dry run
