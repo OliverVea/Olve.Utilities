@@ -16,11 +16,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Setup python
-      uses: ./.github/actions/python-setup
-      with:
-        directory: ${{ inputs.directory }}
-
     - name: Replace placeholder version
       shell: bash
       run: sed -i "s/0.0.0/${{ inputs.version }}/g" ${{ inputs.directory }}/pyproject.toml
@@ -41,7 +36,7 @@ runs:
     - name: Publish
       if: ${{ inputs.dry-run == 'false' }}
       shell: bash
-      run: uv publish --version ${{ inputs.version }}
+      run: uv publish
       working-directory: ${{ inputs.directory }}
 
     - name: Dry run
