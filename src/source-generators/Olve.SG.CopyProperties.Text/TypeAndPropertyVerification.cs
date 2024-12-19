@@ -1,13 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Olve.SG.CopyProperties.Text;
+﻿namespace Olve.SG.CopyProperties.Text;
 
 internal class Source
 {
-    /// <summary>
-    /// Xml comments :D
-    /// </summary>
-    [Required]
     public int Id2 { get; init; }
     public string Text { get; set; } = string.Empty;
 }
@@ -21,7 +15,7 @@ internal class Source
 public class InterfaceClass : IDestinationInterface
 {
     public int Id2 { get; init; }
-    public string Text { get; init; } = string.Empty;
+    public string Text { get; set; } = string.Empty;
 }
 
 public static class Test
@@ -32,6 +26,10 @@ public static class Test
         var dr = new DestinationRecord { Id2 = 2, Text = "Good morning, World!" };
         var ds = new DestinationStruct { Id2 = 3, Text = "Goodbye, World!" };
         var drs = new DestinationRecordStruct { Id2 = 4, Text = "Goodnight, World!" };
-        var ic = new InterfaceClass { Id2 = 5, Text = "Good afternoon, World!" };
+        
+        IDestinationInterface ic = new InterfaceClass { Id2 = 5, Text = "Good afternoon, World!" };
+        
+        var icid2 = ic.Id2;
+        var icText = ic.Text;
     }
 }
