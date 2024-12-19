@@ -1,4 +1,4 @@
-name: 'Get Version 📦'
+name: 'Get Version 📦 (Linux/macOS)'
 description: 'Gets the version from the VERSION file'
 inputs:
   pre-release:
@@ -8,27 +8,17 @@ inputs:
 outputs:
   version:
     description: Version number
-    value: ${{ runner.os == 'Linux' || runner.os == 'macOS' && steps.version-linux_macos.outputs.VERSION || steps.version-windows.outputs.VERSION }}
+    value: ${{ steps.version.outputs.VERSION }}
 
 runs:
   using: "composite"
   steps:
     - if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
-      name: Load version (Linux/macOS)
-      id: version-linux_macos
+      name: Load version
+      id: version
       shell: bash
       working-directory: ./scripts
       run: |
         VERSION=$(uv run version ${{ inputs.pre-release == 'true' && '--prerelease' || ''}})
         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-        echo "Version loaded: $VERSION"
-
-    - if: ${{ runner.os == 'Windows' }}
-      name: Load version (Windows)
-      id: version-windows
-      shell: pwsh
-      working-directory: ./scripts
-      run: |
-        $VERSION=$(uv run version ${{ inputs.pre-release == 'true' && '--prerelease' || ''}})
-        echo "VERSION=$VERSION" >> $env:GITHUB_OUTPUT
         echo "Version loaded: $VERSION"
