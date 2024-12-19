@@ -33,8 +33,16 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup .NET
-      uses: ./.github/actions/setup-dotnet
+    - name: Install .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 9.0.x
+
+    - name: .NET restore
+      shell: bash
+      run: |
+        dotnet restore
+        dotnet tool restore
 
     - name: Build
       run: dotnet build --no-restore -c Release /p:Version=1.0.0
@@ -51,23 +59,13 @@ jobs:
       - resolve-version
       - test
     steps:
-    - uses: actions/checkout@v3
-
-    - name: Echo Version variable
-      shell: bash
-      run: echo ${{ needs.resolve-version.outputs.VERSION }}
-
-    - name: Setup .NET
-      uses: ./.github/actions/setup-dotnet
-
-    - name: Build
-      run: dotnet build --no-restore -c Release /p:Version=${{ needs.resolve-version.outputs.VERSION }}
-
-    - name: pack nuget packages
-      run: dotnet pack ./src/Olve.Utilities --output nupkgs --no-restore --no-build -c Release /p:PackageVersion=${{ needs.resolve-version.outputs.VERSION }}
-
-    - name: upload nuget package
-      run: dotnet nuget push nupkgs/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+    - name: Publish Olve.Utilities
+      uses: ./.github/actions/publish-dotnet
+      with:
+        project: ./src/Olve.Utilities
+        package-name: Olve.Utilities
+        dry-run: true
+        version: ${{ needs.resolve-version.outputs.VERSION }}
 
   publish_olve_sg_copy-properties:
     runs-on: ubuntu-latest
@@ -75,16 +73,16 @@ jobs:
       - resolve-version
       - test
     steps:
+
+    - name: Publish Olve.SG.CopyProperties
+      uses: ./.github/actions/publish-dotnet
+      with:
+        project: ./src/source-generators/Olve.SG.CopyProperties
+        package-name: Olve.SG.CopyProperties
+        dry-run: true
+        version: ${{ needs.resolve-version.outputs.VERSION }}
+
     - uses: actions/checkout@v3
 
     - name: Setup .NET
       uses: ./.github/actions/setup-dotnet
-
-    - name: Build
-      run: dotnet build --no-restore -c Release /p:Version=${{ needs.resolve-version.outputs.VERSION }}
-
-    - name: pack nuget packages
-      run: dotnet pack ./src/source-generators/Olve.SG.CopyProperties --output nupkgs --no-restore --no-build -c Release /p:PackageVersion=${{ needs.resolve-version.outputs.VERSION }}
-
-    - name: upload nuget package
-      run: dotnet nuget push nupkgs/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
