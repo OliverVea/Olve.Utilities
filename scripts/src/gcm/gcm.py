@@ -3,10 +3,6 @@ import subprocess
 MODEL = "llama3.1:8b"
 TIMEOUT = 24 * 60 * 60
 
-
-MODEL = "llama3.1:8b"
-TIMEOUT = 24 * 60 * 60
-
 def query_llm(prompt, print_to_console: bool = False) -> str:
     args = ["ollama", "run", MODEL]
 
