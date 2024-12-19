@@ -60,7 +60,7 @@ def generate_commit_message():
     - Fixed bug where user could not log in with email address
     """
 
-    return query_llm(llm_prompt, print_to_console=False)
+    return query_llm(llm_prompt, print_to_console=False).strip('´`\'"\n')
 
 def read_input(prompt):
     """Function to read user input"""

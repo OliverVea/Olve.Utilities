@@ -90,7 +90,7 @@ public class CopyPropertiesGenerator : IIncrementalGenerator
     {
         var type = property.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
         var name = property.Name;
-        var accessModifiers = property.SetMethod is null ? "get;" : "get; init;";
+        var accessModifiers = GetAccessModifiers(property);
         var initializer = property.SetMethod is null || !includeInit ? "" : $"= {property.Name}!;";
     
         var xmlComment = property.GetDocumentationCommentXml();
@@ -116,6 +116,70 @@ public class CopyPropertiesGenerator : IIncrementalGenerator
             .ToArray();
 
         return new Property(type, name, accessModifiers, initializer, xmlComment, attributes, namespaces);
+    }
+    
+    private static string GetAccessModifiers(IPropertySymbol property)
+    {
+        var sb = new StringBuilder();
+        if (property.GetMethod is {} getMethod)
+        {
+            var getAccessModifiers = GetGetAccessModifiers(getMethod);
+            sb.Append(getAccessModifiers);
+        }
+        if (property.SetMethod is {} setMethod)
+        {
+            var setAccessModifiers = GetSetAccessModifiers(setMethod);
+            sb.Append(setAccessModifiers);
+        }
+        return sb.ToString();
+    }
+
+    private static string GetGetAccessModifiers(IMethodSymbol methodSymbol)
+    {
+        var verb = "get";
+        
+        return GetAccessModifiers(methodSymbol, verb);
+    }
+    
+    private static string GetSetAccessModifiers(IMethodSymbol methodSymbol)
+    {
+        var isInit = methodSymbol.Name.Contains("init");
+        var verb = isInit ? "init" : "set";
+        
+        return GetAccessModifiers(methodSymbol, verb);
+    }
+
+    private static string GetAccessModifiers(IMethodSymbol methodSymbol, string verb)
+    {
+        var sb = new StringBuilder();
+        
+        if (methodSymbol.DeclaredAccessibility == Accessibility.Public)
+        {
+            sb.Append("public ");
+        }
+
+        if (methodSymbol.DeclaredAccessibility == Accessibility.Protected)
+        {
+            sb.Append("protected ");
+        }
+
+        if (methodSymbol.DeclaredAccessibility == Accessibility.Internal)
+        {
+            sb.Append("internal ");
+        }
+
+        if (methodSymbol.DeclaredAccessibility == Accessibility.ProtectedOrInternal)
+        {
+            sb.Append("protected internal ");
+        }
+
+        if (methodSymbol.DeclaredAccessibility == Accessibility.Private)
+        {
+            sb.Append("private ");
+        }
+
+        sb.Append(verb);
+        return sb.ToString();
     }
 
     private static string GetTypeType(TypeDeclarationSyntax typeDeclaration)
