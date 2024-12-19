@@ -3,8 +3,12 @@ import subprocess
 MODEL = "llama3.1:8b"
 TIMEOUT = 24 * 60 * 60
 
+
+MODEL = "llama3.1:8b"
+TIMEOUT = 24 * 60 * 60
+
 def query_llm(prompt, print_to_console: bool = False) -> str:
-    args = ["ollama", "run", MODEL, prompt]
+    args = ["ollama", "run", MODEL]
 
     if print_to_console:
         print("Running LLM: ", args)
@@ -12,10 +16,15 @@ def query_llm(prompt, print_to_console: bool = False) -> str:
         print('---')
         print()
 
-    process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    # Use subprocess.Popen with stdin for passing large prompts
+    process = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
     output = []
     try:
+        # Write the prompt to stdin
+        process.stdin.write(prompt)
+        process.stdin.close()
+
         # Stream output line by line
         for line in iter(process.stdout.readline, ''):
             if print_to_console:
@@ -37,6 +46,8 @@ def query_llm(prompt, print_to_console: bool = False) -> str:
         return ""
 
     return ''.join(output).strip()
+
+
 
 def generate_commit_message():
     """Function to generate commit message"""
