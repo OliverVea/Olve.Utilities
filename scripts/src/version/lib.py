@@ -6,7 +6,7 @@ VERSION_FILE = REPO_ROOT / 'VERSION'
 VERSION_FILE_DELIMITER = '.'
 
 FORMAT_RELEASE = '{major}.{minor}.{patch}'
-FORMAT_PRERELEASE = '{major}.{minor}.{patch}-{date}.{commit_short}'
+FORMAT_PRERELEASE = '{major}.{minor}.{patch}-{datetime}.{commit_short}'
 
 class Version:
     """
@@ -65,12 +65,12 @@ def get_version_string(prerelease: bool) -> str:
             minor=version.minor,
             patch=version.patch)
 
-    date = datetime.datetime.now().strftime('%Y%m%d')
+    dt = datetime.datetime.now().strftime('%Y%m%d%H%M%S%f')
     commit_short = os.popen('git rev-parse --short HEAD').read().strip()
 
     return FORMAT_PRERELEASE.format(
         major=version.major,
         minor=version.minor,
         patch=version.patch,
-        date=date,
+        datetime=dt,
         commit_short=commit_short)
