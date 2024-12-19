@@ -1,6 +1,11 @@
 name: 'Setup Python 🐍'
 description: 'Sets up python environment'
 
+inputs:
+  directory:
+    description: 'The directory to setup'
+    required: true
+
 runs:
   using: "composite"
   steps:
@@ -11,13 +16,13 @@ runs:
         # Install a specific version of uv.
         version: "0.5.10"
 
-    - name: Install Python 3.12 using UV from ./scripts
+    - name: Install Python 3.12 using UV from ${{ inputs.directory }}
       shell: bash
       run: uv python install
-      working-directory: ./scripts
+      working-directory: ${{ inputs.directory }}
 
     - name: Install dependencies using UV
       shell: bash
       run: uv sync --all-extras --dev
-      working-directory: ./scripts
+      working-directory: ${{ inputs.directory }}
 

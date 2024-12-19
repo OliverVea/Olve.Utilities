@@ -4,6 +4,9 @@ inputs:
   pre-release:
     description: 'Indicates if the version is a pre-release'
     required: true
+  directory:
+    description: 'The directory to load the version from'
+    required: true
 
 outputs:
   version:
@@ -13,11 +16,16 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Setup Python
+      uses: ./.github/actions/python-setup
+      with:
+        directory: ${{ inputs.directory }}
+
     - if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
       name: Load version
       id: version
       shell: bash
-      working-directory: ./scripts
+      working-directory: ${{ inputs.directory }}
       run: |
         VERSION=$(uv run version ${{ inputs.pre-release == 'true' && '--prerelease' || ''}})
         echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
