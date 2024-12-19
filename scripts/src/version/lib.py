@@ -1,6 +1,7 @@
 ﻿import datetime
 import pathlib
 import git
+import os
 
 __repo_root = git.Repo('.', search_parent_directories=True)
 REPO_ROOT = pathlib.Path(__repo_root.working_tree_dir)
@@ -9,7 +10,7 @@ VERSION_FILE = REPO_ROOT / 'VERSION'
 VERSION_FILE_DELIMITER = '.'
 
 FORMAT_RELEASE = '{major}.{minor}.{patch}'
-FORMAT_PRERELEASE = '{major}.{minor}.{patch}-{datetime}'
+FORMAT_PRERELEASE = '{major}.{minor}.{patch}-{datetime}.{commit_short}'
 
 TIME_FORMAT = '%Y%m%d%H%M%S'
 
@@ -71,9 +72,11 @@ def get_version_string(prerelease: bool) -> str:
             patch=version.patch)
 
     dt = datetime.datetime.now().strftime(TIME_FORMAT)
+    commit_short = os.popen('git rev-parse --short HEAD').read().strip()
 
     return FORMAT_PRERELEASE.format(
         major=version.major,
         minor=version.minor,
         patch=version.patch,
-        datetime=dt)
+        datetime=dt,
+        commit_short=commit_short)
