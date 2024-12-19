@@ -15,6 +15,9 @@ inputs:
     description: 'The version to publish'
     required: false
     default: '1.0.0'
+  nuget-api-key:
+    description: 'The NuGet API key'
+    required: true
 runs:
   using: "composite"
   steps:
@@ -32,7 +35,7 @@ runs:
     - name: upload nuget package
       if: ${{ inputs.dry-run == 'false' }}
       shell: bash
-      run: dotnet nuget push nupkgs/${{ inputs.package-name}}/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push nupkgs/${{ inputs.package-name}}/*.nupkg -k ${{ inputs.nuget-api-key }} -s https://api.nuget.org/v3/index.json
 
     - name: dry run
       if: ${{ inputs.dry-run == 'true' }}

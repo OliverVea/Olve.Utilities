@@ -53,6 +53,7 @@ jobs:
         project: ./src/Olve.Utilities
         package-name: Olve.Utilities
         version: ${{ needs.resolve_version.outputs.VERSION }}
+        nuget-api-key: ${{ secrets.NUGET_API_KEY }}
         dry-run: true
 
   dotnet_publish_olve_sg_copy-properties:
@@ -69,6 +70,7 @@ jobs:
         project: ./src/source-generators/Olve.SG.CopyProperties
         package-name: Olve.SG.CopyProperties
         version: ${{ needs.resolve_version.outputs.VERSION }}
+        nuget-api-key: ${{ secrets.NUGET_API_KEY }}
         dry-run: true
 
   python_publish_olve_utilities:
