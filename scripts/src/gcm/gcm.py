@@ -50,10 +50,17 @@ def generate_commit_message():
     ```
 
     Please generate a concise, one-line commit message for these changes.
+
     Your only output should be a single line containing the commit message.
+    Do not include any other information.
+    Do not format the line in anyway other than plain text.
+
+    Examples:
+    - User display name now defaults to "Anonymous" if not provided
+    - Fixed bug where user could not log in with email address
     """
 
-    return query_llm(llm_prompt, print_to_console=True)
+    return query_llm(llm_prompt, print_to_console=False)
 
 def read_input(prompt):
     """Function to read user input"""

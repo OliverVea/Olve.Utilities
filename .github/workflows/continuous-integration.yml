@@ -67,7 +67,6 @@ jobs:
       run: dotnet pack ./src/Olve.Utilities --output nupkgs --no-restore --no-build -c Release /p:PackageVersion=${{ needs.resolve-version.outputs.VERSION }}
 
     - name: upload nuget package
-      if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
       run: dotnet nuget push nupkgs/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
 
   publish_olve_sg_copy-properties:
@@ -88,5 +87,4 @@ jobs:
       run: dotnet pack ./src/source-generators/Olve.SG.CopyProperties --output nupkgs --no-restore --no-build -c Release /p:PackageVersion=${{ needs.resolve-version.outputs.VERSION }}
 
     - name: upload nuget package
-      if: github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
       run: dotnet nuget push nupkgs/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
