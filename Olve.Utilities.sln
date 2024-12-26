@@ -28,7 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source-generators", "source
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.SG.CopyProperties", "src\source-generators\Olve.SG.CopyProperties\Olve.SG.CopyProperties.csproj", "{EAA0C1B8-AB17-4CF6-9687-9D1C1F74FBE7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.SG.CopyProperties.Text", "src\source-generators\Olve.SG.CopyProperties.Text\Olve.SG.CopyProperties.Text.csproj", "{E5F16317-1D2F-4C9A-A8DF-4D3C0269F0C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.SG.CopyProperties.Test", "tests\Olve.SG.CopyProperties.Test\Olve.SG.CopyProperties.Test.csproj", "{E5F16317-1D2F-4C9A-A8DF-4D3C0269F0C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +63,6 @@ Global
 		{7BBDB4BF-3D24-4DF5-BE1B-AF86731E2845} = {70431A57-4F24-4AF1-9EB9-85B5D9840E9B}
 		{35348DB8-8CDD-4F53-950B-D01EFCA42023} = {6AE53E7D-3FEB-459A-B821-AD2F5D52DBE4}
 		{EAA0C1B8-AB17-4CF6-9687-9D1C1F74FBE7} = {35348DB8-8CDD-4F53-950B-D01EFCA42023}
-		{E5F16317-1D2F-4C9A-A8DF-4D3C0269F0C2} = {35348DB8-8CDD-4F53-950B-D01EFCA42023}
+		{E5F16317-1D2F-4C9A-A8DF-4D3C0269F0C2} = {70431A57-4F24-4AF1-9EB9-85B5D9840E9B}
 	EndGlobalSection
 EndGlobal
