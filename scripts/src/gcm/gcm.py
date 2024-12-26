@@ -12,20 +12,21 @@ def query_llm(prompt, print_to_console: bool = False) -> str:
         print('---')
         print()
 
-    # Use subprocess.Popen with stdin for passing large prompts
-    process = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    # Use subprocess.Popen with utf-8 encoding for stdin
+    process = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=False)
 
     output = []
     try:
-        # Write the prompt to stdin
-        process.stdin.write(prompt)
+        # Encode the prompt as utf-8 and write it to stdin
+        process.stdin.write(prompt.encode('utf-8'))
         process.stdin.close()
 
-        # Stream output line by line
-        for line in iter(process.stdout.readline, ''):
+        # Stream output line by line, decoding as utf-8
+        for line in iter(process.stdout.readline, b''):
+            decoded_line = line.decode('utf-8')
             if print_to_console:
-                print(line, end="")  # Print to console without adding extra newlines
-            output.append(line)
+                print(decoded_line, end="")  # Print to console without adding extra newlines
+            output.append(decoded_line)
 
         # Wait for the process to complete
         process.stdout.close()
@@ -37,7 +38,7 @@ def query_llm(prompt, print_to_console: bool = False) -> str:
         return ""
 
     if process.returncode != 0:
-        error_message = process.stderr.read()
+        error_message = process.stderr.read().decode('utf-8')
         print("Error running LLM: ", error_message)
         return ""
 
@@ -45,9 +46,11 @@ def query_llm(prompt, print_to_console: bool = False) -> str:
 
 
 
+
 def generate_commit_message():
     """Function to generate commit message"""
-    diff_output = subprocess.check_output(['git', 'diff', '--cached'], text=True)
+    # Ensure the encoding is explicitly set to utf-8
+    diff_output = subprocess.check_output(['git', 'diff', '--cached'], text=True, encoding='utf-8')
 
     llm_prompt = f"""
     Below is a diff of all staged changes, coming from the command:
@@ -60,7 +63,7 @@ def generate_commit_message():
 
     Your only output should be a single line containing the commit message.
     Do not include any other information.
-    Do not format the line in anyway other than plain text.
+    Do not format the line in any way other than plain text.
 
     Examples:
     - User display name now defaults to "Anonymous" if not provided
