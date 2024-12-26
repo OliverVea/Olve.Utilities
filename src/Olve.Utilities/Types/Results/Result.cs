@@ -22,7 +22,7 @@ public readonly struct Result : IResult
     /// <summary>
     /// Gets a result representing success.
     /// </summary>
-    public static Result Success => new(null);
+    public static Result Success() => new(null);
 
     /// <summary>
     /// Creates a result representing failure with the specified problems.
@@ -32,7 +32,7 @@ public readonly struct Result : IResult
     public static Result Failure(IReadOnlyCollection<ResultProblem> problems) => new(problems);
 
     /// <inheritdoc/>
-    public bool TryGetProblems([NotNullWhen(true)] out IReadOnlyCollection<ResultProblem>? problems)
+    public bool TryPickProblems([NotNullWhen(true)] out IReadOnlyCollection<ResultProblem>? problems)
     {
         problems = Problems;
         return problems is not null;

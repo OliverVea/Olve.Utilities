@@ -24,5 +24,5 @@ public interface IResult
     /// When this method returns <see langword="true"/>, contains the problems. Otherwise, <see langword="null"/>.
     /// </param>
     /// <returns><see langword="true"/> if problems exist; otherwise, <see langword="false"/>.</returns>
-    bool TryGetProblems([NotNullWhen(true)] out IReadOnlyCollection<ResultProblem>? problems);
+    bool TryPickProblems([NotNullWhen(true)] out IReadOnlyCollection<ResultProblem>? problems);
 }

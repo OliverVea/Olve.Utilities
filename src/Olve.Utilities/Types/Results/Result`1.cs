@@ -39,14 +39,14 @@ public readonly struct Result<T> : IResult<T>
     public static Result<T> Failure(IReadOnlyCollection<ResultProblem> problems) => new(default, problems);
 
     /// <inheritdoc/>
-    public bool TryGetProblems([NotNullWhen(true)] out IReadOnlyCollection<ResultProblem>? problems)
+    public bool TryPickProblems([NotNullWhen(true)] out IReadOnlyCollection<ResultProblem>? problems)
     {
         problems = Problems;
         return problems is not null;
     }
 
     /// <inheritdoc/>
-    public bool TryGetValue([NotNullWhen(true)] out T? value, [NotNullWhen(false)] out IReadOnlyCollection<ResultProblem>? problems)
+    public bool TryPickValue([NotNullWhen(true)] out T? value, [NotNullWhen(false)] out IReadOnlyCollection<ResultProblem>? problems)
     {
         value = Value;
         problems = Problems;
@@ -54,10 +54,17 @@ public readonly struct Result<T> : IResult<T>
     }
 
     /// <inheritdoc/>
-    public bool TryGetProblems([NotNullWhen(true)] out IReadOnlyCollection<ResultProblem>? problems, [NotNullWhen(false)] out T? value)
+    public bool TryPickProblems([NotNullWhen(true)] out IReadOnlyCollection<ResultProblem>? problems, [NotNullWhen(false)] out T? value)
     {
         problems = Problems;
         value = Value;
         return problems is not null;
     }
+    
+    /// <summary>
+    /// Converts the specified value to a success result.
+    /// </summary>
+    /// <param name="value">The value to convert.</param>
+    /// <returns>A success result.</returns>
+    public static implicit operator Result<T>(T value) => Success(value);
 }
