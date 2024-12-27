@@ -40,7 +40,12 @@ public class ResultProblem(Exception? exception, [StringSyntax(StringSyntaxAttri
     /// Gets the optional arguments providing additional details about the problem.
     /// </summary>
     public object[] Args { get; } = args;
-
+    
+    /// <summary>
+    /// Gets the source of the problem, if any.
+    /// </summary>
+    public string? Source { get; init; }
+    
     /// <summary>
     /// Gets the exception that caused the problem, if any.
     /// </summary>
