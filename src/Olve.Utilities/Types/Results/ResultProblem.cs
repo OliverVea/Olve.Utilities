@@ -41,7 +41,10 @@ public class ResultProblem(Exception? exception, [StringSyntax(StringSyntaxAttri
     /// </summary>
     public object[] Args { get; } = args;
 
-    private Exception? Exception { get; init; } = exception;
+    /// <summary>
+    /// Gets the exception that caused the problem, if any.
+    /// </summary>
+    public Exception? Exception { get; } = exception;
     
     
     /// <summary>
