@@ -6,11 +6,21 @@ namespace Olve.Utilities.Types.Results;
 /// <summary>
 /// Represents a problem encountered during an operation.
 /// </summary>
+/// <param name="exception">The exception that caused the problem, if any.</param>
 /// <param name="message">The message describing the problem.</param>
 /// <param name="args">Optional arguments providing additional details about the problem.</param>
 [DebuggerDisplay("{ToString()}")]
-public class ResultProblem([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message, params object[] args)
+public class ResultProblem(Exception? exception, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message, params object[] args)
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ResultProblem"/> class.
+    /// </summary>
+    /// <param name="message">The message describing the problem.</param>
+    /// <param name="args">Optional arguments providing additional details about the problem.</param>
+    public ResultProblem([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message, params object[] args) : this(null, message, args)
+    {
+    }
+    
     /// <summary>
     /// Gets the message describing the problem.
     /// </summary>
@@ -30,11 +40,15 @@ public class ResultProblem([StringSyntax(StringSyntaxAttribute.CompositeFormat)]
     /// Gets the optional arguments providing additional details about the problem.
     /// </summary>
     public object[] Args { get; } = args;
+
+    private Exception? Exception { get; init; } = exception;
     
     
     /// <summary>
     /// Formats the problem as a string.
     /// </summary>
     /// <returns>The formatted string.</returns>
-    public override string ToString() => string.Format(Message, Args);
+    public override string ToString() => Exception != null
+        ? $"{string.Format(Message, Args)} ({Exception.Message})"
+        : string.Format(Message, Args);
 }
