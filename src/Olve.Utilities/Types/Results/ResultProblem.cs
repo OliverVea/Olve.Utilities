@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Olve.Utilities.Types.Results;
@@ -5,71 +6,35 @@ namespace Olve.Utilities.Types.Results;
 /// <summary>
 /// Represents a problem encountered during an operation.
 /// </summary>
-/// <param name="Message">The message describing the problem.</param>
-/// <param name="Tags">Optional tags categorizing the problem.</param>
-/// <param name="Severity">The severity level of the problem, where higher values indicate more severe problems.</param>
-/// <param name="Args">Optional arguments providing additional details about the problem.</param>
-public record ResultProblem(
-    [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string Message,
-    string[] Tags,
-    int Severity,
-    object[] Args)
+/// <param name="message">The message describing the problem.</param>
+/// <param name="args">Optional arguments providing additional details about the problem.</param>
+[DebuggerDisplay("{ToString()}")]
+public class ResultProblem([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message, params object[] args)
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="ResultProblem"/> class.
+    /// Gets the message describing the problem.
     /// </summary>
-    /// <param name="message">The message describing the problem.</param>
-    public ResultProblem(string message)
-        : this(message, [], 0, []) { }
+    public string Message { get; } = message;
+
+    /// <summary>
+    /// Gets the optional tags categorizing the problem.
+    /// </summary>
+    public string[] Tags { get; init; } = [];
+
+    /// <summary>
+    /// Gets the severity level of the problem, where higher values indicate more severe problems.
+    /// </summary>
+    public int Severity { get; init; } = 0;
     
     /// <summary>
-    /// Initializes a new instance of the <see cref="ResultProblem"/> class.
+    /// Gets the optional arguments providing additional details about the problem.
     /// </summary>
-    /// <param name="message">The message describing the problem.</param>
-    /// <param name="args">Optional arguments providing additional details about the problem.</param>
-    public ResultProblem([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message, params object[] args)
-        : this(message, [], 0, args) { }
+    public object[] Args { get; } = args;
+    
     
     /// <summary>
-    /// Initializes a new instance of the <see cref="ResultProblem"/> class.
+    /// Formats the problem as a string.
     /// </summary>
-    /// <param name="message">The message describing the problem.</param>
-    /// <param name="tags">Optional tags categorizing the problem.</param>
-    public ResultProblem(string message, string[] tags)
-        : this(message, tags, 0, []) { }
-    
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ResultProblem"/> class.
-    /// </summary>
-    /// <param name="message">The message describing the problem.</param>
-    /// <param name="tags">Optional tags categorizing the problem.</param>
-    /// <param name="args">Optional arguments providing additional details about the problem.</param>
-    public ResultProblem([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message, string[] tags, params object[] args)
-        : this(message, tags, 0, args) { }
-    
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ResultProblem"/> class.
-    /// </summary>
-    /// <param name="message">The message describing the problem.</param>
-    /// <param name="severity">The severity level of the problem, where higher values indicate more severe problems.</param>
-    public ResultProblem(string message, int severity)
-        : this(message, [], severity, []) { }
-    
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ResultProblem"/> class.
-    /// </summary>
-    /// <param name="message">The message describing the problem.</param>
-    /// <param name="severity">The severity level of the problem, where higher values indicate more severe problems.</param>
-    /// <param name="args">Optional arguments providing additional details about the problem.</param>
-    public ResultProblem([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message, int severity, params object[] args)
-        : this(message, [], severity, args) { }
-    
-    /// <summary>
-    /// Initializes a new instance of the <see cref="ResultProblem"/> class.
-    /// </summary>
-    /// <param name="message">The message describing the problem.</param>
-    /// <param name="tags">Optional tags categorizing the problem.</param>
-    /// <param name="severity">The severity level of the problem, where higher values indicate more severe problems.</param>
-    public ResultProblem(string message, string[] tags, int severity)
-        : this(message, tags, severity, []) { }
+    /// <returns>The formatted string.</returns>
+    public override string ToString() => string.Format(Message, Args);
 }
