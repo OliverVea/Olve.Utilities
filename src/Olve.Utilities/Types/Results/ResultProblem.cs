@@ -46,12 +46,11 @@ public class ResultProblem(Exception? exception, [StringSyntax(StringSyntaxAttri
     /// </summary>
     public Exception? Exception { get; } = exception;
     
-    
     /// <summary>
     /// Formats the problem as a string.
     /// </summary>
     /// <returns>The formatted string.</returns>
     public override string ToString() => Exception != null
-        ? $"{string.Format(Message, Args)} ({Exception.Message})"
+        ? $"{string.Format(Message, Args)} ({Exception.GetType().Name}: {Exception.Message})"
         : string.Format(Message, Args);
 }
