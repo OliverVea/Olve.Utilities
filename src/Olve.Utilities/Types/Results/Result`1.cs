@@ -36,7 +36,7 @@ public readonly struct Result<T> : IResult<T>
     /// </summary>
     /// <param name="problems">The problems associated with the failure.</param>
     /// <returns>A failure result.</returns>
-    public static Result<T> Failure(IReadOnlyCollection<ResultProblem> problems) => new(default, problems);
+    public static Result<T> Failure(params IReadOnlyCollection<ResultProblem> problems) => new(default, problems);
 
     /// <inheritdoc/>
     public bool TryPickProblems([NotNullWhen(true)] out IReadOnlyCollection<ResultProblem>? problems)
