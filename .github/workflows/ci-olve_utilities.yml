@@ -3,7 +3,7 @@ name: Publish Olve.Utilities
 on:
   push:
     paths:
-      - 'src/**'
+      - 'src/Olve.Utilities/**'
     branches:
       - master
   workflow_dispatch:
