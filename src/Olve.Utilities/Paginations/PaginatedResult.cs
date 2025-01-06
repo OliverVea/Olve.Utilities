@@ -24,6 +24,14 @@ public sealed class PaginatedResult<T>(IList<T> items, Pagination pagination, in
     public required int TotalCount { get; init; } = totalCount;
 
     /// <summary>
+    /// The total number of pages.
+    /// </summary>
+    /// <remarks>
+    /// Will be 0 if the page size is 0.
+    /// </remarks>
+    public int TotalPages => PageSize > 0 ? (int)Math.Ceiling(TotalCount / (double)PageSize) : 0;
+
+    /// <summary>
     /// The page number.
     /// </summary>
     [Range(0, int.MaxValue)]
@@ -45,7 +53,6 @@ public sealed class PaginatedResult<T>(IList<T> items, Pagination pagination, in
     /// The pagination information for the previous page.
     /// </summary>
     public Pagination? Next => HasNextPage ? new Pagination(Page + 1, PageSize) : null;
-    
     
     // IReadOnlyList<T> implementation
     
