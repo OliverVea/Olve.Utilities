@@ -6,7 +6,7 @@ on:
       - 'src/source-generators/Olve.SG.CopyProperties/**'
     branches:
       - master
-  workflow_call:
+  workflow_dispatch:
     inputs:
       pre_release:
         description: 'Whether to publish a pre-release version'
