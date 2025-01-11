@@ -6,7 +6,7 @@ namespace Olve.Utilities.Types.Results;
 /// Represents a result of an operation with a value, indicating success or failure.
 /// </summary>
 /// <typeparam name="T">The type of the result value.</typeparam>
-public readonly struct Result<T> : IResult<T>
+public readonly struct Result<T>
 {
     private Result(T? result, ResultProblemCollection? problems)
     {
@@ -15,13 +15,19 @@ public readonly struct Result<T> : IResult<T>
         Problems = problems;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets a value indicating whether the operation succeeded.
+    /// </summary>
     public bool Succeded { get; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the collection of problems associated with the result, if any.
+    /// </summary>
     public ResultProblemCollection? Problems { get; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the value associated with the result, if any.
+    /// </summary>
     public T? Value { get; }
 
     /// <summary>
@@ -38,21 +44,42 @@ public readonly struct Result<T> : IResult<T>
     /// <returns>A failure result.</returns>
     public static Result<T> Failure(params IEnumerable<ResultProblem> problems) => new(default, new(problems));
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Attempts to retrieve the value of the result.
+    /// </summary>
+    /// <param name="value">
+    /// When this method returns <see langword="true"/>, contains the value. Otherwise, <see langword="null"/>.
+    /// </param>
+    /// <returns><see langword="true"/> if a value exists; otherwise, <see langword="false"/>.</returns>
     public bool TryPickValue([NotNullWhen(true)] out T? value)
     {
         value = Value;
         return value is not null;
     }
     
-    /// <inheritdoc/>
+    /// <summary>
+    /// Attempts to retrieve the problems associated with the result.
+    /// </summary>
+    /// <param name="problems">
+    /// When this method returns <see langword="true"/>, contains the problems. Otherwise, <see langword="null"/>.
+    /// </param>
+    /// <returns><see langword="true"/> if problems exist; otherwise, <see langword="false"/>.</returns>
     public bool TryPickProblems([NotNullWhen(true)] out ResultProblemCollection? problems)
     {
         problems = Problems;
         return problems is not null;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Attempts to retrieve the value of the result.
+    /// </summary>
+    /// <param name="value">
+    /// When this method returns <see langword="true"/>, contains the value. Otherwise, <see langword="null"/>.
+    /// </param>
+    /// <param name="problems">
+    /// When this method returns <see langword="false"/>, contains the problems. Otherwise, <see langword="null"/>.
+    /// </param>
+    /// <returns><see langword="true"/> if a value exists; otherwise, <see langword="false"/>.</returns>
     public bool TryPickValue([NotNullWhen(true)] out T? value, [NotNullWhen(false)] out ResultProblemCollection? problems)
     {
         value = Value;
@@ -60,7 +87,16 @@ public readonly struct Result<T> : IResult<T>
         return value is not null;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Attempts to retrieve the problems associated with the result.
+    /// </summary>
+    /// <param name="problems">
+    /// When this method returns <see langword="true"/>, contains the problems. Otherwise, <see langword="null"/>.
+    /// </param>
+    /// <param name="value">
+    /// When this method returns <see langword="false"/>, contains the value. Otherwise, <see langword="null"/>.
+    /// </param>
+    /// <returns><see langword="true"/> if problems exist; otherwise, <see langword="false"/>.</returns>
     public bool TryPickProblems([NotNullWhen(true)] out ResultProblemCollection? problems, [NotNullWhen(false)] out T? value)
     {
         problems = Problems;

@@ -1,16 +1,16 @@
 ﻿namespace Olve.Utilities.Types.Results;
 
 /// <summary>
-/// Extension methods for working with <see cref="IResult"/>, <see cref="Result"/>, and <see cref="Result{T}"/> collections.
+/// Extension methods for working with <see cref="Result"/>, <see cref="Result"/>, and <see cref="Result{T}"/> collections.
 /// </summary>
 public static class ResultEnumerableExtensions
 {
     /// <summary>
     /// Determines whether any of the results in the collection indicate failure.
     /// </summary>
-    /// <param name="results">The collection of <see cref="IResult"/> objects.</param>
+    /// <param name="results">The collection of <see cref="Result"/> objects.</param>
     /// <returns><c>true</c> if any result in the collection failed; otherwise, <c>false</c>.</returns>
-    public static bool HasProblems(this IEnumerable<IResult> results) => results.Any(r => !r.Succeded);
+    public static bool HasProblems(this IEnumerable<Result> results) => results.Any(r => !r.Succeded);
 
     /// <summary>
     /// Determines whether any of the results in the collection indicate failure.
@@ -18,7 +18,7 @@ public static class ResultEnumerableExtensions
     /// <typeparam name="T">The type of the result value.</typeparam>
     /// <param name="results">The collection of <see cref="Result{T}"/> objects.</param>
     /// <returns><c>true</c> if any result in the collection failed; otherwise, <c>false</c>.</returns>
-    public static bool HasProblems<T>(this IEnumerable<IResult<T>> results) => results.Any(r => !r.Succeded);
+    public static bool HasProblems<T>(this IEnumerable<Result<T>> results) => results.Any(r => !r.Succeded);
     
     /// <summary>
     /// Attempts to collect problems from the results in the collection.
@@ -32,7 +32,7 @@ public static class ResultEnumerableExtensions
     /// <returns>
     /// <c>true</c> if any result in the collection had problems; otherwise, <c>false</c>.
     /// </returns>
-    public static bool TryPickProblems<T>(this IEnumerable<IResult<T>> results, out ResultProblemCollection problems)
+    public static bool TryPickProblems<T>(this IEnumerable<Result<T>> results, out ResultProblemCollection problems)
     {
         problems = new ResultProblemCollection();
         var hadProblems = false;
@@ -66,7 +66,7 @@ public static class ResultEnumerableExtensions
     /// <returns>
     /// <c>true</c> if any result in the collection had problems; otherwise, <c>false</c>.
     /// </returns>
-    public static bool TryPickProblems<T>(this IEnumerable<IResult<T>> results, out ResultProblemCollection problems, out IEnumerable<T> values)
+    public static bool TryPickProblems<T>(this IEnumerable<Result<T>> results, out ResultProblemCollection problems, out IEnumerable<T> values)
     {
         List<T> valuesList = new();
         values = valuesList;
@@ -93,9 +93,9 @@ public static class ResultEnumerableExtensions
     /// <summary>
     /// Retrieves all problems from the results in the collection.
     /// </summary>
-    /// <param name="results">The collection of <see cref="IResult"/> objects.</param>
+    /// <param name="results">The collection of <see cref="Result"/> objects.</param>
     /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="ResultProblem"/> objects from the failed results.</returns>
-    public static IEnumerable<ResultProblem> GetProblems(this IEnumerable<IResult> results) =>
+    public static IEnumerable<ResultProblem> GetProblems(this IEnumerable<Result> results) =>
         results.SelectMany(r => r.Problems ?? [ ]);
 
     /// <summary>
@@ -104,7 +104,7 @@ public static class ResultEnumerableExtensions
     /// <typeparam name="T">The type of the result value.</typeparam>
     /// <param name="results">The collection of <see cref="Result{T}"/> objects.</param>
     /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="ResultProblem"/> objects from the failed results.</returns>
-    public static IEnumerable<ResultProblem> GetProblems<T>(this IEnumerable<IResult<T>> results) =>
+    public static IEnumerable<ResultProblem> GetProblems<T>(this IEnumerable<Result<T>> results) =>
         results.SelectMany(r => r.Problems ?? [ ]);
 
     /// <summary>
@@ -113,7 +113,7 @@ public static class ResultEnumerableExtensions
     /// <typeparam name="T">The type of the result value.</typeparam>
     /// <param name="results">The collection of <see cref="Result{T}"/> objects.</param>
     /// <returns>An <see cref="IEnumerable{T}"/> of successful result values.</returns>
-    public static IEnumerable<T> GetValues<T>(this IEnumerable<IResult<T>> results) =>
+    public static IEnumerable<T> GetValues<T>(this IEnumerable<Result<T>> results) =>
         results
             .Select(r => r.Value)
             .OfType<T>();

@@ -5,7 +5,7 @@ namespace Olve.Utilities.Types.Results;
 /// <summary>
 /// Represents a result of an operation without a value, indicating success or failure.
 /// </summary>
-public readonly struct Result : IResult
+public readonly struct Result
 {
     private Result(ResultProblemCollection? problems)
     {
@@ -13,10 +13,14 @@ public readonly struct Result : IResult
         Problems = problems;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets a value indicating whether the operation succeeded.
+    /// </summary>
     public bool Succeded { get; private init; }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets the collection of problems associated with the result, if any.
+    /// </summary>
     public ResultProblemCollection? Problems { get; private init; }
 
     /// <summary>
@@ -31,7 +35,13 @@ public readonly struct Result : IResult
     /// <returns>A failure result.</returns>
     public static Result Failure(params IEnumerable<ResultProblem> problems) => new(new(problems));
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Attempts to retrieve the problems associated with the result.
+    /// </summary>
+    /// <param name="problems">
+    /// When this method returns <see langword="true"/>, contains the problems. Otherwise, <see langword="null"/>.
+    /// </param>
+    /// <returns><see langword="true"/> if problems exist; otherwise, <see langword="false"/>.</returns>
     public bool TryPickProblems([NotNullWhen(true)] out ResultProblemCollection? problems)
     {
         problems = Problems;
