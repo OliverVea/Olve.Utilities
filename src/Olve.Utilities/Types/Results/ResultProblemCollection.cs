@@ -5,11 +5,9 @@ namespace Olve.Utilities.Types.Results;
 /// <summary>
 /// Represents a collection of problems encountered during an operation.
 /// </summary>
-/// <param name="resultProblems">The problems encountered during the operation.</param>
-public class ResultProblemCollection(params IEnumerable<ResultProblem> resultProblems) : IReadOnlyList<ResultProblem>
+/// <param name="problems">The problems encountered during the operation.</param>
+public class ResultProblemCollection(params IEnumerable<ResultProblem> problems) : IEnumerable<ResultProblem>
 {
-    private readonly ResultProblem[] _problems = resultProblems.ToArray();
-    
     /// <summary>
     /// Appends the specified problems to the collection.
     /// </summary>
@@ -17,7 +15,7 @@ public class ResultProblemCollection(params IEnumerable<ResultProblem> resultPro
     /// <returns>A new collection with the specified problems appended.</returns>
     public ResultProblemCollection Append(params IEnumerable<ResultProblem> resultProblems)
     {
-        return new(_problems.Concat(resultProblems));
+        return new(problems.Concat(resultProblems));
     }
     
     /// <summary>
@@ -27,13 +25,24 @@ public class ResultProblemCollection(params IEnumerable<ResultProblem> resultPro
     /// <returns>A new collection with the specified problems prepended.</returns>
     public ResultProblemCollection Prepend(params IEnumerable<ResultProblem> resultProblems)
     {
-        return new(resultProblems.Concat(_problems));
+        return new(resultProblems.Concat(problems));
+    }
+
+    /// <summary>
+    /// Merges multiple problem collections together.
+    /// </summary>
+    /// <param name="problemCollections"></param>
+    /// <returns></returns>
+    public static ResultProblemCollection Merge(params IEnumerable<ResultProblemCollection> problemCollections)
+    {
+        var allProblems = problemCollections.SelectMany(x => x);
+        return new ResultProblemCollection(allProblems);
     }
 
     /// <inheritdoc />
     public IEnumerator<ResultProblem> GetEnumerator()
     {
-        return _problems.AsEnumerable().GetEnumerator();
+        return problems.AsEnumerable().GetEnumerator();
     }
 
     /// <inheritdoc />
@@ -41,10 +50,4 @@ public class ResultProblemCollection(params IEnumerable<ResultProblem> resultPro
     {
         return GetEnumerator();
     }
-
-    /// <inheritdoc />
-    public int Count => _problems.Length;
-    
-    /// <inheritdoc />
-    public ResultProblem this[int index] => _problems[index];
 }

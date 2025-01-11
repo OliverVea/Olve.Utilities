@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace Olve.Utilities.Types.Results;
 
@@ -77,11 +76,16 @@ public readonly struct Result<T> : IResult<T>
     public static implicit operator Result<T>(T value) => Success(value);
     
     /// <summary>
+    /// Converts the specified problem to a failure result.
+    /// </summary>
+    /// <param name="problem">The problem to convert.</param>
+    /// <returns>A failure result.</returns>
+    public static implicit operator Result<T>(ResultProblem problem) => Failure(problem);
+    
+    /// <summary>
     /// Converts the specified problems to a failure result.
     /// </summary>
     /// <param name="problems">The problems to convert.</param>
     /// <returns>A failure result.</returns>
     public static implicit operator Result<T>(ResultProblemCollection problems) => Failure(problems);
-    
-    
 }

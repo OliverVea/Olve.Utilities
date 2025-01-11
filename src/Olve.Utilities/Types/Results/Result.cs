@@ -37,6 +37,13 @@ public readonly struct Result : IResult
         problems = Problems;
         return problems is not null;
     }
+
+    /// <summary>
+    /// Converts the specified problem to a failure result.
+    /// </summary>
+    /// <param name="problem">The problem to convert.</param>
+    /// <returns>A failure result.</returns>
+    public static implicit operator Result(ResultProblem problem) => Failure(problem);
     
     /// <summary>
     /// Converts the specified problems to a failure result.
