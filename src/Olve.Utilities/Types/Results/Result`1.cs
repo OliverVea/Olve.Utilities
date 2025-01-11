@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Olve.Utilities.Types.Results;
 
@@ -8,7 +9,7 @@ namespace Olve.Utilities.Types.Results;
 /// <typeparam name="T">The type of the result value.</typeparam>
 public readonly struct Result<T> : IResult<T>
 {
-    private Result(T? result, IReadOnlyCollection<ResultProblem>? problems)
+    private Result(T? result, ResultProblemCollection? problems)
     {
         Succeded = problems is null;
         Value = result;
@@ -19,7 +20,7 @@ public readonly struct Result<T> : IResult<T>
     public bool Succeded { get; }
 
     /// <inheritdoc/>
-    public IReadOnlyCollection<ResultProblem>? Problems { get; }
+    public ResultProblemCollection? Problems { get; }
 
     /// <inheritdoc/>
     public T? Value { get; }
@@ -36,17 +37,24 @@ public readonly struct Result<T> : IResult<T>
     /// </summary>
     /// <param name="problems">The problems associated with the failure.</param>
     /// <returns>A failure result.</returns>
-    public static Result<T> Failure(params IReadOnlyCollection<ResultProblem> problems) => new(default, problems);
+    public static Result<T> Failure(params IEnumerable<ResultProblem> problems) => new(default, new(problems));
 
     /// <inheritdoc/>
-    public bool TryPickProblems([NotNullWhen(true)] out IReadOnlyCollection<ResultProblem>? problems)
+    public bool TryPickValue([NotNullWhen(true)] out T? value)
+    {
+        value = Value;
+        return value is not null;
+    }
+    
+    /// <inheritdoc/>
+    public bool TryPickProblems([NotNullWhen(true)] out ResultProblemCollection? problems)
     {
         problems = Problems;
         return problems is not null;
     }
 
     /// <inheritdoc/>
-    public bool TryPickValue([NotNullWhen(true)] out T? value, [NotNullWhen(false)] out IReadOnlyCollection<ResultProblem>? problems)
+    public bool TryPickValue([NotNullWhen(true)] out T? value, [NotNullWhen(false)] out ResultProblemCollection? problems)
     {
         value = Value;
         problems = Problems;
@@ -54,7 +62,7 @@ public readonly struct Result<T> : IResult<T>
     }
 
     /// <inheritdoc/>
-    public bool TryPickProblems([NotNullWhen(true)] out IReadOnlyCollection<ResultProblem>? problems, [NotNullWhen(false)] out T? value)
+    public bool TryPickProblems([NotNullWhen(true)] out ResultProblemCollection? problems, [NotNullWhen(false)] out T? value)
     {
         problems = Problems;
         value = Value;
@@ -67,4 +75,13 @@ public readonly struct Result<T> : IResult<T>
     /// <param name="value">The value to convert.</param>
     /// <returns>A success result.</returns>
     public static implicit operator Result<T>(T value) => Success(value);
+    
+    /// <summary>
+    /// Converts the specified problems to a failure result.
+    /// </summary>
+    /// <param name="problems">The problems to convert.</param>
+    /// <returns>A failure result.</returns>
+    public static implicit operator Result<T>(ResultProblemCollection problems) => Failure(problems);
+    
+    
 }

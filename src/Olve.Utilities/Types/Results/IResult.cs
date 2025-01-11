@@ -15,7 +15,7 @@ public interface IResult
     /// <summary>
     /// Gets the collection of problems associated with the result, if any.
     /// </summary>
-    IReadOnlyCollection<ResultProblem>? Problems { get; }
+    ResultProblemCollection? Problems { get; }
 
     /// <summary>
     /// Attempts to retrieve the problems associated with the result.
@@ -24,5 +24,5 @@ public interface IResult
     /// When this method returns <see langword="true"/>, contains the problems. Otherwise, <see langword="null"/>.
     /// </param>
     /// <returns><see langword="true"/> if problems exist; otherwise, <see langword="false"/>.</returns>
-    bool TryPickProblems([NotNullWhen(true)] out IReadOnlyCollection<ResultProblem>? problems);
+    bool TryPickProblems([NotNullWhen(true)] out ResultProblemCollection? problems);
 }
