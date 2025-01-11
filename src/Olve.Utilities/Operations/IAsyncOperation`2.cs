@@ -13,5 +13,5 @@ public interface IAsyncOperation<in TRequest, TResult>
     /// <param name="request">The request to execute the operation with.</param>
     /// <param name="ct">The cancellation token to cancel the operation.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    Task<TResult> ExecuteAsync(TRequest request, CancellationToken ct = default);
+    Task<Result<TResult>> ExecuteAsync(TRequest request, CancellationToken ct = default);
 }

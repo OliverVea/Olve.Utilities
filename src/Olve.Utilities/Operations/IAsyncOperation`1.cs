@@ -1,4 +1,6 @@
-﻿namespace Olve.Utilities.Operations;
+﻿using Olve.Utilities.Types.Results;
+
+namespace Olve.Utilities.Operations;
 
 /// <summary>
 /// Represents an asynchronous operation that takes an input.
@@ -12,5 +14,5 @@ public interface IAsyncOperation<in TInput>
     /// <param name="input">The input to the operation.</param>
     /// <param name="ct">The cancellation token to cancel the operation.</param>
     /// <returns></returns>
-    Task ExecuteAsync(TInput input, CancellationToken ct = default);
+    Task<Result> ExecuteAsync(TInput input, CancellationToken ct = default);
 }

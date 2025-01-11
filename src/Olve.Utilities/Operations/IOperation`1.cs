@@ -1,4 +1,6 @@
-﻿namespace Olve.Utilities.Operations;
+﻿using Olve.Utilities.Types.Results;
+
+namespace Olve.Utilities.Operations;
 
 /// <summary>
 /// Represents an operation that can be executed.
@@ -10,5 +12,5 @@ public interface IOperation<in TInput>
     /// Executes the operation.
     /// </summary>
     /// <param name="input">The input to the operation.</param>
-    void Execute(TInput input);
+    Result Execute(TInput input);
 }
