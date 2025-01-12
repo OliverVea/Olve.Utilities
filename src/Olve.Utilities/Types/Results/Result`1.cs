@@ -105,6 +105,25 @@ public readonly struct Result<T>
     }
     
     /// <summary>
+    /// Gets the value of the result or throws an exception if the result is a failure.
+    /// </summary>
+    /// <param name="defaultValue">The default value to return if the result is a failure.</param>
+    /// <returns>The value of the result or the default value.</returns>
+    public T GetValueOrDefault(T defaultValue) => Value ?? defaultValue;
+    
+    /// <summary>
+    /// Attempts to retrieve the value of the result or a default value.
+    /// </summary>
+    /// <param name="value">The value of the result or the default value.</param>
+    /// <param name="defaultValue">The default value to return if the result is a failure.</param>
+    /// <returns><see langword="true"/> if a value exists; otherwise, <see langword="false"/>.</returns>
+    public bool TryGetValueOrDefault([NotNullWhen(true)] out T? value, T defaultValue)
+    {
+        value = Value;
+        return value is not null || defaultValue is not null;
+    }
+    
+    /// <summary>
     /// Converts the specified value to a success result.
     /// </summary>
     /// <param name="value">The value to convert.</param>
