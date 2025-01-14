@@ -65,9 +65,12 @@ def generate_commit_message():
     Do not include any other information.
     Do not format the line in any way other than plain text.
 
+    If the changes contain breaking changes, please start the commit message with "(Breaking)".
+
     Examples:
     - User display name now defaults to "Anonymous" if not provided
     - Fixed bug where user could not log in with email address
+    - (Breaking) Removed support for Python 2.7
     """
 
     return query_llm(llm_prompt, print_to_console=False).strip('´`\'"\n')
