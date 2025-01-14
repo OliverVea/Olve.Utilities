@@ -7,6 +7,6 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
     <PackageVersion Include="Olve.SG.CopyProperties" Version="0.0.13-20241219.317a544" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
-    <PackageVersion Include="TUnit" Version="0.6.0" />
+    <PackageVersion Include="TUnit" Version="0.6.89" />
   </ItemGroup>
 </Project>
