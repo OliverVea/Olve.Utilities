@@ -9,14 +9,14 @@ public readonly struct Result
 {
     private Result(ResultProblemCollection? problems)
     {
-        Succeded = problems is null;
+        Succeeded = problems is null;
         Problems = problems;
     }
 
     /// <summary>
     /// Gets a value indicating whether the operation succeeded.
     /// </summary>
-    public bool Succeded { get; private init; }
+    public bool Succeeded { get; private init; }
 
     /// <summary>
     /// Gets the collection of problems associated with the result, if any.
@@ -27,6 +27,11 @@ public readonly struct Result
     /// Gets a result representing success.
     /// </summary>
     public static Result Success() => new(null);
+    
+    /// <summary>
+    /// Creates a result representing success with the specified value.
+    /// </summary>
+    public static Result<T> Success<T>(T value) => Result<T>.Success(value);
 
     /// <summary>
     /// Creates a result representing failure with the specified problems.

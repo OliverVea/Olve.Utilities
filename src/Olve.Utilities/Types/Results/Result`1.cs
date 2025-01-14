@@ -10,7 +10,7 @@ public readonly struct Result<T>
 {
     private Result(T? result, ResultProblemCollection? problems)
     {
-        Succeded = problems is null;
+        Succeeded = problems is null;
         Value = result;
         Problems = problems;
     }
@@ -18,7 +18,7 @@ public readonly struct Result<T>
     /// <summary>
     /// Gets a value indicating whether the operation succeeded.
     /// </summary>
-    public bool Succeded { get; }
+    public bool Succeeded { get; }
 
     /// <summary>
     /// Gets the collection of problems associated with the result, if any.

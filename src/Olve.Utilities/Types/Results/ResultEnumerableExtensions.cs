@@ -10,7 +10,7 @@ public static class ResultEnumerableExtensions
     /// </summary>
     /// <param name="results">The collection of <see cref="Result"/> objects.</param>
     /// <returns><c>true</c> if any result in the collection failed; otherwise, <c>false</c>.</returns>
-    public static bool HasProblems(this IEnumerable<Result> results) => results.Any(r => !r.Succeded);
+    public static bool HasProblems(this IEnumerable<Result> results) => results.Any(r => !r.Succeeded);
 
     /// <summary>
     /// Determines whether any of the results in the collection indicate failure.
@@ -18,7 +18,7 @@ public static class ResultEnumerableExtensions
     /// <typeparam name="T">The type of the result value.</typeparam>
     /// <param name="results">The collection of <see cref="Result{T}"/> objects.</param>
     /// <returns><c>true</c> if any result in the collection failed; otherwise, <c>false</c>.</returns>
-    public static bool HasProblems<T>(this IEnumerable<Result<T>> results) => results.Any(r => !r.Succeded);
+    public static bool HasProblems<T>(this IEnumerable<Result<T>> results) => results.Any(r => !r.Succeeded);
     
     /// <summary>
     /// Attempts to collect problems from the results in the collection.
