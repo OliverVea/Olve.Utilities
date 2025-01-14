@@ -6,7 +6,6 @@
     <ItemGroup>
         <PackageReference Include="TUnit"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection"/>
-        <PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage"/>
     </ItemGroup>
 
     <ItemGroup>
