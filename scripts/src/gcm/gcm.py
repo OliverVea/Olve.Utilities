@@ -69,8 +69,8 @@ def generate_commit_message():
 
     Examples:
     - User display name now defaults to "Anonymous" if not provided
-    - Fixed bug where user could not log in with email address
     - (Breaking) Removed support for Python 2.7
+    - Fixed bug where user could not log in with email address
     """
 
     return query_llm(llm_prompt, print_to_console=False).strip('´`\'"\n')
@@ -88,7 +88,7 @@ def gcm():
         print("\nProposed commit message:")
         print(commit_message)
 
-        choice = read_input("Do you want to (a)ccept, (e)dit, (r)egenerate, or (c)ancel? ").strip().lower()
+        choice = read_input("Do you want to (a)ccept, (e)dit, (r)egenerate, (c)ancel, or mark as (b)reaking?").strip().lower()
 
         if choice == 'a':
             try:
@@ -117,6 +117,9 @@ def gcm():
         elif choice == 'c':
             print("Commit cancelled.")
             return 1
+
+        elif choice == 'b':
+            commit_message = commit_message[len("(Breaking) "):] if commit_message.startswith("(Breaking) ") else f"(Breaking) {commit_message}"
 
         else:
             print("Invalid choice. Please try again.")
