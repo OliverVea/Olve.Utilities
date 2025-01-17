@@ -61,7 +61,6 @@ jobs:
   publish-olve-utilities:
     needs:
       - bump-version
-      - create-release
     runs-on: ubuntu-latest
     name: "Publish Olve.Utilities"
     if: "${{ needs.bump-version.outputs.changed == 'true' }}"
