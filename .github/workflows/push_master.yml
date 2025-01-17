@@ -32,10 +32,36 @@ jobs:
         run: |
           [[ $REVISION = $PREVIOUS_REVISION ]] && CHANGED="false" || CHANGED="true"
           echo "changed=$CHANGED" >> "$GITHUB_OUTPUT"
-          [[ $CHANGED = "true" ]] && echo "Version changed ($PREVIOUS_REVISION -> $REVISION)" || echo "Version did not change"
+          [[ $CHANGED = "true" ]] && echo "::notice::Version changed ($PREVIOUS_REVISION -> $REVISION)" || echo "::notice::Version did not change"
+
+  create-release:
+    needs: bump-version
+    runs-on: ubuntu-latest
+    name: "Create release"
+    outputs:
+      release_id: ${{ steps.release.outputs.id }}
+      release_url: ${{ steps.release.outputs.url }}
+      release_upload_url: ${{ steps.release.outputs.upload_url }}
+    if: "${{ needs.bump-version.outputs.changed == 'true' }}"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Release
+        id: release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          body_path: ${{ github.workspace }}/CHANGELOG.md
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Echo release id
+        run: echo "::notice::id=${{ steps.release.outputs.id }}"
 
   publish-olve-utilities:
-    needs: bump-version
+    needs:
+      - bump-version
+      - create-release
     runs-on: ubuntu-latest
     name: "Publish Olve.Utilities"
     if: "${{ needs.bump-version.outputs.changed == 'true' }}"
