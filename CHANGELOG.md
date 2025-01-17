@@ -1,3 +1,9 @@
+## v0.1.2 (2025-01-17)
+
+### Fix
+
+- release moved to same action as bump to keep new changelog
+
 ## v0.1.1 (2025-01-17)
 
 ### Fix
