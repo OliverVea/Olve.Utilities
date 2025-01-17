@@ -1,3 +1,9 @@
+## v0.2.0 (2025-01-17)
+
+### Feat
+
+- added `Assert.IsEmpty(IEnumerable<T>)` and `Assert.IsNotEmpty(IEnumerable<T>)`
+
 ## v0.1.2 (2025-01-17)
 
 ### Fix
