@@ -13,6 +13,6 @@ public interface IAsyncOperation<in TInput>
     /// </summary>
     /// <param name="input">The input to the operation.</param>
     /// <param name="ct">The cancellation token to cancel the operation.</param>
-    /// <returns></returns>
+    /// <returns>The result of the operation.</returns>
     Task<Result> ExecuteAsync(TInput input, CancellationToken ct = default);
 }

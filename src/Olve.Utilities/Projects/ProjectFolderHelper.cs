@@ -48,7 +48,7 @@ public class ProjectFolderHelper(
     ///     Gets a subfolder of the project.
     /// </summary>
     /// <param name="subfolderName">The name of the subfolder.</param>
-    /// <returns></returns>
+    /// <returns>The path to the subfolder.</returns>
     public string GetSubfolder(string subfolderName) => Path.Combine(ProjectRootFolder, subfolderName);
 
     /// <summary>

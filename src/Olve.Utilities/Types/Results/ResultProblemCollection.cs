@@ -36,8 +36,8 @@ public class ResultProblemCollection(params IEnumerable<ResultProblem> problems)
     /// <summary>
     ///     Merges multiple problem collections together.
     /// </summary>
-    /// <param name="problemCollections"></param>
-    /// <returns></returns>
+    /// <param name="problemCollections">The problem collections to merge.</param>
+    /// <returns>A new collection containing all problems from the specified collections.</returns>
     public static ResultProblemCollection Merge(params IEnumerable<ResultProblemCollection> problemCollections)
     {
         var allProblems = problemCollections.SelectMany(x => x);
