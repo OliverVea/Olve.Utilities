@@ -38,6 +38,7 @@ jobs:
     needs: bump-version
     runs-on: ubuntu-latest
     name: "Publish Olve.Utilities"
+    if: "${{ needs.bump-version.outputs.changed == 'true' }}"
     steps:
     - uses: actions/checkout@v4
 
