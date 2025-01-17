@@ -16,7 +16,7 @@ public static class OneOfTryGetExtensions
     /// </param>
     /// <typeparam name="T0">The type of the first value in the <see cref="OneOf{T0, T1}" />.</typeparam>
     /// <typeparam name="T1">The type of the second value in the <see cref="OneOf{T0, T1}" />.</typeparam>
-    /// <returns></returns>
+    /// <returns>The value of the <see cref="OneOf{T0, T1}" /> if it is of type <typeparamref name="T0" />, otherwise the default value.</returns>
     public static T0 GetT0OrDefault<T0, T1>(this OneOf<T0, T1> oneOf, T0 defaultValue)
     {
         if (oneOf.IsT0)
@@ -38,7 +38,7 @@ public static class OneOfTryGetExtensions
     /// </param>
     /// <typeparam name="T0">The type of the first value in the <see cref="OneOf{T0, T1}" />.</typeparam>
     /// <typeparam name="T1">The type of the second value in the <see cref="OneOf{T0, T1}" />.</typeparam>
-    /// <returns></returns>
+    /// <returns>The value of the <see cref="OneOf{T0, T1}" /> if it is of type <typeparamref name="T1" />, otherwise the default value.</returns>
     public static T1 GetT1OrDefault<T0, T1>(this OneOf<T0, T1> oneOf, T1 defaultValue)
     {
         return oneOf.Match(
@@ -59,7 +59,7 @@ public static class OneOfTryGetExtensions
     /// <typeparam name="T0">The type of the first value in the <see cref="OneOf{T0, T1, T2}" />.</typeparam>
     /// <typeparam name="T1">The type of the second value in the <see cref="OneOf{T0, T1, T2}" />.</typeparam>
     /// <typeparam name="T2">The type of the third value in the <see cref="OneOf{T0, T1, T2}" />.</typeparam>
-    /// <returns></returns>
+    /// <returns>The value of the <see cref="OneOf{T0, T1, T2}" /> if it is of type <typeparamref name="T0" />, otherwise the default value.</returns>
     public static T0 GetT0OrDefault<T0, T1, T2>(this OneOf<T0, T1, T2> oneOf, T0 defaultValue)
     {
         return oneOf.Match(
