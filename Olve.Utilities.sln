@@ -10,7 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "repo", "repo", "{853B9358-C
 		Directory.Packages.props = Directory.Packages.props
 		.gitignore = .gitignore
 		CONTRIBUTING.md = CONTRIBUTING.md
-		VERSION = VERSION
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6AE53E7D-3FEB-459A-B821-AD2F5D52DBE4}"
