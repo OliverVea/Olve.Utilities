@@ -13,22 +13,26 @@ public static class PropertyExtractionHelper
         var accessibility = propertySymbol.DeclaredAccessibility;
 
         var initializer = "";
-    
+
         var xmlComment = propertySymbol.GetDocumentationCommentXml();
 
-        var attributes = propertySymbol.GetAttributes()
+        var attributes = propertySymbol
+            .GetAttributes()
             .Select(attr =>
             {
-                var attributeName = attr.AttributeClass?.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat) ?? "";
+                var attributeName = attr.AttributeClass?.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)
+                                    ?? "";
                 if (attributeName.EndsWith("Attribute"))
                 {
                     attributeName = attributeName.Substring(0, attributeName.Length - 9);
                 }
+
                 return $"[{attributeName}]";
             })
             .ToArray();
 
-        var namespaces = propertySymbol.GetAttributes()
+        var namespaces = propertySymbol
+            .GetAttributes()
             .Select(attr => attr.AttributeClass?.ContainingNamespace.ToDisplayString())
             .Concat([propertySymbol.Type.ContainingNamespace.ToDisplayString()])
             .Where(ns => !string.IsNullOrEmpty(ns))
@@ -36,6 +40,13 @@ public static class PropertyExtractionHelper
             .Distinct()
             .ToArray();
 
-        return new PropertyModel(type, name, accessModifiers, accessibility, initializer, xmlComment, attributes, namespaces);
+        return new PropertyModel(type,
+            name,
+            accessModifiers,
+            accessibility,
+            initializer,
+            xmlComment,
+            attributes,
+            namespaces);
     }
 }

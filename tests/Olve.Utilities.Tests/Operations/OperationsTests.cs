@@ -17,7 +17,7 @@ public class OperationsTests
         serviceCollection.AddTransient<EchoOperation.Factory>();
         _serviceProvider = serviceCollection.BuildServiceProvider();
     }
-    
+
     [After(Test)]
     public void TearDown()
     {
@@ -37,9 +37,15 @@ public class OperationsTests
         var result = operation.Execute(input);
 
         // Assert
-        await Assert.That(result.Succeeded).IsTrue();
-        await Assert.That(logger.Messages.Count).IsEqualTo(1);
-        await Assert.That(logger.Messages).Contains(input);
+        await Assert
+            .That(result.Succeeded)
+            .IsTrue();
+        await Assert
+            .That(logger.Messages.Count)
+            .IsEqualTo(1);
+        await Assert
+            .That(logger.Messages)
+            .Contains(input);
     }
 
     [Test]
@@ -55,9 +61,15 @@ public class OperationsTests
         var result = operation.Execute(input);
 
         // Assert
-        await Assert.That(result.Succeeded).IsTrue();
-        await Assert.That(logger.Messages.Count).IsEqualTo(1);
-        await Assert.That(logger.Messages).Contains(input);
+        await Assert
+            .That(result.Succeeded)
+            .IsTrue();
+        await Assert
+            .That(logger.Messages.Count)
+            .IsEqualTo(1);
+        await Assert
+            .That(logger.Messages)
+            .Contains(input);
     }
 
     [Test]
@@ -71,9 +83,15 @@ public class OperationsTests
         var operation2 = factory.Build();
 
         // Assert
-        await Assert.That(operation1).IsNotNull();
-        await Assert.That(operation2).IsNotNull();
-        await Assert.That(operation1).IsNotEqualTo(operation2);
+        await Assert
+            .That(operation1)
+            .IsNotNull();
+        await Assert
+            .That(operation2)
+            .IsNotNull();
+        await Assert
+            .That(operation1)
+            .IsNotEqualTo(operation2);
     }
 
     [Test]
@@ -87,8 +105,12 @@ public class OperationsTests
         logger.Log(message);
 
         // Assert
-        await Assert.That(logger.Messages.Count).IsEqualTo(1);
-        await Assert.That(logger.Messages).Contains(message);
+        await Assert
+            .That(logger.Messages.Count)
+            .IsEqualTo(1);
+        await Assert
+            .That(logger.Messages)
+            .Contains(message);
     }
 
     public class Logger

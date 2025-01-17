@@ -6,24 +6,26 @@ namespace Olve.SG.CopyProperties.Helpers;
 
 public static class GeneratedTypeExtractionHelper
 {
-    public static GeneratedTypeModel ExtractGeneratedType(INamedTypeSymbol[] sourceSymbols, INamedTypeSymbol destinationSymbol, TypeDeclarationSyntax typeDeclaration)
+    public static GeneratedTypeModel ExtractGeneratedType(INamedTypeSymbol[] sourceSymbols,
+        INamedTypeSymbol destinationSymbol,
+        TypeDeclarationSyntax typeDeclaration)
     {
         var properties = sourceSymbols
             .SelectMany(PropertyEnumerationHelper.GetProperties)
             .ToArray();
-        
+
         var typeName = TypeExtractionHelper.GetType(typeDeclaration);
-        
+
         return new GeneratedTypeModel(
-            @namespace: destinationSymbol.ContainingNamespace.ToDisplayString(),
-            typeType: typeName,
-            typeName: destinationSymbol.Name,
-            typeAccessibility: destinationSymbol.DeclaredAccessibility,
-            properties: properties);
+            destinationSymbol.ContainingNamespace.ToDisplayString(),
+            typeName,
+            destinationSymbol.Name,
+            destinationSymbol.DeclaredAccessibility,
+            properties);
     }
-    
+
     /*
-     
+
 
         var attribute = typeDeclaration
             .AttributeLists
@@ -44,7 +46,7 @@ public static class GeneratedTypeExtractionHelper
                             ?? throw new InvalidOperationException("The destination type must be in a namespace.");
         var destTypeType = GetTypeType(typeDeclaration);
         var destTypeName = typeDeclaration.Identifier.Text;
-        
+
         var destIsInterface = typeDeclaration is InterfaceDeclarationSyntax;
 
         var publicProperties = sourceType

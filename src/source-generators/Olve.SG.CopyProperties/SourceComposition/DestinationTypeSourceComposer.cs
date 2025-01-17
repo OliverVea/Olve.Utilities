@@ -11,7 +11,8 @@ public static class DestinationTypeSourceComposer
         var sb = new StringBuilder();
 
         // Collect all unique namespaces
-        var namespaces = model.Properties
+        var namespaces = model
+            .Properties
             .SelectMany(p => p.Namespaces)
             .Distinct()
             .OrderBy(ns => ns);
@@ -36,7 +37,7 @@ public static class DestinationTypeSourceComposer
                 var formattedComment = FormatXmlComment(property.XmlComment!);
                 sb.Append(formattedComment);
             }
-            
+
             // Add attributes
             foreach (var attribute in property.Attributes)
             {
@@ -52,20 +53,20 @@ public static class DestinationTypeSourceComposer
                 {
                     sb.Append($"{AccessibilityToString(get.Accessibility)} ");
                 }
-                
+
                 sb.Append($"{get.Verb};");
             }
-            
+
             if (property.AccessModifiers.Set is { } set)
             {
                 if (set.Accessibility != property.PropertyAccessibility)
                 {
                     sb.Append($"{AccessibilityToString(set.Accessibility)} ");
                 }
-                
+
                 sb.Append($"{set.Verb};");
             }
-            
+
             sb.AppendLine("}");
         }
 
@@ -89,11 +90,10 @@ public static class DestinationTypeSourceComposer
     }
 
 
-    
     private static string FormatXmlComment(string rawXml)
     {
         var sb = new StringBuilder();
-    
+
         // Split the raw XML comment into lines and trim each line
         var lines = rawXml.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries);
 
@@ -101,7 +101,9 @@ public static class DestinationTypeSourceComposer
         {
             // Exclude the outer <member> tags
             if (line.Contains("<member") || line.Contains("</member>"))
+            {
                 continue;
+            }
 
             // Add the triple-slash and indent correctly
             sb.AppendLine($"    /// {line.Trim()}");
