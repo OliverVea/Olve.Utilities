@@ -63,4 +63,3 @@ jobs:
         package-name: Olve.Utilities
         version: ${{ needs.bump-version.outputs.version }}
         nuget-api-key: ${{ secrets.NUGET_API_KEY }}
-        dry-run: true
