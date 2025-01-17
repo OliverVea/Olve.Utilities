@@ -46,3 +46,8 @@ We need a git hook to enforce the commit message format.
     - Creates a changelog
     - Pushes the changes to the `master` branch
 7. Code is deployed to production
+
+
+[bump version](https://github.com/commitizen-tools/commitizen-action)
+[create release](https://github.com/softprops/action-gh-release)
+[add files to release](https://github.com/marketplace/actions/upload-files-to-a-github-release)
