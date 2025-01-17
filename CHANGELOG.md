@@ -1,3 +1,9 @@
+## v0.1.1 (2025-01-17)
+
+### Fix
+
+- making release step not require git ref tag
+
 ## v0.1.0 (2025-01-17)
 
 ### Feat
