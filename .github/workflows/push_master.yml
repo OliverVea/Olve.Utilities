@@ -50,10 +50,10 @@ jobs:
       - name: Release
         id: release
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           body_path: ${{ github.workspace }}/CHANGELOG.md
           token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          tag_name: v${{ needs.bump-version.outputs.version }}
 
       - name: Echo release id
         run: echo "::notice::id=${{ steps.release.outputs.id }}"
