@@ -4,13 +4,13 @@ using System.Diagnostics.CodeAnalysis;
 namespace Olve.Utilities.Assertions;
 
 /// <summary>
-/// Provides a set of assertion methods:
-/// <li><see cref="That"/> method throws an <see cref="AssertionError"/> if the assertion is false.</li>
+///     Provides a set of assertion methods:
+///     <li><see cref="That" /> method throws an <see cref="AssertionError" /> if the assertion is false.</li>
 /// </summary>
 public static class Assert
 {
     /// <summary>
-    /// Throws an <see cref="AssertionError"/> if the assertion is false.
+    ///     Throws an <see cref="AssertionError" /> if the assertion is false.
     /// </summary>
     /// <remarks>Is only executed in debug builds.</remarks>
     /// <param name="assertion">The assertion to check.</param>
@@ -24,15 +24,16 @@ public static class Assert
             throw new AssertionError(message);
         }
     }
-    
+
     /// <summary>
-    /// Throws an <see cref="AssertionError"/> if the value is null.
+    ///     Throws an <see cref="AssertionError" /> if the value is null.
     /// </summary>
     /// <param name="value">Value to check.</param>
     /// <param name="message">The message to include in the exception.</param>
     /// <typeparam name="T">Type of the value.</typeparam>
     [Conditional("DEBUG")]
-    public static void NotNull<T>([NotNull] T? value, string message = "Value cannot be null.") where T : class
+    public static void NotNull<T>([NotNull] T? value, string message = "Value cannot be null.")
+        where T : class
     {
         if (value is null)
         {

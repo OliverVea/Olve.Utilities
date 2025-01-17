@@ -2,7 +2,12 @@
 
 namespace Olve.SG.CopyProperties.Models;
 
-public class GeneratedTypeModel(string @namespace, string typeType, string typeName, Accessibility typeAccessibility, PropertyModel[] properties)
+public class GeneratedTypeModel(
+    string @namespace,
+    string typeType,
+    string typeName,
+    Accessibility typeAccessibility,
+    PropertyModel[] properties)
 {
     public string Namespace { get; } = @namespace;
     public string TypeType { get; } = typeType;

@@ -1,18 +1,19 @@
 ﻿namespace Olve.Utilities.StringFormatting;
 
 /// <summary>
-/// Formats a <see cref="DateTimeOffset"/> into human-readable strings.
+///     Formats a <see cref="DateTimeOffset" /> into human-readable strings.
 /// </summary>
 public static class DateTimeFormatter
 {
     /// <summary>
-    /// Formats the specified <see cref="DateTimeOffset"/> into a string representing the time elapsed since the specified date.
+    ///     Formats the specified <see cref="DateTimeOffset" /> into a string representing the time elapsed since the specified
+    ///     date.
     /// </summary>
     /// <param name="now">The current date and time.</param>
     /// <param name="then">The date and time to format.</param>
     /// <example>
-    /// 2021-09-01 12:00:00 -> "1 year ago"
-    /// 2024-01-01 12:00:00 -> "just now"
+    ///     2021-09-01 12:00:00 -> "1 year ago"
+    ///     2024-01-01 12:00:00 -> "just now"
     /// </example>
     /// <returns>A string representing the time elapsed since the specified date.</returns>
     public static string FormatTimeAgo(DateTimeOffset now, DateTimeOffset then)

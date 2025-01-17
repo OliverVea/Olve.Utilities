@@ -13,23 +13,27 @@ public class AsyncOnStartupTests
     {
         // Arrange
         var services = new ServiceCollection();
-        
+
         var service = new StartupOperation();
-        
+
         services.AddSingleton<IAsyncOnStartup>(service);
 
         var serviceProvider = services.BuildServiceProvider();
-            
+
         var executedBefore = service.Executed;
-        
+
         // Act
         await serviceProvider.RunAsyncOnStartup();
-        
+
         // Assert
         var executedAfter = service.Executed;
 
-        await Assert.That(executedBefore).IsFalse();
-        await Assert.That(executedAfter).IsTrue();
+        await Assert
+            .That(executedBefore)
+            .IsFalse();
+        await Assert
+            .That(executedAfter)
+            .IsTrue();
     }
 
     [Test]
@@ -43,36 +47,35 @@ public class AsyncOnStartupTests
 
         var startupOperations = Enumerable
             .Range(0, 100)
-            .Select(x => new StartupOperation(x, () =>
-                {
-                    dict[x] = Interlocked.Increment(ref executed);
-                }))
+            .Select(x => new StartupOperation(x, () => { dict[x] = Interlocked.Increment(ref executed); }))
             .Shuffle()
             .ToList();
-        
+
         foreach (var operation in startupOperations)
         {
             services.AddSingleton<IAsyncOnStartup>(operation);
         }
-        
+
         var serviceProvider = services.BuildServiceProvider();
-        
+
         // Act
         await serviceProvider.RunAsyncOnStartup();
-        
+
         // Assert
         foreach (var (priority, executionOrder) in dict)
         {
-            await Assert.That(executionOrder).IsEqualTo(priority);
+            await Assert
+                .That(executionOrder)
+                .IsEqualTo(priority);
         }
     }
 
 
     private class StartupOperation(int priority = 0, Action? onExecution = null) : IAsyncOnStartup
     {
-        public int Priority => priority;
         public bool Executed { get; private set; }
-        
+        public int Priority => priority;
+
         public Task OnStartupAsync(CancellationToken cancellationToken = default)
         {
             onExecution?.Invoke();

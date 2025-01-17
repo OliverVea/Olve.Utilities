@@ -14,14 +14,13 @@ public static class TypeExtractionHelper
             RecordDeclarationSyntax recordDeclarationSyntax => GetTypeType(recordDeclarationSyntax),
             StructDeclarationSyntax => "struct",
             InterfaceDeclarationSyntax => "interface",
-            _ => throw new InvalidOperationException($"The destination type must be a class or a struct. Was {typeDeclaration.Kind()}.")
+            _ => throw new InvalidOperationException(
+                $"The destination type must be a class or a struct. Was {typeDeclaration.Kind()}.")
         };
     }
-    
-    private static string GetTypeType(RecordDeclarationSyntax recordDeclarationSyntax)
-    {
-        return recordDeclarationSyntax.ClassOrStructKeyword.IsKind(SyntaxKind.StructKeyword)
+
+    private static string GetTypeType(RecordDeclarationSyntax recordDeclarationSyntax) =>
+        recordDeclarationSyntax.ClassOrStructKeyword.IsKind(SyntaxKind.StructKeyword)
             ? "record struct"
             : "record";
-    }
 }

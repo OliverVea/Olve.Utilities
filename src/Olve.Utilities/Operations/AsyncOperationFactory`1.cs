@@ -3,16 +3,18 @@
 namespace Olve.Utilities.Operations;
 
 /// <summary>
-/// A factory for creating instances of asynchronous operations that implement <see cref="IAsyncOperation{TRequest}"/>.
+///     A factory for creating instances of asynchronous operations that implement <see cref="IAsyncOperation{TRequest}" />
+///     .
 /// </summary>
 /// <typeparam name="TOperation">The type of the asynchronous operation to create.</typeparam>
 /// <typeparam name="TRequest">The type of the request handled by the operation.</typeparam>
-/// <param name="serviceProvider">The <see cref="IServiceProvider"/> used to resolve dependencies for the operation.</param>
-public class AsyncOperationFactory<TOperation, TRequest>(IServiceProvider serviceProvider) where TOperation : IAsyncOperation<TRequest>
+/// <param name="serviceProvider">The <see cref="IServiceProvider" /> used to resolve dependencies for the operation.</param>
+public class AsyncOperationFactory<TOperation, TRequest>(IServiceProvider serviceProvider)
+    where TOperation : IAsyncOperation<TRequest>
 {
     /// <summary>
-    /// Creates a new instance of the specified asynchronous operation type.
+    ///     Creates a new instance of the specified asynchronous operation type.
     /// </summary>
-    /// <returns>A new instance of <typeparamref name="TOperation"/>.</returns>
+    /// <returns>A new instance of <typeparamref name="TOperation" />.</returns>
     public TOperation Build() => serviceProvider.GetRequiredService<TOperation>();
 }
