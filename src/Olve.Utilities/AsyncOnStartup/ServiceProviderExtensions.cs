@@ -18,7 +18,7 @@ public static class ServiceProviderExtensions
         CancellationToken cancellationToken = default)
     {
         var asyncOnStartups = serviceProvider.GetServices<IAsyncOnStartup>();
-        
+
         var asyncOnStartupGroups = asyncOnStartups.GroupBy(x => x.Priority).OrderBy(x => x.Key);
 
         foreach (var asyncOnStartupGroup in asyncOnStartupGroups)
