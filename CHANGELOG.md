@@ -1,3 +1,9 @@
+## v0.3.0 (2025-01-29)
+
+### Feat
+
+- adding `TryAsSet<T>` and `TryAsReadOnlySet<T>` on `IEnumerable<T>`
+
 ## v0.2.0 (2025-01-17)
 
 ### Feat
