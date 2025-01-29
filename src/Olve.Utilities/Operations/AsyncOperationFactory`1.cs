@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Olve.Utilities.Operations;
 
@@ -9,6 +10,7 @@ namespace Olve.Utilities.Operations;
 /// <typeparam name="TOperation">The type of the asynchronous operation to create.</typeparam>
 /// <typeparam name="TRequest">The type of the request handled by the operation.</typeparam>
 /// <param name="serviceProvider">The <see cref="IServiceProvider" /> used to resolve dependencies for the operation.</param>
+[SuppressMessage("Design", "MA0048:File name must match type name")]
 public class AsyncOperationFactory<TOperation, TRequest>(IServiceProvider serviceProvider)
     where TOperation : IAsyncOperation<TRequest>
 {

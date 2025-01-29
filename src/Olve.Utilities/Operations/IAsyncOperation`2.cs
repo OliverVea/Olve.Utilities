@@ -1,4 +1,5 @@
-﻿using Olve.Utilities.Types.Results;
+﻿using System.Diagnostics.CodeAnalysis;
+using Olve.Utilities.Types.Results;
 
 namespace Olve.Utilities.Operations;
 
@@ -7,6 +8,7 @@ namespace Olve.Utilities.Operations;
 /// </summary>
 /// <typeparam name="TRequest">The type of the request.</typeparam>
 /// <typeparam name="TResult">The type of the result.</typeparam>
+[SuppressMessage("Design", "MA0048:File name must match type name")]
 public interface IAsyncOperation<in TRequest, TResult>
 {
     /// <summary>

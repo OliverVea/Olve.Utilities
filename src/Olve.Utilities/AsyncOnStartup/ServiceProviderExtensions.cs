@@ -13,7 +13,7 @@ public static class ServiceProviderExtensions
     /// <param name="serviceProvider">The service provider to get the services from.</param>
     /// <param name="cancellationToken">The cancellation token to cancel the tasks.</param>
     /// <remarks>Will run in order of <see cref="IAsyncOnStartup.Priority" />.</remarks>
-    public static async Task RunAsyncOnStartup(
+    public static async ValueTask RunAsyncOnStartup(
         this IServiceProvider serviceProvider,
         CancellationToken cancellationToken = default)
     {
@@ -28,7 +28,8 @@ public static class ServiceProviderExtensions
             var tasks = asyncOnStartupGroup
                 .Select(x => x.OnStartupAsync(cancellationToken))
                 .ToArray();
-            await Task.WhenAll(tasks);
+
+            await Task.WhenAll(tasks).ConfigureAwait(false);
         }
     }
 }

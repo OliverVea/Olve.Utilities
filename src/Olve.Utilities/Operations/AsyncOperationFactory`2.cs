@@ -1,9 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Olve.Utilities.Operations;
 
+#pragma warning disable MA0026
 // Todo: Add warning for direct DI of operations
 //       All operations should be created through a factory
+#pragma warning restore MA0026
 
 /// <summary>
 ///     A factory for creating instances of asynchronous operations that implement
@@ -13,6 +16,7 @@ namespace Olve.Utilities.Operations;
 /// <typeparam name="TRequest">The type of the request handled by the operation.</typeparam>
 /// <typeparam name="TResponse">The type of the response returned by the operation.</typeparam>
 /// <param name="serviceProvider">The <see cref="IServiceProvider" /> used to resolve dependencies for the operation.</param>
+[SuppressMessage("Design", "MA0048:File name must match type name")]
 public class AsyncOperationFactory<TOperation, TRequest, TResponse>(IServiceProvider serviceProvider)
     where TOperation : IAsyncOperation<TRequest, TResponse>
 {

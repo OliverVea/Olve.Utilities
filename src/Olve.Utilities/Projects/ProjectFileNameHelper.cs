@@ -28,10 +28,11 @@ public class ProjectFileNameHelper(string? delimiter = null, string? extension =
     ///     Gets the elements from a file name.
     /// </summary>
     /// <param name="fileName">The file name.</param>
+    /// <param name="comparisonType">The comparison to use when checking the file extension.</param>
     /// <returns>The elements.</returns>
-    public IEnumerable<string> GetElements(string fileName)
+    public IEnumerable<string> GetElements(string fileName, StringComparison comparisonType = StringComparison.Ordinal)
     {
-        if (!fileName.EndsWith(FileExtension))
+        if (!fileName.EndsWith(FileExtension, comparisonType))
         {
             throw new ArgumentException("The file name does not have the expected extension.", nameof(fileName));
         }

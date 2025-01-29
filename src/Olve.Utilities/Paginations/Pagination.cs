@@ -1,10 +1,13 @@
-﻿namespace Olve.Utilities.Paginations;
+﻿using System.Runtime.InteropServices;
+
+namespace Olve.Utilities.Paginations;
 
 /// <summary>
 ///     Represents a pagination.
 /// </summary>
 /// <param name="Page">The (0-based) page number.</param>
 /// <param name="PageSize">The number of items per page.</param>
+[StructLayout(LayoutKind.Sequential)]
 public readonly record struct Pagination(int Page, int PageSize)
 {
     /// <summary>

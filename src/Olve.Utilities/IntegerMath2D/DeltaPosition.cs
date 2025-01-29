@@ -1,10 +1,13 @@
-﻿namespace Olve.Utilities.IntegerMath2D;
+﻿using System.Runtime.InteropServices;
+
+namespace Olve.Utilities.IntegerMath2D;
 
 /// <summary>
 ///     Represents a change in position.
 /// </summary>
 /// <param name="X">The change in the X position.</param>
 /// <param name="Y">The change in the Y position.</param>
+[StructLayout(LayoutKind.Sequential)]
 public readonly record struct DeltaPosition(int X, int Y)
 {
     /// <summary>

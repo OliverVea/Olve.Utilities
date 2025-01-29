@@ -1,10 +1,13 @@
-﻿namespace Olve.Utilities.IntegerMath2D;
+﻿using System.Runtime.InteropServices;
+
+namespace Olve.Utilities.IntegerMath2D;
 
 /// <summary>
 ///     A position in 2D space.
 /// </summary>
 /// <param name="X">The x-coordinate.</param>
 /// <param name="Y">The y-coordinate.</param>
+[StructLayout(LayoutKind.Sequential)]
 public readonly record struct Position(int X, int Y)
 {
     /// <summary>
