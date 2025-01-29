@@ -44,4 +44,53 @@ public static class EnumerableExtensions
     {
         return enumerable.Aggregate(1f, (current, value) => current * value);
     }
+
+    /// <summary>
+    /// Attempts to cast an <see cref="IEnumerable{T}"/> to an <see cref="IReadOnlySet{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the collection.</typeparam>
+    /// <param name="enumerable">The enumerable to attempt to cast.</param>
+    /// <param name="readOnlySet">
+    /// When this method returns, contains the resulting <see cref="IReadOnlySet{T}"/>
+    /// if the cast was successful, or <c>null</c> otherwise.
+    /// </param>
+    /// <returns><c>true</c> if the cast was successful; otherwise, <c>false</c>.</returns>
+    public static bool TryAsReadOnlySet<T>(this IEnumerable<T> enumerable, out IReadOnlySet<T>? readOnlySet)
+    {
+        switch (enumerable)
+        {
+            case IReadOnlySet<T> asReadOnlySet:
+                readOnlySet = asReadOnlySet;
+                return true;
+            case ISet<T> asSet:
+                readOnlySet = (IReadOnlySet<T>)asSet;
+                return true;
+            default:
+                readOnlySet = null;
+                return false;
+        }
+    }
+
+    /// <summary>
+    /// Attempts to cast an <see cref="IEnumerable{T}"/> to an <see cref="ISet{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the collection.</typeparam>
+    /// <param name="enumerable">The enumerable to attempt to cast.</param>
+    /// <param name="set">
+    /// When this method returns, contains the resulting <see cref="ISet{T}"/>
+    /// if the cast was successful, or <c>null</c> otherwise.
+    /// </param>
+    /// <returns><c>true</c> if the cast was successful; otherwise, <c>false</c>.</returns>
+    public static bool TryAsSet<T>(this IEnumerable<T> enumerable, out ISet<T>? set)
+    {
+        switch (enumerable)
+        {
+            case ISet<T> asSet:
+                set = asSet;
+                return true;
+            default:
+                set = null;
+                return false;
+        }
+    }
 }
