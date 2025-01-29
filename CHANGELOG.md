@@ -1,3 +1,13 @@
+## v0.4.0 (2025-01-29)
+
+### Feat
+
+- adding `OneToManyLookup`
+
+### Fix
+
+- adding `Meziantou.Analyzer` and rectifying issues
+
 ## v0.3.0 (2025-01-29)
 
 ### Feat
