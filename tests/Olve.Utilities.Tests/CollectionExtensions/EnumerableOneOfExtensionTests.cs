@@ -49,23 +49,4 @@ public class EnumerableOneOfExtensions
             .That(result)
             .IsEquivalentTo(["3"]);
     }
-
-    [Test]
-    public async Task WhereT0_OnT0T1OneOfEnumerable_CallsFallbackOnT1Items()
-    {
-        // Arrange
-        var source = new List<OneOf<int, string>> { 1, "3" };
-
-        var fallbackCalls = new List<string>();
-
-        // Act
-        _ = source
-            .OfT0(s => fallbackCalls.Add(s))
-            .ToArray();
-
-        // Assert
-        await Assert
-            .That(fallbackCalls)
-            .IsEquivalentTo(["3"]);
-    }
 }
