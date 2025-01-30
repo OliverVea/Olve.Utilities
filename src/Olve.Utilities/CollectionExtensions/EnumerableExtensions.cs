@@ -1,4 +1,6 @@
-﻿namespace Olve.Utilities.CollectionExtensions;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Olve.Utilities.CollectionExtensions;
 
 /// <summary>
 ///     Provides extension methods for enumerables.
@@ -55,7 +57,7 @@ public static class EnumerableExtensions
     /// if the cast was successful, or <c>null</c> otherwise.
     /// </param>
     /// <returns><c>true</c> if the cast was successful; otherwise, <c>false</c>.</returns>
-    public static bool TryAsReadOnlySet<T>(this IEnumerable<T> enumerable, out IReadOnlySet<T>? readOnlySet)
+    public static bool TryAsReadOnlySet<T>(this IEnumerable<T> enumerable, [NotNullWhen(true)] out IReadOnlySet<T>? readOnlySet)
     {
         switch (enumerable)
         {
@@ -81,7 +83,7 @@ public static class EnumerableExtensions
     /// if the cast was successful, or <c>null</c> otherwise.
     /// </param>
     /// <returns><c>true</c> if the cast was successful; otherwise, <c>false</c>.</returns>
-    public static bool TryAsSet<T>(this IEnumerable<T> enumerable, out ISet<T>? set)
+    public static bool TryAsSet<T>(this IEnumerable<T> enumerable, [NotNullWhen(true)] out ISet<T>? set)
     {
         switch (enumerable)
         {
