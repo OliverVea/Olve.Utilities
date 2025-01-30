@@ -148,14 +148,14 @@ Olve.Utilities.Operations.AsyncOperationFactory<TOperation, TRequest, TResponse>
 Olve.Utilities.Operations.AsyncOperationFactory<TOperation, TRequest>
 Olve.Utilities.Operations.AsyncOperationFactory<TOperation, TRequest>.AsyncOperationFactory(System.IServiceProvider! serviceProvider) -> void
 Olve.Utilities.Operations.AsyncOperationFactory<TOperation, TRequest>.Build() -> TOperation
-Olve.Utilities.Operations.IAsyncOperation<TInput>
-Olve.Utilities.Operations.IAsyncOperation<TInput>.ExecuteAsync(TInput input, System.Threading.CancellationToken ct = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Olve.Utilities.Types.Results.Result>!
 Olve.Utilities.Operations.IAsyncOperation<TRequest, TResult>
 Olve.Utilities.Operations.IAsyncOperation<TRequest, TResult>.ExecuteAsync(TRequest request, System.Threading.CancellationToken ct = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Olve.Utilities.Types.Results.Result<TResult>>!
-Olve.Utilities.Operations.IOperation<TInput>
-Olve.Utilities.Operations.IOperation<TInput>.Execute(TInput input) -> Olve.Utilities.Types.Results.Result
+Olve.Utilities.Operations.IAsyncOperation<TRequest>
+Olve.Utilities.Operations.IAsyncOperation<TRequest>.ExecuteAsync(TRequest request, System.Threading.CancellationToken ct = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Olve.Utilities.Types.Results.Result>!
 Olve.Utilities.Operations.IOperation<TRequest, TResult>
 Olve.Utilities.Operations.IOperation<TRequest, TResult>.Execute(TRequest request) -> Olve.Utilities.Types.Results.Result<TResult>
+Olve.Utilities.Operations.IOperation<TRequest>
+Olve.Utilities.Operations.IOperation<TRequest>.Execute(TRequest request) -> Olve.Utilities.Types.Results.Result
 Olve.Utilities.Operations.OperationFactory<TOperation, TRequest, TResponse>
 Olve.Utilities.Operations.OperationFactory<TOperation, TRequest, TResponse>.Build() -> TOperation
 Olve.Utilities.Operations.OperationFactory<TOperation, TRequest, TResponse>.OperationFactory(System.IServiceProvider! serviceProvider) -> void

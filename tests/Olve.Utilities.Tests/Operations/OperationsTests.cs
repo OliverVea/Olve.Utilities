@@ -126,9 +126,9 @@ public class OperationsTests
 
     private class EchoOperation(Logger logger) : IOperation<string>
     {
-        public Result Execute(string input)
+        public Result Execute(string request)
         {
-            logger.Log(input);
+            logger.Log(request);
             return Result.Success();
         }
 
