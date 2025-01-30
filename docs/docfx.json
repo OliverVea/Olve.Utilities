@@ -38,7 +38,7 @@
     "globalMetadata": {
       "_appName": "Olve.Utilities",
       "_appTitle": "Olve.Utilities",
-      "_enableSearch": false,
+      "_enableSearch": true,
       "pdf": false
     }
   }
