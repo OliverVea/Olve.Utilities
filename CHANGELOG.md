@@ -1,3 +1,9 @@
+## v0.5.1 (2025-01-30)
+
+### Fix
+
+- tagging `TryAsSet` and `TryAsReadOnlySet` output with `NotNullWhen(true)`
+
 ## v0.5.0 (2025-01-30)
 
 ### BREAKING CHANGE
