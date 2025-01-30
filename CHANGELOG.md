@@ -1,3 +1,13 @@
+## v0.5.0 (2025-01-30)
+
+### BREAKING CHANGE
+
+- name of arguments of types implementing `IOperation` or `IAsyncOperation` should be changed from `input` to `request`
+
+### Fix
+
+- `IOperation` and `IAsyncOperation` uses `TRequest request` instead of `TInput input` as argument
+
 ## v0.4.0 (2025-01-29)
 
 ### Feat
