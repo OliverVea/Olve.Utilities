@@ -1,3 +1,9 @@
+## v0.6.0 (2025-01-31)
+
+### Feat
+
+- adding `GetOrAdd` and `TryUpdate` `Dictionary` extension methods
+
 ## v0.5.1 (2025-01-30)
 
 ### Fix
