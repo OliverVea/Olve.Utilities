@@ -6,6 +6,7 @@ Olve.Utilities.AsyncOnStartup.IAsyncOnStartup
 Olve.Utilities.AsyncOnStartup.IAsyncOnStartup.OnStartupAsync(System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task!
 Olve.Utilities.AsyncOnStartup.IAsyncOnStartup.Priority.get -> int
 Olve.Utilities.AsyncOnStartup.ServiceProviderExtensions
+Olve.Utilities.CollectionExtensions.DictionaryExtensions
 Olve.Utilities.CollectionExtensions.EnumerableExtensions
 Olve.Utilities.CollectionExtensions.EnumerableOneOfExtensions
 Olve.Utilities.CollectionExtensions.ISetExtensions
@@ -280,6 +281,10 @@ static Olve.Utilities.Assertions.Assert.IsNotEmpty<T>(System.Collections.Generic
 static Olve.Utilities.Assertions.Assert.NotNull<T>(T? value, string! message = "Value cannot be null.") -> void
 static Olve.Utilities.Assertions.Assert.That(System.Func<bool>! assertion, string! message) -> void
 static Olve.Utilities.AsyncOnStartup.ServiceProviderExtensions.RunAsyncOnStartup(this System.IServiceProvider! serviceProvider, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.ValueTask
+static Olve.Utilities.CollectionExtensions.DictionaryExtensions.GetOrAdd<TKey, TValue>(this System.Collections.Generic.Dictionary<TKey, TValue>! dictionary, TKey key, System.Func<TValue>! valueFactory) -> TValue
+static Olve.Utilities.CollectionExtensions.DictionaryExtensions.GetOrAdd<TKey, TValue>(this System.Collections.Generic.Dictionary<TKey, TValue>! dictionary, TKey key, TValue value) -> TValue
+static Olve.Utilities.CollectionExtensions.DictionaryExtensions.TryUpdate<TKey, TValue>(this System.Collections.Generic.Dictionary<TKey, TValue>! dictionary, TKey key, System.Func<TValue, TValue>! update) -> bool
+static Olve.Utilities.CollectionExtensions.DictionaryExtensions.TryUpdate<TKey, TValue>(this System.Collections.Generic.Dictionary<TKey, TValue>! dictionary, TKey key, TValue value) -> bool
 static Olve.Utilities.CollectionExtensions.EnumerableExtensions.ForEach<T>(this System.Collections.Generic.IEnumerable<T>! enumerable, System.Action<T>! action) -> void
 static Olve.Utilities.CollectionExtensions.EnumerableExtensions.ForEach<TIn, TOut>(this System.Collections.Generic.IEnumerable<TIn>! enumerable, System.Func<TIn, TOut>! action) -> System.Collections.Generic.IEnumerable<TOut>!
 static Olve.Utilities.CollectionExtensions.EnumerableExtensions.Product(this System.Collections.Generic.IEnumerable<float>! enumerable) -> float
