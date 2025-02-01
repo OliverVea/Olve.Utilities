@@ -400,6 +400,9 @@ static Olve.Utilities.CollectionExtensions.EnumerableOneOfExtensions.OfT6<T0, T1
 static Olve.Utilities.CollectionExtensions.EnumerableOneOfExtensions.OfT7<T0, T1, T2, T3, T4, T5, T6, T7>(this System.Collections.Generic.IEnumerable<OneOf.OneOf<T0, T1, T2, T3, T4, T5, T6, T7>>! source) -> System.Collections.Generic.IEnumerable<T7>!
 static Olve.Utilities.CollectionExtensions.ISetExtensions.Set<T>(this System.Collections.Generic.ISet<T>! set, T item, bool value) -> bool
 static Olve.Utilities.CollectionExtensions.ISetExtensions.Toggle<T>(this System.Collections.Generic.ISet<T>! set, T item) -> bool
+static Olve.Utilities.CollectionExtensions.RandomExtensions.PickRandom<T>(this System.Collections.Generic.IEnumerable<T>! source) -> T
+static Olve.Utilities.CollectionExtensions.RandomExtensions.PickRandom<T>(this System.Collections.Generic.IEnumerable<T>! source, int count) -> System.Collections.Generic.IEnumerable<T>!
+static Olve.Utilities.CollectionExtensions.RandomExtensions.PickRandomOrDefault<T>(this System.Collections.Generic.IEnumerable<T>! source) -> T?
 static Olve.Utilities.CollectionExtensions.RandomExtensions.Shuffle<T>(this System.Collections.Generic.IEnumerable<T>! source) -> System.Collections.Generic.IEnumerable<T>!
 static Olve.Utilities.Extensions.OneOfTryGetExtensions.GetT0OrDefault<T0, T1, T2>(this OneOf.OneOf<T0, T1, T2> oneOf, T0 defaultValue) -> T0
 static Olve.Utilities.Extensions.OneOfTryGetExtensions.GetT0OrDefault<T0, T1>(this OneOf.OneOf<T0, T1> oneOf, T0 defaultValue) -> T0
