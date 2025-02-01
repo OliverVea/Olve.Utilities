@@ -16,7 +16,7 @@ public static class RandomExtensions
     /// <remarks>This method is lazy and will not shuffle the enumerable until it is enumerated.</remarks>
     public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> source)
     {
-        return source.OrderBy(x => Random.Next());
+        return source.OrderBy(_ => Random.Next());
     }
     
     /// <summary>
