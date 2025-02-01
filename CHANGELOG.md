@@ -1,3 +1,13 @@
+## v0.7.0 (2025-02-01)
+
+### Feat
+
+- adding `PickRandom`  and `PickRandomOrDefault` extension methods to `IEnumerable<T>`
+
+### Refactor
+
+- renamed unused lambda argument to `_`
+
 ## v0.6.0 (2025-01-31)
 
 ### Feat
