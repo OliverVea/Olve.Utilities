@@ -195,11 +195,13 @@ Olve.Utilities.Projects.ProjectFolderHelper
 Olve.Utilities.Projects.ProjectFolderHelper.GetSubfolder(string! subfolderName) -> string!
 Olve.Utilities.Projects.ProjectFolderHelper.Organization.get -> string!
 Olve.Utilities.Projects.ProjectFolderHelper.ProjectFolderExists.get -> bool
-Olve.Utilities.Projects.ProjectFolderHelper.ProjectFolderHelper(string! projectName, string! organization = "Olve", System.Environment.SpecialFolder specialFolder = System.Environment.SpecialFolder.CommonApplicationData) -> void
+Olve.Utilities.Projects.ProjectFolderHelper.ProjectFolderHelper(string! projectName, string! organization = "Olve", System.Environment.SpecialFolder? specialFolder = null) -> void
 Olve.Utilities.Projects.ProjectFolderHelper.ProjectName.get -> string!
 Olve.Utilities.Projects.ProjectFolderHelper.ProjectRootFolder.get -> string!
-Olve.Utilities.Projects.ProjectFolderHelper.Search(string! searchPatten) -> System.Collections.Generic.IEnumerable<string!>!
-Olve.Utilities.Projects.ProjectFolderHelper.SpecialFolder.get -> System.Environment.SpecialFolder
+Olve.Utilities.Projects.ProjectFolderHelper.RootDirectory.get -> string!
+Olve.Utilities.Projects.ProjectFolderHelper.RootDirectory.set -> void
+Olve.Utilities.Projects.ProjectFolderHelper.Search(string! searchPattern) -> System.Collections.Generic.IEnumerable<string!>!
+Olve.Utilities.Projects.ProjectFolderHelper.SpecialFolder.get -> System.Environment.SpecialFolder?
 Olve.Utilities.StringFormatting.DateTimeFormatter
 Olve.Utilities.Types.AlreadyExists
 Olve.Utilities.Types.AlreadyExists.AlreadyExists() -> void
