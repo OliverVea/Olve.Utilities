@@ -1,3 +1,9 @@
+## v0.7.1 (2025-02-03)
+
+### Fix
+
+- improving support for linux in `ProjectFolderHelper.cs`
+
 ## v0.7.0 (2025-02-01)
 
 ### Feat
