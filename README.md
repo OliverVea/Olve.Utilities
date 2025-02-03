@@ -4,4 +4,4 @@
 
 The purpose of this library is to provide a set of utilities that can be used in .NET projects.
 
-Please read the [documentation](https://olivervea.github.io/Olve.Utilities/] for more information.
+Please read the [documentation](https://olivervea.github.io/Olve.Utilities/) for more information.
