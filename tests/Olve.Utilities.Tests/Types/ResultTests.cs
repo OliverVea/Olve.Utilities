@@ -24,4 +24,38 @@ public class ResultTests
         _ = new ResultProblem(message + "{0}", arg0) { Tags = tags };
         _ = new ResultProblem(message + "{0}", arg0) { Severity = severity, Tags = tags };
     }
+
+    [Test]
+    public async Task Test()
+    {
+        // Arrange
+        const string message = "some problem occurred";
+
+        // Act
+        var problem = new ResultProblem(message);
+
+        // Assert
+        await Assert.That(problem.OriginInformation.MemberName).IsEqualTo("MoveNext");
+        await Assert.That(problem.OriginInformation.FilePath).EndsWith("ResultTests.cs");
+        await Assert.That(problem.OriginInformation.LineNumber).IsEqualTo(35);
+    }
+
+    [Test]
+    public async Task Test2()
+    {
+        // Arrange
+
+        // Act
+        var problem = GetResultProblem();
+
+        // Assert
+        await Assert.That(problem.OriginInformation.MemberName).IsEqualTo(nameof(GetResultProblem));
+        await Assert.That(problem.OriginInformation.FilePath).EndsWith("ResultTests.cs");
+        await Assert.That(problem.OriginInformation.LineNumber).IsEqualTo(59);
+    }
+
+    private static ResultProblem GetResultProblem()
+    {
+        return new ResultProblem("some problem occurred");
+    }
 }

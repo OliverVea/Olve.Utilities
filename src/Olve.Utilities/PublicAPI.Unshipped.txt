@@ -215,6 +215,15 @@ Olve.Utilities.Types.NotFound
 Olve.Utilities.Types.NotFound.NotFound() -> void
 Olve.Utilities.Types.NotFound<T>
 Olve.Utilities.Types.NotFound<T>.NotFound() -> void
+Olve.Utilities.Types.Results.ProblemOriginInformation
+Olve.Utilities.Types.Results.ProblemOriginInformation.FilePath.get -> string!
+Olve.Utilities.Types.Results.ProblemOriginInformation.FilePath.init -> void
+Olve.Utilities.Types.Results.ProblemOriginInformation.LineNumber.get -> int
+Olve.Utilities.Types.Results.ProblemOriginInformation.LineNumber.init -> void
+Olve.Utilities.Types.Results.ProblemOriginInformation.MemberName.get -> string!
+Olve.Utilities.Types.Results.ProblemOriginInformation.MemberName.init -> void
+Olve.Utilities.Types.Results.ProblemOriginInformation.ProblemOriginInformation() -> void
+Olve.Utilities.Types.Results.ProblemOriginInformation.ProblemOriginInformation(string! FilePath, int LineNumber, string! MemberName) -> void
 Olve.Utilities.Types.Results.Result
 Olve.Utilities.Types.Results.Result.Problems.get -> Olve.Utilities.Types.Results.ResultProblemCollection?
 Olve.Utilities.Types.Results.Result.Result() -> void
@@ -237,8 +246,9 @@ Olve.Utilities.Types.Results.ResultProblem
 Olve.Utilities.Types.Results.ResultProblem.Args.get -> object![]!
 Olve.Utilities.Types.Results.ResultProblem.Exception.get -> System.Exception?
 Olve.Utilities.Types.Results.ResultProblem.Message.get -> string!
+Olve.Utilities.Types.Results.ResultProblem.OriginInformation.get -> Olve.Utilities.Types.Results.ProblemOriginInformation
 Olve.Utilities.Types.Results.ResultProblem.ResultProblem(string! message, params object![]! args) -> void
-Olve.Utilities.Types.Results.ResultProblem.ResultProblem(System.Exception? exception, string! message, params object![]! args) -> void
+Olve.Utilities.Types.Results.ResultProblem.ResultProblem(System.Exception! exception, string! message, params object![]! args) -> void
 Olve.Utilities.Types.Results.ResultProblem.Severity.get -> int
 Olve.Utilities.Types.Results.ResultProblem.Severity.init -> void
 Olve.Utilities.Types.Results.ResultProblem.Source.get -> string?

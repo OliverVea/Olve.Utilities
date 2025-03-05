@@ -6,31 +6,57 @@ namespace Olve.Utilities.Types.Results;
 /// <summary>
 ///     Represents a problem encountered during an operation.
 /// </summary>
-/// <param name="exception">The exception that caused the problem, if any.</param>
-/// <param name="message">The message describing the problem.</param>
-/// <param name="args">Optional arguments providing additional details about the problem.</param>
 [DebuggerDisplay("{ToString()}")]
-public class ResultProblem(
-    Exception? exception,
-    [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
-    params object[] args)
+public class ResultProblem
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="ResultProblem" /> class.
     /// </summary>
     /// <param name="message">The message describing the problem.</param>
     /// <param name="args">Optional arguments providing additional details about the problem.</param>
-    public ResultProblem([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message, params object[] args) : this(
-        null,
-        message,
-        args)
+    [StackTraceHidden]
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
+    public ResultProblem([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message, params object[] args)
     {
+        Message = message;
+        Args = args;
+
+        StackFrame frame = new(1, true);
+        var method = frame.GetMethod();
+        var memberName = method?.Name;
+
+        OriginInformation = new ProblemOriginInformation(frame.GetFileName() ?? string.Empty, frame.GetFileLineNumber(), memberName ?? string.Empty);
     }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ResultProblem" /> class.
+    /// </summary>
+    /// <param name="exception">The exception that caused the problem, if any.</param>
+    /// <param name="message">The message describing the problem.</param>
+    /// <param name="args">Optional arguments providing additional details about the problem.</param>
+    [StackTraceHidden]
+    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
+    public ResultProblem(Exception exception,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
+        string message,
+        params object[] args)
+    {
+        Message = message;
+        Args = args;
+        Exception = exception;
+
+        StackFrame frame = new(1, true);
+        var method = frame.GetMethod();
+        var memberName = method?.Name;
+
+        OriginInformation = new ProblemOriginInformation(frame.GetFileName() ?? string.Empty, frame.GetFileLineNumber(), memberName ?? string.Empty);
+    }
+
 
     /// <summary>
     ///     Gets the message describing the problem.
     /// </summary>
-    public string Message { get; } = message;
+    public string Message { get; }
 
     /// <summary>
     ///     Gets the optional tags categorizing the problem.
@@ -45,7 +71,7 @@ public class ResultProblem(
     /// <summary>
     ///     Gets the optional arguments providing additional details about the problem.
     /// </summary>
-    public object[] Args { get; } = args;
+    public object[] Args { get; }
 
     /// <summary>
     ///     Gets the source of the problem, if any.
@@ -55,7 +81,13 @@ public class ResultProblem(
     /// <summary>
     ///     Gets the exception that caused the problem, if any.
     /// </summary>
-    public Exception? Exception { get; } = exception;
+    public Exception? Exception { get; }
+
+    /// <summary>
+    ///     Gets the origin information of the problem.
+    /// </summary>
+    public ProblemOriginInformation OriginInformation { get; }
+
 
     /// <summary>
     ///     Formats the problem as a string.
