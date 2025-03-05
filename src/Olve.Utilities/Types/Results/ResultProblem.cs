@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using System.Xml.Schema;
 
 namespace Olve.Utilities.Types.Results;
 
@@ -96,4 +98,31 @@ public class ResultProblem
     public override string ToString() => Exception != null
         ? $"{string.Format(Message, Args)} ({Exception.GetType().Name}: {Exception.Message})"
         : string.Format(Message, Args);
+
+
+    /// <summary>
+    ///    Formats the problem as a string for debugging purposes.
+    /// </summary>
+    /// <returns>The formatted string.</returns>
+    public string ToDebugString()
+    {
+        StringBuilder sb = new();
+
+        sb.Append("[");
+        sb.Append(OriginInformation.FilePath);
+        sb.Append(":");
+        sb.Append(OriginInformation.MemberName);
+        sb.Append(":l");
+        sb.Append(OriginInformation.LineNumber);
+        sb.Append("] ");
+
+        sb.Append(string.Format(Message, Args));
+
+        if (Exception != null)
+        {
+            sb.Append($" ({Exception.GetType().Name}: {Exception.Message})");
+        }
+
+        return sb.ToString();
+    }
 }

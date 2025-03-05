@@ -255,6 +255,7 @@ Olve.Utilities.Types.Results.ResultProblem.Source.get -> string?
 Olve.Utilities.Types.Results.ResultProblem.Source.init -> void
 Olve.Utilities.Types.Results.ResultProblem.Tags.get -> string![]!
 Olve.Utilities.Types.Results.ResultProblem.Tags.init -> void
+Olve.Utilities.Types.Results.ResultProblem.ToDebugString() -> string!
 Olve.Utilities.Types.Results.ResultProblemCollection
 Olve.Utilities.Types.Results.ResultProblemCollection.Append(params System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.ResultProblem!>! resultProblems) -> Olve.Utilities.Types.Results.ResultProblemCollection!
 Olve.Utilities.Types.Results.ResultProblemCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<Olve.Utilities.Types.Results.ResultProblem!>!
