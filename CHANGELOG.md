@@ -1,3 +1,15 @@
+## v0.8.0 (2025-03-05)
+
+### Feat
+
+- adding `ResultProblem.ToDebugString` with tests
+- adding stacktrace information in `ResultProblem.OriginInformation`
+
+### Fix
+
+- setting .net version in CI to equal 9.0.100
+- setting .net version in CI to equal 9.0.100
+
 ## v0.7.1 (2025-02-03)
 
 ### Fix
