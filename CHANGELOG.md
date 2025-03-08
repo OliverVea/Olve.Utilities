@@ -1,3 +1,14 @@
+## v0.9.0 (2025-03-08)
+
+### Feat
+
+- adding `DeletionResult` for deletion operations
+- adding `Success` class
+
+### Fix
+
+- specifying `problems` parameter in `Result.Success` static methods
+
 ## v0.8.0 (2025-03-05)
 
 ### Feat
