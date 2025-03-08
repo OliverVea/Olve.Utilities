@@ -215,6 +215,12 @@ Olve.Utilities.Types.NotFound
 Olve.Utilities.Types.NotFound.NotFound() -> void
 Olve.Utilities.Types.NotFound<T>
 Olve.Utilities.Types.NotFound<T>.NotFound() -> void
+Olve.Utilities.Types.Results.DeletionResult
+Olve.Utilities.Types.Results.DeletionResult.DeletionResult() -> void
+Olve.Utilities.Types.Results.DeletionResult.Problems.get -> Olve.Utilities.Types.Results.ResultProblemCollection?
+Olve.Utilities.Types.Results.DeletionResult.Succeeded.get -> bool
+Olve.Utilities.Types.Results.DeletionResult.TryPickProblems(out Olve.Utilities.Types.Results.ResultProblemCollection? problems) -> bool
+Olve.Utilities.Types.Results.DeletionResult.WasNotFound.get -> bool
 Olve.Utilities.Types.Results.ProblemOriginInformation
 Olve.Utilities.Types.Results.ProblemOriginInformation.FilePath.get -> string!
 Olve.Utilities.Types.Results.ProblemOriginInformation.FilePath.init -> void
@@ -434,6 +440,9 @@ static Olve.Utilities.IntegerMath2D.Position.operator +(Olve.Utilities.IntegerMa
 static Olve.Utilities.IntegerMath2D.Position.operator -(Olve.Utilities.IntegerMath2D.Position a, Olve.Utilities.IntegerMath2D.Position b) -> Olve.Utilities.IntegerMath2D.DeltaPosition
 static Olve.Utilities.IntegerMath2D.Size.implicit operator Olve.Utilities.IntegerMath2D.Size((int Width, int Height) tuple) -> Olve.Utilities.IntegerMath2D.Size
 static Olve.Utilities.StringFormatting.DateTimeFormatter.FormatTimeAgo(System.DateTimeOffset now, System.DateTimeOffset then) -> string!
+static Olve.Utilities.Types.Results.DeletionResult.Error(params System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.ResultProblem!>! problems) -> Olve.Utilities.Types.Results.DeletionResult
+static Olve.Utilities.Types.Results.DeletionResult.NotFound() -> Olve.Utilities.Types.Results.DeletionResult
+static Olve.Utilities.Types.Results.DeletionResult.Success() -> Olve.Utilities.Types.Results.DeletionResult
 static Olve.Utilities.Types.Results.Result.Failure(params System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.ResultProblem!>! problems) -> Olve.Utilities.Types.Results.Result
 static Olve.Utilities.Types.Results.Result.implicit operator Olve.Utilities.Types.Results.Result(Olve.Utilities.Types.Results.ResultProblem! problem) -> Olve.Utilities.Types.Results.Result
 static Olve.Utilities.Types.Results.Result.implicit operator Olve.Utilities.Types.Results.Result(Olve.Utilities.Types.Results.ResultProblemCollection! problems) -> Olve.Utilities.Types.Results.Result
