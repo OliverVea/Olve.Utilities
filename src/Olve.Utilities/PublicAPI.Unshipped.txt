@@ -265,6 +265,10 @@ Olve.Utilities.Types.Skipped
 Olve.Utilities.Types.Skipped.Skipped() -> void
 Olve.Utilities.Types.Skipped<T>
 Olve.Utilities.Types.Skipped<T>.Skipped() -> void
+Olve.Utilities.Types.Success
+Olve.Utilities.Types.Success.Success() -> void
+Olve.Utilities.Types.Success<T>
+Olve.Utilities.Types.Success<T>.Success() -> void
 Olve.Utilities.Types.Waiting
 Olve.Utilities.Types.Waiting.Waiting() -> void
 Olve.Utilities.Types.Waiting<T>
@@ -285,6 +289,8 @@ override Olve.Utilities.Types.NotFound<T>.ToString() -> string!
 override Olve.Utilities.Types.Results.ResultProblem.ToString() -> string!
 override Olve.Utilities.Types.Skipped.ToString() -> string!
 override Olve.Utilities.Types.Skipped<T>.ToString() -> string!
+override Olve.Utilities.Types.Success.ToString() -> string!
+override Olve.Utilities.Types.Success<T>.ToString() -> string!
 override Olve.Utilities.Types.Waiting.ToString() -> string!
 override Olve.Utilities.Types.Waiting<T>.ToString() -> string!
 override Olve.Utilities.Types.Yes.ToString() -> string!
