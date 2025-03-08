@@ -35,7 +35,7 @@ public readonly struct Result<T>
     /// </summary>
     /// <param name="value">The value associated with the success.</param>
     /// <returns>A success result.</returns>
-    public static Result<T> Success(T value) => new(value, null);
+    public static Result<T> Success(T value) => new(value, problems: null);
 
     /// <summary>
     ///     Creates a result representing failure with the specified problems.

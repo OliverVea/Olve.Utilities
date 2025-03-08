@@ -26,7 +26,7 @@ public readonly struct Result
     /// <summary>
     ///     Gets a result representing success.
     /// </summary>
-    public static Result Success() => new(null);
+    public static Result Success() => new(problems: null);
 
     /// <summary>
     ///     Creates a result representing success with the specified value.
