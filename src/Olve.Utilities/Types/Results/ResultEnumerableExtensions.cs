@@ -32,7 +32,7 @@ public static class ResultEnumerableExtensions
     ///     failed results. If the collection had no problems, this parameter is set to <c>null</c>.
     /// </param>
     /// <returns><c>true</c> if any result in the collection had problems; otherwise, <c>false</c>.</returns>
-    public static bool TryPickProblems(this IEnumerable<Result> results, [NotNullWhen(false)] out ResultProblemCollection? problems)
+    public static bool TryPickProblems(this IEnumerable<Result> results, [NotNullWhen(true)] out ResultProblemCollection? problems)
     {
         problems = null;
         var hadProblems = false;
@@ -64,7 +64,7 @@ public static class ResultEnumerableExtensions
     /// <returns>
     ///     <c>true</c> if any result in the collection had problems; otherwise, <c>false</c>.
     /// </returns>
-    public static bool TryPickProblems<T>(this IEnumerable<Result<T>> results, [NotNullWhen(false)] out ResultProblemCollection? problems)
+    public static bool TryPickProblems<T>(this IEnumerable<Result<T>> results, [NotNullWhen(true)] out ResultProblemCollection? problems)
     {
         problems = null;
         var hadProblems = false;
@@ -101,8 +101,8 @@ public static class ResultEnumerableExtensions
     ///     <c>true</c> if any result in the collection had problems; otherwise, <c>false</c>.
     /// </returns>
     public static bool TryPickProblems<T>(this IEnumerable<Result<T>> results,
-        [NotNullWhen(false)] out ResultProblemCollection? problems,
-        [NotNullWhen(true)] out IList<T>? values)
+        [NotNullWhen(true)] out ResultProblemCollection? problems,
+        [NotNullWhen(false)] out IList<T>? values)
     {
         values = null;
         problems = null;
