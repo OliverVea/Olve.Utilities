@@ -27,7 +27,10 @@ public static class ResultEnumerableExtensions
     ///   Attempts to collect problems from the results in the collection.
     /// </summary>
     /// <param name="results">The collection of <see cref="Result" /> objects.</param>
-    /// <param name="problems">The <see cref="ResultProblemCollection" /> that includes all problems found in the failed results.</param>
+    /// <param name="problems">
+    ///     When this method returns, contains a <see cref="ResultProblemCollection" /> that includes all problems found in the
+    ///     failed results. If the collection had no problems, this parameter is set to <c>null</c>.
+    /// </param>
     /// <returns><c>true</c> if any result in the collection had problems; otherwise, <c>false</c>.</returns>
     public static bool TryPickProblems(this IEnumerable<Result> results, [NotNullWhen(false)] out ResultProblemCollection? problems)
     {
@@ -56,7 +59,7 @@ public static class ResultEnumerableExtensions
     /// <param name="results">The collection of <see cref="Result{T}" /> objects.</param>
     /// <param name="problems">
     ///     When this method returns, contains a <see cref="ResultProblemCollection" /> that includes
-    ///     all problems found in the failed results. If no problems were found, this will be an empty collection.
+    ///     all problems found in the failed results. If the collection had no problems, this parameter is set to <c>null</c>.
     /// </param>
     /// <returns>
     ///     <c>true</c> if any result in the collection had problems; otherwise, <c>false</c>.
@@ -88,11 +91,11 @@ public static class ResultEnumerableExtensions
     /// <param name="results">The collection of <see cref="Result{T}" /> objects.</param>
     /// <param name="problems">
     ///     When this method returns, contains a <see cref="ResultProblemCollection" /> that includes
-    ///     all problems found in the failed results. If no problems were found, this will be an empty collection.
+    ///     all problems found in the failed results. If the collection had no problems, this parameter is set to <c>null</c>.
     /// </param>
     /// <param name="values">
-    ///     When this method returns, contains a collection of successful result values. If no successful results were found,
-    ///     this will be an empty collection.
+    ///     When this method returns, contains a collection of successful result values.
+    ///     If no results were successful, this parameter is set to <c>null</c>.
     /// </param>
     /// <returns>
     ///     <c>true</c> if any result in the collection had problems; otherwise, <c>false</c>.
@@ -113,7 +116,6 @@ public static class ResultEnumerableExtensions
             {
                 valuesList ??= [];
                 valuesList.Add(value);
-                values = valuesList;
                 continue;
             }
 
@@ -121,6 +123,8 @@ public static class ResultEnumerableExtensions
             problems = ResultProblemCollection.Merge(resultProblems, problems);
             hadProblems = true;
         }
+
+        values = valuesList;
 
         return hadProblems;
     }
