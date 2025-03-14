@@ -1,3 +1,9 @@
+## v0.10.1 (2025-03-14)
+
+### Fix
+
+- fixing incorrect `NotNullWhen` boolean value for `TryPickProblems`
+
 ## v0.10.0 (2025-03-14)
 
 ### Feat
