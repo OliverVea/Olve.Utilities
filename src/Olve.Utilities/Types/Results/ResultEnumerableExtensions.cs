@@ -1,4 +1,6 @@
-﻿namespace Olve.Utilities.Types.Results;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Olve.Utilities.Types.Results;
 
 /// <summary>
 ///     Extension methods for working with <see cref="Result" />, <see cref="Result" />, and <see cref="Result{T}" />
@@ -20,6 +22,32 @@ public static class ResultEnumerableExtensions
     /// <param name="results">The collection of <see cref="Result{T}" /> objects.</param>
     /// <returns><c>true</c> if any result in the collection failed; otherwise, <c>false</c>.</returns>
     public static bool HasProblems<T>(this IEnumerable<Result<T>> results) => results.Any(r => !r.Succeeded);
+
+    /// <summary>
+    ///   Attempts to collect problems from the results in the collection.
+    /// </summary>
+    /// <param name="results">The collection of <see cref="Result" /> objects.</param>
+    /// <param name="problems">The <see cref="ResultProblemCollection" /> that includes all problems found in the failed results.</param>
+    /// <returns><c>true</c> if any result in the collection had problems; otherwise, <c>false</c>.</returns>
+    public static bool TryPickProblems(this IEnumerable<Result> results, [NotNullWhen(false)] out ResultProblemCollection? problems)
+    {
+        problems = null;
+        var hadProblems = false;
+
+        foreach (var result in results)
+        {
+            if (!result.TryPickProblems(out var resultProblems))
+            {
+                continue;
+            }
+
+            problems ??= new ResultProblemCollection();
+            problems = ResultProblemCollection.Merge(resultProblems, problems);
+            hadProblems = true;
+        }
+
+        return hadProblems;
+    }
 
     /// <summary>
     ///     Attempts to collect problems from the results in the collection.
