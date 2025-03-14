@@ -61,9 +61,9 @@ public static class ResultEnumerableExtensions
     /// <returns>
     ///     <c>true</c> if any result in the collection had problems; otherwise, <c>false</c>.
     /// </returns>
-    public static bool TryPickProblems<T>(this IEnumerable<Result<T>> results, out ResultProblemCollection problems)
+    public static bool TryPickProblems<T>(this IEnumerable<Result<T>> results, [NotNullWhen(false)] out ResultProblemCollection? problems)
     {
-        problems = new ResultProblemCollection();
+        problems = null;
         var hadProblems = false;
 
         foreach (var result in results)
@@ -73,6 +73,7 @@ public static class ResultEnumerableExtensions
                 continue;
             }
 
+            problems ??= new ResultProblemCollection();
             problems = ResultProblemCollection.Merge(resultProblems, problems);
             hadProblems = true;
         }
@@ -97,23 +98,26 @@ public static class ResultEnumerableExtensions
     ///     <c>true</c> if any result in the collection had problems; otherwise, <c>false</c>.
     /// </returns>
     public static bool TryPickProblems<T>(this IEnumerable<Result<T>> results,
-        out ResultProblemCollection problems,
-        out IEnumerable<T> values)
+        [NotNullWhen(false)] out ResultProblemCollection? problems,
+        [NotNullWhen(true)] out IList<T>? values)
     {
-        List<T> valuesList = new();
-        values = valuesList;
+        values = null;
+        problems = null;
+        List<T>? valuesList = null;
 
-        problems = new ResultProblemCollection();
         var hadProblems = false;
 
         foreach (var result in results)
         {
             if (!result.TryPickProblems(out var resultProblems, out var value))
             {
+                valuesList ??= [];
                 valuesList.Add(value);
+                values = valuesList;
                 continue;
             }
 
+            problems ??= new ResultProblemCollection();
             problems = ResultProblemCollection.Merge(resultProblems, problems);
             hadProblems = true;
         }
