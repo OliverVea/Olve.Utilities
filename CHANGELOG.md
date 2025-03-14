@@ -1,3 +1,13 @@
+## v0.10.0 (2025-03-14)
+
+### Feat
+
+- adding missing `IEnumerable<Result>.TryPickProblems` for non-generic `Result`
+
+### Perf
+
+- added `[NotNullWhen]`, lazy initialization and allowed nullable results to `problems` and `values` in `TryPickProblems`
+
 ## v0.9.0 (2025-03-08)
 
 ### Feat
