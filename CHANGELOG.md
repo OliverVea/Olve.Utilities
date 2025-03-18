@@ -1,3 +1,9 @@
+## v0.13.0 (2025-03-18)
+
+### Feat
+
+- **Olve.Result**: allow chaining `Result` using the static `Result.Chain` method
+
 ## v0.12.1 (2025-03-18)
 
 ### Fix
