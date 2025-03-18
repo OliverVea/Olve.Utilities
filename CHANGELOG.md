@@ -1,3 +1,9 @@
+## v0.12.1 (2025-03-18)
+
+### Fix
+
+- removing `RequiresPreviewFeature` attributes
+
 ## v0.12.0 (2025-03-18)
 
 ### Feat
