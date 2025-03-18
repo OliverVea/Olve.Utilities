@@ -36,7 +36,6 @@ public class ResultTests
         var problem = new ResultProblem(Message);
 
         // Assert
-        await Assert.That(problem.OriginInformation.MemberName).IsEqualTo("MoveNext");
         await Assert.That(problem.OriginInformation.FilePath).EndsWith("ResultTests.cs");
         await Assert.That(problem.OriginInformation.LineNumber).IsEqualTo(36);
     }
@@ -50,9 +49,8 @@ public class ResultTests
         var problem = GetResultProblem();
 
         // Assert
-        await Assert.That(problem.OriginInformation.MemberName).IsEqualTo(nameof(GetResultProblem));
         await Assert.That(problem.OriginInformation.FilePath).EndsWith("ResultTests.cs");
-        await Assert.That(problem.OriginInformation.LineNumber).IsEqualTo(60);
+        await Assert.That(problem.OriginInformation.LineNumber).IsEqualTo(58);
     }
 
     private static ResultProblem GetResultProblem()
@@ -73,6 +71,6 @@ public class ResultTests
         Console.WriteLine(debugString);
 
         // Assert
-        await Assert.That(debugString).EndsWith("ResultTests.cs:GetResultProblem:l60] some problem occurred");
+        await Assert.That(debugString).EndsWith("ResultTests.cs:l58] some problem occurred");
     }
 }

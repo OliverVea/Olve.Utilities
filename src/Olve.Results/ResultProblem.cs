@@ -16,41 +16,35 @@ public class ResultProblem
     /// <param name="message">The message describing the problem.</param>
     /// <param name="args">Optional arguments providing additional details about the problem.</param>
     [StackTraceHidden]
-    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
-    public ResultProblem([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message, params object[] args)
+    public ResultProblem([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
+        params object[] args) : this(null, message, args, new StackFrame(1, true))
     {
-        Message = message;
-        Args = args;
-
-        StackFrame frame = new(1, true);
-        var method = frame.GetMethod();
-        var memberName = method?.Name;
-
-        OriginInformation = new ProblemOriginInformation(frame.GetFileName() ?? string.Empty, frame.GetFileLineNumber(), memberName ?? string.Empty);
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ResultProblem" /> class.
+    ///     Initializes a new instance of the <see cref="ResultProblem" /> class from an <see cref="System.Exception"/>.
     /// </summary>
     /// <param name="exception">The exception that caused the problem, if any.</param>
     /// <param name="message">The message describing the problem.</param>
     /// <param name="args">Optional arguments providing additional details about the problem.</param>
     [StackTraceHidden]
-    [UnconditionalSuppressMessage("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "<Pending>")]
     public ResultProblem(Exception exception,
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         string message,
-        params object[] args)
+        params object[] args) : this(exception, message, args, new StackFrame(1, true))
     {
+    }
+
+    internal ResultProblem(Exception? exception,
+        string message,
+        object[] args,
+        StackFrame stackFrame)
+    {
+        Exception = exception;
         Message = message;
         Args = args;
-        Exception = exception;
 
-        StackFrame frame = new(1, true);
-        var method = frame.GetMethod();
-        var memberName = method?.Name;
-
-        OriginInformation = new ProblemOriginInformation(frame.GetFileName() ?? string.Empty, frame.GetFileLineNumber(), memberName ?? string.Empty);
+        OriginInformation = new ProblemOriginInformation(stackFrame.GetFileName() ?? string.Empty, stackFrame.GetFileLineNumber());
     }
 
 
@@ -109,8 +103,6 @@ public class ResultProblem
 
         sb.Append("[");
         sb.Append(OriginInformation.FilePath);
-        sb.Append(":");
-        sb.Append(OriginInformation.MemberName);
         sb.Append(":l");
         sb.Append(OriginInformation.LineNumber);
         sb.Append("] ");
