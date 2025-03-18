@@ -1,3 +1,9 @@
+## v0.12.0 (2025-03-18)
+
+### Feat
+
+- adding `Result.Try<TException>` and `Result.Try<TValue, TException>`
+
 ## v0.11.0 (2025-03-18)
 
 ### Feat
