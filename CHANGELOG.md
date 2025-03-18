@@ -1,3 +1,13 @@
+## v0.11.0 (2025-03-18)
+
+### Feat
+
+- added more brief `ResultProblemCollection.Prepend` shorthand
+
+### Fix
+
+- fixed broken ci/cp pipeline
+
 ## v0.10.1 (2025-03-14)
 
 ### Fix
