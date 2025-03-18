@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Olve.Utilities.Operations;
-using Olve.Utilities.Types.Results;
+using Olve.Results;
 
-namespace Olve.Utilities.Tests.Operations;
+namespace Olve.Operations.Tests;
 
 public class OperationsTests
 {

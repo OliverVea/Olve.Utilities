@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Olve.Utilities.Types.Results;
+namespace Olve.Results;
 
 /// <summary>
 ///     Represents a result of an operation with a value, indicating success or failure.

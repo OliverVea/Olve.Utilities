@@ -1,9 +1,8 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
-using System.Xml.Schema;
 
-namespace Olve.Utilities.Types.Results;
+namespace Olve.Results;
 
 /// <summary>
 ///     Represents a problem encountered during an operation.

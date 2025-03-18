@@ -143,26 +143,6 @@ Olve.Utilities.Lookup.IdFrozenLookup<T, TId>
 Olve.Utilities.Lookup.IdFrozenLookup<T, TId>.IdFrozenLookup(System.Collections.Generic.IEnumerable<T>! items) -> void
 Olve.Utilities.Lookup.IHasId<TId>
 Olve.Utilities.Lookup.IHasId<TId>.Id.get -> TId
-Olve.Utilities.Operations.AsyncOperationFactory<TOperation, TRequest, TResponse>
-Olve.Utilities.Operations.AsyncOperationFactory<TOperation, TRequest, TResponse>.AsyncOperationFactory(System.IServiceProvider! serviceProvider) -> void
-Olve.Utilities.Operations.AsyncOperationFactory<TOperation, TRequest, TResponse>.Build() -> TOperation
-Olve.Utilities.Operations.AsyncOperationFactory<TOperation, TRequest>
-Olve.Utilities.Operations.AsyncOperationFactory<TOperation, TRequest>.AsyncOperationFactory(System.IServiceProvider! serviceProvider) -> void
-Olve.Utilities.Operations.AsyncOperationFactory<TOperation, TRequest>.Build() -> TOperation
-Olve.Utilities.Operations.IAsyncOperation<TRequest, TResult>
-Olve.Utilities.Operations.IAsyncOperation<TRequest, TResult>.ExecuteAsync(TRequest request, System.Threading.CancellationToken ct = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Olve.Utilities.Types.Results.Result<TResult>>!
-Olve.Utilities.Operations.IAsyncOperation<TRequest>
-Olve.Utilities.Operations.IAsyncOperation<TRequest>.ExecuteAsync(TRequest request, System.Threading.CancellationToken ct = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Olve.Utilities.Types.Results.Result>!
-Olve.Utilities.Operations.IOperation<TRequest, TResult>
-Olve.Utilities.Operations.IOperation<TRequest, TResult>.Execute(TRequest request) -> Olve.Utilities.Types.Results.Result<TResult>
-Olve.Utilities.Operations.IOperation<TRequest>
-Olve.Utilities.Operations.IOperation<TRequest>.Execute(TRequest request) -> Olve.Utilities.Types.Results.Result
-Olve.Utilities.Operations.OperationFactory<TOperation, TRequest, TResponse>
-Olve.Utilities.Operations.OperationFactory<TOperation, TRequest, TResponse>.Build() -> TOperation
-Olve.Utilities.Operations.OperationFactory<TOperation, TRequest, TResponse>.OperationFactory(System.IServiceProvider! serviceProvider) -> void
-Olve.Utilities.Operations.OperationFactory<TOperation, TRequest>
-Olve.Utilities.Operations.OperationFactory<TOperation, TRequest>.Build() -> TOperation
-Olve.Utilities.Operations.OperationFactory<TOperation, TRequest>.OperationFactory(System.IServiceProvider! serviceProvider) -> void
 Olve.Utilities.Paginations.PaginatedResult<T>
 Olve.Utilities.Paginations.PaginatedResult<T>.Count.get -> int
 Olve.Utilities.Paginations.PaginatedResult<T>.GetEnumerator() -> System.Collections.Generic.IEnumerator<T>!
@@ -215,58 +195,6 @@ Olve.Utilities.Types.NotFound
 Olve.Utilities.Types.NotFound.NotFound() -> void
 Olve.Utilities.Types.NotFound<T>
 Olve.Utilities.Types.NotFound<T>.NotFound() -> void
-Olve.Utilities.Types.Results.DeletionResult
-Olve.Utilities.Types.Results.DeletionResult.DeletionResult() -> void
-Olve.Utilities.Types.Results.DeletionResult.Problems.get -> Olve.Utilities.Types.Results.ResultProblemCollection?
-Olve.Utilities.Types.Results.DeletionResult.Succeeded.get -> bool
-Olve.Utilities.Types.Results.DeletionResult.TryPickProblems(out Olve.Utilities.Types.Results.ResultProblemCollection? problems) -> bool
-Olve.Utilities.Types.Results.DeletionResult.WasNotFound.get -> bool
-Olve.Utilities.Types.Results.ProblemOriginInformation
-Olve.Utilities.Types.Results.ProblemOriginInformation.FilePath.get -> string!
-Olve.Utilities.Types.Results.ProblemOriginInformation.FilePath.init -> void
-Olve.Utilities.Types.Results.ProblemOriginInformation.LineNumber.get -> int
-Olve.Utilities.Types.Results.ProblemOriginInformation.LineNumber.init -> void
-Olve.Utilities.Types.Results.ProblemOriginInformation.MemberName.get -> string!
-Olve.Utilities.Types.Results.ProblemOriginInformation.MemberName.init -> void
-Olve.Utilities.Types.Results.ProblemOriginInformation.ProblemOriginInformation() -> void
-Olve.Utilities.Types.Results.ProblemOriginInformation.ProblemOriginInformation(string! FilePath, int LineNumber, string! MemberName) -> void
-Olve.Utilities.Types.Results.Result
-Olve.Utilities.Types.Results.Result.Problems.get -> Olve.Utilities.Types.Results.ResultProblemCollection?
-Olve.Utilities.Types.Results.Result.Result() -> void
-Olve.Utilities.Types.Results.Result.Succeeded.get -> bool
-Olve.Utilities.Types.Results.Result.TryPickProblems(out Olve.Utilities.Types.Results.ResultProblemCollection? problems) -> bool
-Olve.Utilities.Types.Results.Result<T>
-Olve.Utilities.Types.Results.Result<T>.GetValueOrDefault(T defaultValue) -> T
-Olve.Utilities.Types.Results.Result<T>.Problems.get -> Olve.Utilities.Types.Results.ResultProblemCollection?
-Olve.Utilities.Types.Results.Result<T>.Result() -> void
-Olve.Utilities.Types.Results.Result<T>.Succeeded.get -> bool
-Olve.Utilities.Types.Results.Result<T>.TryGetValueOrDefault(out T? value, T defaultValue) -> bool
-Olve.Utilities.Types.Results.Result<T>.TryPickProblems(out Olve.Utilities.Types.Results.ResultProblemCollection? problems) -> bool
-Olve.Utilities.Types.Results.Result<T>.TryPickProblems(out Olve.Utilities.Types.Results.ResultProblemCollection? problems, out T? value) -> bool
-Olve.Utilities.Types.Results.Result<T>.TryPickValue(out T? value) -> bool
-Olve.Utilities.Types.Results.Result<T>.TryPickValue(out T? value, out Olve.Utilities.Types.Results.ResultProblemCollection? problems) -> bool
-Olve.Utilities.Types.Results.Result<T>.Value.get -> T?
-Olve.Utilities.Types.Results.ResultEnumerableExtensions
-Olve.Utilities.Types.Results.ResultFuncExtensions
-Olve.Utilities.Types.Results.ResultProblem
-Olve.Utilities.Types.Results.ResultProblem.Args.get -> object![]!
-Olve.Utilities.Types.Results.ResultProblem.Exception.get -> System.Exception?
-Olve.Utilities.Types.Results.ResultProblem.Message.get -> string!
-Olve.Utilities.Types.Results.ResultProblem.OriginInformation.get -> Olve.Utilities.Types.Results.ProblemOriginInformation
-Olve.Utilities.Types.Results.ResultProblem.ResultProblem(string! message, params object![]! args) -> void
-Olve.Utilities.Types.Results.ResultProblem.ResultProblem(System.Exception! exception, string! message, params object![]! args) -> void
-Olve.Utilities.Types.Results.ResultProblem.Severity.get -> int
-Olve.Utilities.Types.Results.ResultProblem.Severity.init -> void
-Olve.Utilities.Types.Results.ResultProblem.Source.get -> string?
-Olve.Utilities.Types.Results.ResultProblem.Source.init -> void
-Olve.Utilities.Types.Results.ResultProblem.Tags.get -> string![]!
-Olve.Utilities.Types.Results.ResultProblem.Tags.init -> void
-Olve.Utilities.Types.Results.ResultProblem.ToDebugString() -> string!
-Olve.Utilities.Types.Results.ResultProblemCollection
-Olve.Utilities.Types.Results.ResultProblemCollection.Append(params System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.ResultProblem!>! resultProblems) -> Olve.Utilities.Types.Results.ResultProblemCollection!
-Olve.Utilities.Types.Results.ResultProblemCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<Olve.Utilities.Types.Results.ResultProblem!>!
-Olve.Utilities.Types.Results.ResultProblemCollection.Prepend(params System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.ResultProblem!>! resultProblems) -> Olve.Utilities.Types.Results.ResultProblemCollection!
-Olve.Utilities.Types.Results.ResultProblemCollection.ResultProblemCollection(params System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.ResultProblem!>! problems) -> void
 Olve.Utilities.Types.Skipped
 Olve.Utilities.Types.Skipped.Skipped() -> void
 Olve.Utilities.Types.Skipped<T>
@@ -292,7 +220,6 @@ override Olve.Utilities.Types.Any.ToString() -> string!
 override Olve.Utilities.Types.Any<T>.ToString() -> string!
 override Olve.Utilities.Types.NotFound.ToString() -> string!
 override Olve.Utilities.Types.NotFound<T>.ToString() -> string!
-override Olve.Utilities.Types.Results.ResultProblem.ToString() -> string!
 override Olve.Utilities.Types.Skipped.ToString() -> string!
 override Olve.Utilities.Types.Skipped<T>.ToString() -> string!
 override Olve.Utilities.Types.Success.ToString() -> string!
@@ -440,26 +367,3 @@ static Olve.Utilities.IntegerMath2D.Position.operator +(Olve.Utilities.IntegerMa
 static Olve.Utilities.IntegerMath2D.Position.operator -(Olve.Utilities.IntegerMath2D.Position a, Olve.Utilities.IntegerMath2D.Position b) -> Olve.Utilities.IntegerMath2D.DeltaPosition
 static Olve.Utilities.IntegerMath2D.Size.implicit operator Olve.Utilities.IntegerMath2D.Size((int Width, int Height) tuple) -> Olve.Utilities.IntegerMath2D.Size
 static Olve.Utilities.StringFormatting.DateTimeFormatter.FormatTimeAgo(System.DateTimeOffset now, System.DateTimeOffset then) -> string!
-static Olve.Utilities.Types.Results.DeletionResult.Error(params System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.ResultProblem!>! problems) -> Olve.Utilities.Types.Results.DeletionResult
-static Olve.Utilities.Types.Results.DeletionResult.NotFound() -> Olve.Utilities.Types.Results.DeletionResult
-static Olve.Utilities.Types.Results.DeletionResult.Success() -> Olve.Utilities.Types.Results.DeletionResult
-static Olve.Utilities.Types.Results.Result.Failure(params System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.ResultProblem!>! problems) -> Olve.Utilities.Types.Results.Result
-static Olve.Utilities.Types.Results.Result.implicit operator Olve.Utilities.Types.Results.Result(Olve.Utilities.Types.Results.ResultProblem! problem) -> Olve.Utilities.Types.Results.Result
-static Olve.Utilities.Types.Results.Result.implicit operator Olve.Utilities.Types.Results.Result(Olve.Utilities.Types.Results.ResultProblemCollection! problems) -> Olve.Utilities.Types.Results.Result
-static Olve.Utilities.Types.Results.Result.Success() -> Olve.Utilities.Types.Results.Result
-static Olve.Utilities.Types.Results.Result.Success<T>(T value) -> Olve.Utilities.Types.Results.Result<T>
-static Olve.Utilities.Types.Results.Result<T>.Failure(params System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.ResultProblem!>! problems) -> Olve.Utilities.Types.Results.Result<T>
-static Olve.Utilities.Types.Results.Result<T>.implicit operator Olve.Utilities.Types.Results.Result<T>(Olve.Utilities.Types.Results.ResultProblem! problem) -> Olve.Utilities.Types.Results.Result<T>
-static Olve.Utilities.Types.Results.Result<T>.implicit operator Olve.Utilities.Types.Results.Result<T>(Olve.Utilities.Types.Results.ResultProblemCollection! problems) -> Olve.Utilities.Types.Results.Result<T>
-static Olve.Utilities.Types.Results.Result<T>.implicit operator Olve.Utilities.Types.Results.Result<T>(T value) -> Olve.Utilities.Types.Results.Result<T>
-static Olve.Utilities.Types.Results.Result<T>.Success(T value) -> Olve.Utilities.Types.Results.Result<T>
-static Olve.Utilities.Types.Results.ResultEnumerableExtensions.GetProblems(this System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.Result>! results) -> System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.ResultProblem!>!
-static Olve.Utilities.Types.Results.ResultEnumerableExtensions.GetProblems<T>(this System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.Result<T>>! results) -> System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.ResultProblem!>!
-static Olve.Utilities.Types.Results.ResultEnumerableExtensions.GetValues<T>(this System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.Result<T>>! results) -> System.Collections.Generic.IEnumerable<T>!
-static Olve.Utilities.Types.Results.ResultEnumerableExtensions.HasProblems(this System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.Result>! results) -> bool
-static Olve.Utilities.Types.Results.ResultEnumerableExtensions.HasProblems<T>(this System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.Result<T>>! results) -> bool
-static Olve.Utilities.Types.Results.ResultEnumerableExtensions.TryPickProblems(this System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.Result>! results, out Olve.Utilities.Types.Results.ResultProblemCollection? problems) -> bool
-static Olve.Utilities.Types.Results.ResultEnumerableExtensions.TryPickProblems<T>(this System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.Result<T>>! results, out Olve.Utilities.Types.Results.ResultProblemCollection? problems) -> bool
-static Olve.Utilities.Types.Results.ResultEnumerableExtensions.TryPickProblems<T>(this System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.Result<T>>! results, out Olve.Utilities.Types.Results.ResultProblemCollection? problems, out System.Collections.Generic.IList<T>? values) -> bool
-static Olve.Utilities.Types.Results.ResultFuncExtensions.ToResultFunc<T>(this System.Action<T>! action) -> System.Func<T, Olve.Utilities.Types.Results.Result>!
-static Olve.Utilities.Types.Results.ResultProblemCollection.Merge(params System.Collections.Generic.IEnumerable<Olve.Utilities.Types.Results.ResultProblemCollection!>! problemCollections) -> Olve.Utilities.Types.Results.ResultProblemCollection!

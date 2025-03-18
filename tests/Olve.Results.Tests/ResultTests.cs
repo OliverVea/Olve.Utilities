@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
-using Olve.Utilities.Types.Results;
 
-namespace Olve.Utilities.Tests.Types;
+namespace Olve.Results.Tests;
 
 public class ResultTests
 {
@@ -39,7 +38,7 @@ public class ResultTests
         // Assert
         await Assert.That(problem.OriginInformation.MemberName).IsEqualTo("MoveNext");
         await Assert.That(problem.OriginInformation.FilePath).EndsWith("ResultTests.cs");
-        await Assert.That(problem.OriginInformation.LineNumber).IsEqualTo(37);
+        await Assert.That(problem.OriginInformation.LineNumber).IsEqualTo(36);
     }
 
     [Test]
@@ -53,7 +52,7 @@ public class ResultTests
         // Assert
         await Assert.That(problem.OriginInformation.MemberName).IsEqualTo(nameof(GetResultProblem));
         await Assert.That(problem.OriginInformation.FilePath).EndsWith("ResultTests.cs");
-        await Assert.That(problem.OriginInformation.LineNumber).IsEqualTo(61);
+        await Assert.That(problem.OriginInformation.LineNumber).IsEqualTo(60);
     }
 
     private static ResultProblem GetResultProblem()
@@ -74,6 +73,6 @@ public class ResultTests
         Console.WriteLine(debugString);
 
         // Assert
-        await Assert.That(debugString).EndsWith("ResultTests.cs:GetResultProblem:l61] some problem occurred");
+        await Assert.That(debugString).EndsWith("ResultTests.cs:GetResultProblem:l60] some problem occurred");
     }
 }

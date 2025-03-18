@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace Olve.Utilities.Types.Results;
+namespace Olve.Results;
 
 /// <summary>
 ///     Represents the result of a deletion operation, which can succeed, fail due to not being found, or fail due to an error.

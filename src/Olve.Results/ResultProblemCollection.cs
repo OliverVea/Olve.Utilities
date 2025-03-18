@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace Olve.Utilities.Types.Results;
+namespace Olve.Results;
 
 /// <summary>
 ///     Represents a collection of problems encountered during an operation.

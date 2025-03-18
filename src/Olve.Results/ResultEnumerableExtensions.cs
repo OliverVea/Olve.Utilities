@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Olve.Utilities.Types.Results;
+namespace Olve.Results;
 
 /// <summary>
 ///     Extension methods for working with <see cref="Result" />, <see cref="Result" />, and <see cref="Result{T}" />

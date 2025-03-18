@@ -1,0 +1,77 @@
+﻿#nullable enable
+Olve.Results.DeletionResult
+Olve.Results.DeletionResult.DeletionResult() -> void
+Olve.Results.DeletionResult.Problems.get -> Olve.Results.ResultProblemCollection?
+Olve.Results.DeletionResult.Succeeded.get -> bool
+Olve.Results.DeletionResult.TryPickProblems(out Olve.Results.ResultProblemCollection? problems) -> bool
+Olve.Results.DeletionResult.WasNotFound.get -> bool
+Olve.Results.ProblemOriginInformation
+Olve.Results.ProblemOriginInformation.FilePath.get -> string!
+Olve.Results.ProblemOriginInformation.FilePath.init -> void
+Olve.Results.ProblemOriginInformation.LineNumber.get -> int
+Olve.Results.ProblemOriginInformation.LineNumber.init -> void
+Olve.Results.ProblemOriginInformation.MemberName.get -> string!
+Olve.Results.ProblemOriginInformation.MemberName.init -> void
+Olve.Results.ProblemOriginInformation.ProblemOriginInformation() -> void
+Olve.Results.ProblemOriginInformation.ProblemOriginInformation(string! FilePath, int LineNumber, string! MemberName) -> void
+Olve.Results.Result
+Olve.Results.Result.Problems.get -> Olve.Results.ResultProblemCollection?
+Olve.Results.Result.Result() -> void
+Olve.Results.Result.Succeeded.get -> bool
+Olve.Results.Result.TryPickProblems(out Olve.Results.ResultProblemCollection? problems) -> bool
+Olve.Results.Result<T>
+Olve.Results.Result<T>.GetValueOrDefault(T defaultValue) -> T
+Olve.Results.Result<T>.Problems.get -> Olve.Results.ResultProblemCollection?
+Olve.Results.Result<T>.Result() -> void
+Olve.Results.Result<T>.Succeeded.get -> bool
+Olve.Results.Result<T>.TryGetValueOrDefault(out T? value, T defaultValue) -> bool
+Olve.Results.Result<T>.TryPickProblems(out Olve.Results.ResultProblemCollection? problems) -> bool
+Olve.Results.Result<T>.TryPickProblems(out Olve.Results.ResultProblemCollection? problems, out T? value) -> bool
+Olve.Results.Result<T>.TryPickValue(out T? value) -> bool
+Olve.Results.Result<T>.TryPickValue(out T? value, out Olve.Results.ResultProblemCollection? problems) -> bool
+Olve.Results.Result<T>.Value.get -> T?
+Olve.Results.ResultEnumerableExtensions
+Olve.Results.ResultFuncExtensions
+Olve.Results.ResultProblem
+Olve.Results.ResultProblem.Args.get -> object![]!
+Olve.Results.ResultProblem.Exception.get -> System.Exception?
+Olve.Results.ResultProblem.Message.get -> string!
+Olve.Results.ResultProblem.OriginInformation.get -> Olve.Results.ProblemOriginInformation
+Olve.Results.ResultProblem.ResultProblem(string! message, params object![]! args) -> void
+Olve.Results.ResultProblem.ResultProblem(System.Exception! exception, string! message, params object![]! args) -> void
+Olve.Results.ResultProblem.Severity.get -> int
+Olve.Results.ResultProblem.Severity.init -> void
+Olve.Results.ResultProblem.Source.get -> string?
+Olve.Results.ResultProblem.Source.init -> void
+Olve.Results.ResultProblem.Tags.get -> string![]!
+Olve.Results.ResultProblem.Tags.init -> void
+Olve.Results.ResultProblem.ToDebugString() -> string!
+Olve.Results.ResultProblemCollection
+Olve.Results.ResultProblemCollection.Append(params System.Collections.Generic.IEnumerable<Olve.Results.ResultProblem!>! resultProblems) -> Olve.Results.ResultProblemCollection!
+Olve.Results.ResultProblemCollection.GetEnumerator() -> System.Collections.Generic.IEnumerator<Olve.Results.ResultProblem!>!
+Olve.Results.ResultProblemCollection.Prepend(params System.Collections.Generic.IEnumerable<Olve.Results.ResultProblem!>! resultProblems) -> Olve.Results.ResultProblemCollection!
+Olve.Results.ResultProblemCollection.ResultProblemCollection(params System.Collections.Generic.IEnumerable<Olve.Results.ResultProblem!>! problems) -> void
+override Olve.Results.ResultProblem.ToString() -> string!
+static Olve.Results.DeletionResult.Error(params System.Collections.Generic.IEnumerable<Olve.Results.ResultProblem!>! problems) -> Olve.Results.DeletionResult
+static Olve.Results.DeletionResult.NotFound() -> Olve.Results.DeletionResult
+static Olve.Results.DeletionResult.Success() -> Olve.Results.DeletionResult
+static Olve.Results.Result.Failure(params System.Collections.Generic.IEnumerable<Olve.Results.ResultProblem!>! problems) -> Olve.Results.Result
+static Olve.Results.Result.implicit operator Olve.Results.Result(Olve.Results.ResultProblem! problem) -> Olve.Results.Result
+static Olve.Results.Result.implicit operator Olve.Results.Result(Olve.Results.ResultProblemCollection! problems) -> Olve.Results.Result
+static Olve.Results.Result.Success() -> Olve.Results.Result
+static Olve.Results.Result.Success<T>(T value) -> Olve.Results.Result<T>
+static Olve.Results.Result<T>.Failure(params System.Collections.Generic.IEnumerable<Olve.Results.ResultProblem!>! problems) -> Olve.Results.Result<T>
+static Olve.Results.Result<T>.implicit operator Olve.Results.Result<T>(Olve.Results.ResultProblem! problem) -> Olve.Results.Result<T>
+static Olve.Results.Result<T>.implicit operator Olve.Results.Result<T>(Olve.Results.ResultProblemCollection! problems) -> Olve.Results.Result<T>
+static Olve.Results.Result<T>.implicit operator Olve.Results.Result<T>(T value) -> Olve.Results.Result<T>
+static Olve.Results.Result<T>.Success(T value) -> Olve.Results.Result<T>
+static Olve.Results.ResultEnumerableExtensions.GetProblems(this System.Collections.Generic.IEnumerable<Olve.Results.Result>! results) -> System.Collections.Generic.IEnumerable<Olve.Results.ResultProblem!>!
+static Olve.Results.ResultEnumerableExtensions.GetProblems<T>(this System.Collections.Generic.IEnumerable<Olve.Results.Result<T>>! results) -> System.Collections.Generic.IEnumerable<Olve.Results.ResultProblem!>!
+static Olve.Results.ResultEnumerableExtensions.GetValues<T>(this System.Collections.Generic.IEnumerable<Olve.Results.Result<T>>! results) -> System.Collections.Generic.IEnumerable<T>!
+static Olve.Results.ResultEnumerableExtensions.HasProblems(this System.Collections.Generic.IEnumerable<Olve.Results.Result>! results) -> bool
+static Olve.Results.ResultEnumerableExtensions.HasProblems<T>(this System.Collections.Generic.IEnumerable<Olve.Results.Result<T>>! results) -> bool
+static Olve.Results.ResultEnumerableExtensions.TryPickProblems(this System.Collections.Generic.IEnumerable<Olve.Results.Result>! results, out Olve.Results.ResultProblemCollection? problems) -> bool
+static Olve.Results.ResultEnumerableExtensions.TryPickProblems<T>(this System.Collections.Generic.IEnumerable<Olve.Results.Result<T>>! results, out Olve.Results.ResultProblemCollection? problems) -> bool
+static Olve.Results.ResultEnumerableExtensions.TryPickProblems<T>(this System.Collections.Generic.IEnumerable<Olve.Results.Result<T>>! results, out Olve.Results.ResultProblemCollection? problems, out System.Collections.Generic.IList<T>? values) -> bool
+static Olve.Results.ResultFuncExtensions.ToResultFunc<T>(this System.Action<T>! action) -> System.Func<T, Olve.Results.Result>!
+static Olve.Results.ResultProblemCollection.Merge(params System.Collections.Generic.IEnumerable<Olve.Results.ResultProblemCollection!>! problemCollections) -> Olve.Results.ResultProblemCollection!

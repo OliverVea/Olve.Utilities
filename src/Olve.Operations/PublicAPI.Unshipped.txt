@@ -1,0 +1,21 @@
+﻿#nullable enable
+Olve.Operations.AsyncOperationFactory<TOperation, TRequest, TResponse>
+Olve.Operations.AsyncOperationFactory<TOperation, TRequest, TResponse>.AsyncOperationFactory(System.IServiceProvider! serviceProvider) -> void
+Olve.Operations.AsyncOperationFactory<TOperation, TRequest, TResponse>.Build() -> TOperation
+Olve.Operations.AsyncOperationFactory<TOperation, TRequest>
+Olve.Operations.AsyncOperationFactory<TOperation, TRequest>.AsyncOperationFactory(System.IServiceProvider! serviceProvider) -> void
+Olve.Operations.AsyncOperationFactory<TOperation, TRequest>.Build() -> TOperation
+Olve.Operations.IAsyncOperation<TRequest, TResult>
+Olve.Operations.IAsyncOperation<TRequest, TResult>.ExecuteAsync(TRequest request, System.Threading.CancellationToken ct = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Olve.Utilities.Types.Results.Result<TResult>>!
+Olve.Operations.IAsyncOperation<TRequest>
+Olve.Operations.IAsyncOperation<TRequest>.ExecuteAsync(TRequest request, System.Threading.CancellationToken ct = default(System.Threading.CancellationToken)) -> System.Threading.Tasks.Task<Olve.Utilities.Types.Results.Result>!
+Olve.Operations.IOperation<TRequest, TResult>
+Olve.Operations.IOperation<TRequest, TResult>.Execute(TRequest request) -> Olve.Utilities.Types.Results.Result<TResult>
+Olve.Operations.IOperation<TRequest>
+Olve.Operations.IOperation<TRequest>.Execute(TRequest request) -> Olve.Utilities.Types.Results.Result
+Olve.Operations.OperationFactory<TOperation, TRequest, TResponse>
+Olve.Operations.OperationFactory<TOperation, TRequest, TResponse>.Build() -> TOperation
+Olve.Operations.OperationFactory<TOperation, TRequest, TResponse>.OperationFactory(System.IServiceProvider! serviceProvider) -> void
+Olve.Operations.OperationFactory<TOperation, TRequest>
+Olve.Operations.OperationFactory<TOperation, TRequest>.Build() -> TOperation
+Olve.Operations.OperationFactory<TOperation, TRequest>.OperationFactory(System.IServiceProvider! serviceProvider) -> void

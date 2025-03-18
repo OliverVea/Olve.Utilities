@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Olve.Utilities.Operations;
+namespace Olve.Operations;
 
 /// <summary>
 ///     A factory for creating instances of operations that implement <see cref="IOperation{TRequest, TResponse}" />.

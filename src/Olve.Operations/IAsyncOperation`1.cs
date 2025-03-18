@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Olve.Utilities.Types.Results;
+using Olve.Results;
 
-namespace Olve.Utilities.Operations;
+namespace Olve.Operations;
 
 /// <summary>
 ///     Represents an asynchronous operation that takes an input.

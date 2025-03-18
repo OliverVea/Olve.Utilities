@@ -9,10 +9,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\Olve.Utilities\Olve.Utilities.csproj"/>
+        <ProjectReference Include="..\..\src\Olve.Operations\Olve.Operations.csproj" />
     </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Operations\" />
-    </ItemGroup>
-
 </Project>

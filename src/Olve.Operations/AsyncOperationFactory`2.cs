@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Olve.Utilities.Operations;
+namespace Olve.Operations;
 
 #pragma warning disable MA0026
 // Todo: Add warning for direct DI of operations

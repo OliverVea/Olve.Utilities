@@ -1,4 +1,4 @@
-﻿namespace Olve.Utilities.Types.Results;
+﻿namespace Olve.Results;
 
 /// <summary>
 ///     Extensions for <see cref="Func{T, Result}" />.

@@ -2,7 +2,7 @@ name: Push to master
 
 on:
   push:
-    branches:
+    branches:Utilities
       - master
 
 permissions:
@@ -97,6 +97,22 @@ jobs:
       with:
         project: ./src/Olve.Utilities
         package-name: Olve.Utilities
+        version: ${{ needs.bump-version.outputs.version }}
+        nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+
+    - name: Publish Olve.Results to NuGet
+      uses: ./.github/actions/dotnet-publish
+      with:
+        project: ./src/Olve.Results
+        package-name: Olve.Results
+        version: ${{ needs.bump-version.outputs.version }}
+        nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+
+    - name: Publish Olve.Operations to NuGet
+      uses: ./.github/actions/dotnet-publish
+      with:
+        project: ./src/Olve.Operations
+        package-name: Olve.Operations
         version: ${{ needs.bump-version.outputs.version }}
         nuget-api-key: ${{ secrets.NUGET_API_KEY }}
 

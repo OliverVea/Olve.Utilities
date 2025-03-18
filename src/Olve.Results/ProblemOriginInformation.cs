@@ -1,4 +1,4 @@
-namespace Olve.Utilities.Types.Results;
+namespace Olve.Results;
 
 /// <summary>
 ///     Represents the origin of a problem.

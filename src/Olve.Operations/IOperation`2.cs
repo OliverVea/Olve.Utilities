@@ -1,6 +1,6 @@
-﻿using Olve.Utilities.Types.Results;
+﻿using Olve.Results;
 
-namespace Olve.Utilities.Operations;
+namespace Olve.Operations;
 
 /// <summary>
 ///     Represents an operation that takes a request and returns a result.
