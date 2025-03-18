@@ -1,13 +1,12 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Versioning;
 
 namespace Olve.Results;
 
 /// <summary>
 ///     Represents a result of an operation without a value, indicating success or failure.
 /// </summary>
-public readonly struct Result
+public readonly partial struct Result
 {
     private Result(ResultProblemCollection? problems)
     {
@@ -104,6 +103,27 @@ public readonly struct Result
             StackFrame stackFrame = new(1, true);
             return new ResultProblem(exception, message ?? string.Empty, args: args, stackFrame);
         }
+    }
+
+    /// <summary>
+    /// Executes a sequence of functions that return a <see cref="Result"/>.
+    /// If any function in the chain returns a result containing problems, execution stops,
+    /// and that result is returned. Otherwise, returns a successful result.
+    /// </summary>
+    /// <param name="links">An array of functions that return a <see cref="Result"/>.</param>
+    /// <returns>The first result with problems, or a successful result if all functions succeed.</returns>
+    public static Result Chain(params IEnumerable<Func<Result>> links)
+    {
+        foreach (var link in links)
+        {
+            var result = link();
+            if (result.Problems is not null)
+            {
+                return result;
+            }
+        }
+
+        return Success();
     }
 
     /// <summary>
