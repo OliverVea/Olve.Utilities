@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Versioning;
 
 namespace Olve.Results;
 
@@ -39,6 +41,54 @@ public readonly struct Result
     /// <param name="problems">The problems associated with the failure.</param>
     /// <returns>A failure result.</returns>
     public static Result Failure(params IEnumerable<ResultProblem> problems) => new(new ResultProblemCollection(problems));
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="action"></param>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    /// <typeparam name="TException"></typeparam>
+    /// <returns></returns>
+    [RequiresPreviewFeatures]
+    public static Result Try<TException>(Action action, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string? message = null, params object[] args) where TException : Exception
+    {
+        try
+        {
+            action();
+        }
+        catch (TException exception)
+        {
+            StackFrame stackFrame = new(1, true);
+            return new ResultProblem(exception, message ?? string.Empty, args: args, stackFrame);
+        }
+
+        return Success();
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="action"></param>
+    /// <param name="message"></param>
+    /// <param name="args"></param>
+    /// <typeparam name="TException"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <returns></returns>
+    [RequiresPreviewFeatures]
+    public static Result<TValue> Try<TValue, TException>(Func<TValue> action, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string? message = null, params object[] args) where TException : Exception
+    {
+        try
+        {
+            var value = action();
+            return value;
+        }
+        catch (TException exception)
+        {
+            StackFrame stackFrame = new(1, true);
+            return new ResultProblem(exception, message ?? string.Empty, args: args, stackFrame);
+        }
+    }
 
     /// <summary>
     ///     Attempts to retrieve the problems associated with the result.

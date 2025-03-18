@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Versioning;
 
 namespace Olve.Results;
 
@@ -40,6 +41,7 @@ public class ResultProblemCollection(params IEnumerable<ResultProblem> problems)
     /// <param name="message">The format string for the problem message.</param>
     /// <param name="args">The arguments to format the message.</param>
     /// <returns>A new collection with the formatted problem prepended.</returns>
+    [RequiresPreviewFeatures]
     public ResultProblemCollection Prepend([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
         params object[] args)
         => Prepend(new ResultProblem(null, message, args: args, stackFrame: new StackFrame(1, true)));
@@ -51,6 +53,7 @@ public class ResultProblemCollection(params IEnumerable<ResultProblem> problems)
     /// <param name="message">The format string for the problem message.</param>
     /// <param name="args">The arguments to format the message.</param>
     /// <returns>A new collection with the formatted problem prepended.</returns>
+    [RequiresPreviewFeatures]
     public ResultProblemCollection Prepend(Exception exception, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
         params object[] args)
         => Prepend(new ResultProblem(exception, message, args: args, stackFrame: new StackFrame(1, true)));
