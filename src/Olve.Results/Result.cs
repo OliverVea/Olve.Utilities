@@ -58,7 +58,7 @@ public readonly struct Result
     ///     A successful result if no exception is thrown; otherwise, a failure result
     ///     containing details of the caught exception.
     /// </returns>
-    [RequiresPreviewFeatures]
+    [DebuggerHidden]
     public static Result Try<TException>(Action action, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string? message = null, params object[] args) where TException : Exception
     {
         try
@@ -91,7 +91,7 @@ public readonly struct Result
     ///     A successful result containing the function's return value if no exception is thrown;
     ///     otherwise, a failure result containing details of the caught exception.
     /// </returns>
-    [RequiresPreviewFeatures]
+    [DebuggerHidden]
     public static Result<TValue> Try<TValue, TException>(Func<TValue> action, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string? message = null, params object[] args) where TException : Exception
     {
         try
