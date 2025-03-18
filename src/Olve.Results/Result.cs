@@ -43,13 +43,21 @@ public readonly struct Result
     public static Result Failure(params IEnumerable<ResultProblem> problems) => new(new ResultProblemCollection(problems));
 
     /// <summary>
-    ///
+    ///     Attempts to execute the specified action and returns a <see cref="Result"/>.
+    ///     If an exception of type <typeparamref name="TException"/> is thrown, it is captured
+    ///     as a problem in the result.
     /// </summary>
-    /// <param name="action"></param>
-    /// <param name="message"></param>
-    /// <param name="args"></param>
-    /// <typeparam name="TException"></typeparam>
-    /// <returns></returns>
+    /// <typeparam name="TException">The type of exception to catch.</typeparam>
+    /// <param name="action">The action to execute.</param>
+    /// <param name="message">
+    ///     An optional message providing additional context if an exception is thrown.
+    ///     Supports composite formatting.
+    /// </param>
+    /// <param name="args">Optional arguments for formatting the message.</param>
+    /// <returns>
+    ///     A successful result if no exception is thrown; otherwise, a failure result
+    ///     containing details of the caught exception.
+    /// </returns>
     [RequiresPreviewFeatures]
     public static Result Try<TException>(Action action, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string? message = null, params object[] args) where TException : Exception
     {
@@ -67,14 +75,22 @@ public readonly struct Result
     }
 
     /// <summary>
-    ///
+    ///     Attempts to execute the specified function and returns a <see cref="Result{TValue}"/>.
+    ///     If an exception of type <typeparamref name="TException"/> is thrown, it is captured
+    ///     as a problem in the result.
     /// </summary>
-    /// <param name="action"></param>
-    /// <param name="message"></param>
-    /// <param name="args"></param>
-    /// <typeparam name="TException"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
-    /// <returns></returns>
+    /// <typeparam name="TValue">The type of value returned by the function.</typeparam>
+    /// <typeparam name="TException">The type of exception to catch.</typeparam>
+    /// <param name="action">The function to execute.</param>
+    /// <param name="message">
+    ///     An optional message providing additional context if an exception is thrown.
+    ///     Supports composite formatting.
+    /// </param>
+    /// <param name="args">Optional arguments for formatting the message.</param>
+    /// <returns>
+    ///     A successful result containing the function's return value if no exception is thrown;
+    ///     otherwise, a failure result containing details of the caught exception.
+    /// </returns>
     [RequiresPreviewFeatures]
     public static Result<TValue> Try<TValue, TException>(Func<TValue> action, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string? message = null, params object[] args) where TException : Exception
     {
