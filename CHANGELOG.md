@@ -1,3 +1,13 @@
+## v0.14.0 (2025-03-19)
+
+### Feat
+
+- adding `Result.Chain` to `Result<T>` and renaming the previous operation `Result.Concat` for clarity
+
+### Refactor
+
+- fixing file name
+
 ## v0.13.0 (2025-03-18)
 
 ### Feat
