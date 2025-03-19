@@ -95,25 +95,6 @@ public class ResultTests
         await Assert.That(bInvoked).IsEqualTo(bInvokedExpected);
     }
 
-    [Test]
-    public async Task Test5()
-    {
-        // Arrange
-        Func<Result<int>> a = () => Result.Success(1), b = () => Result.Success(2), c = () => Result.Success(3);
-
-        // Act
-        var result = Result.Chain(a, b, c);
-
-        // Assert
-        await Assert.That(result.Succeeded).IsTrue();
-
-        var (aValue, bValue, cValue) = result.Value;
-
-        await Assert.That(aValue).IsEqualTo(1);
-        await Assert.That(bValue).IsEqualTo(2);
-        await Assert.That(cValue).IsEqualTo(3);
-    }
-
     private Result Fail(Action? action)
     {
         action?.Invoke();
@@ -126,5 +107,104 @@ public class ResultTests
         action?.Invoke();
 
         return Result.Success();
+    }
+
+    [Test]
+    public async Task Test5()
+    {
+        // Arrange
+        Func<Result<int>> a = () => Result.Success(1), b = () => Result.Success(2), c = () => Result.Success(3);
+
+        // Act
+        var result = Result.Concat(a, b, c);
+
+        // Assert
+        await Assert.That(result.Succeeded).IsTrue();
+
+        var (aValue, bValue, cValue) = result.Value;
+
+        await Assert.That(aValue).IsEqualTo(1);
+        await Assert.That(bValue).IsEqualTo(2);
+        await Assert.That(cValue).IsEqualTo(3);
+    }
+
+    [Test]
+    [Arguments(false, false, false, false)]
+    [Arguments(true, false, true, false)]
+    [Arguments(false, true, false, false)]
+    [Arguments(true, true, true, true)]
+    public async Task Result_Then(bool aSucceeds, bool bSucceeds, bool bInvokedExpected, bool expected)
+    {
+        // Arrange
+        bool aInvoked = false, bInvoked = false;
+
+        Func<Result<int>> a = aSucceeds ? () => SuccessInt(() => aInvoked = true) : () => FailInt(() => aInvoked = true);
+        Func<int, Result<int>> b = bSucceeds ? v => SuccessInt(() => bInvoked = true, v) : v => FailInt(() => bInvoked = true, v);
+
+        // Act
+        var actual = Result.Chain(a, b);
+
+        // Assert
+        await Assert.That(actual.Succeeded).IsEqualTo(expected);
+        await Assert.That(aInvoked).IsTrue();
+        await Assert.That(bInvoked).IsEqualTo(bInvokedExpected);
+    }
+
+    private Result<int> FailInt(Action? action, int value = 0)
+    {
+        action?.Invoke();
+
+        return new ResultProblem("fail!");
+    }
+
+    private Result<int> SuccessInt(Action? action = null, int value = 0)
+    {
+        action?.Invoke();
+
+        return value + 42;
+    }
+
+    private Result<string> GetResultString(string value)
+    {
+        return value;
+    }
+
+    private Result<int> GetParsedInt(string value)
+    {
+        if (int.TryParse(value, out var result))
+        {
+            return result;
+        }
+
+        return new ResultProblem("Could not parse value");
+    }
+
+    [Test]
+    public async Task Result_Then_Chaining_Succeeds()
+    {
+        // Arrange
+        var value = "42";
+
+        // Act
+        var result = Result.Chain(() => GetResultString(value), GetParsedInt);
+
+        // Assert
+        await Assert.That(result.Succeeded).IsTrue();
+        await Assert.That(result.Value).IsEqualTo(42);
+    }
+
+    [Test]
+    public async Task Result_Then_Chaining_Fails()
+    {
+        // Arrange
+        var value = "not a number";
+
+        // Act
+        var result = Result.Chain(() => GetResultString(value), GetParsedInt);
+
+        // Assert
+        await Assert.That(result.Succeeded).IsFalse();
+        var problem = result.Problems!.Single();
+        await Assert.That(problem.Message).IsEqualTo("Could not parse value");
     }
 }
