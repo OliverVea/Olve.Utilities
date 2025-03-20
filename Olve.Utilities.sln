@@ -14,6 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "repo", "repo", "{853B9358-C
 		.config\dotnet-tools.json = .config\dotnet-tools.json
 		.cz.yaml = .cz.yaml
 		CHANGELOG.md = CHANGELOG.md
+		docs\docfx.json = docs\docfx.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6AE53E7D-3FEB-459A-B821-AD2F5D52DBE4}"
