@@ -7,6 +7,14 @@
         {
           "src": "../src/Olve.Utilities",
           "files": ["**/Olve.Utilities.csproj"]
+        },
+        {
+          "src": "../src/Olve.Results",
+            "files": ["**/Olve.Results.csproj"]
+        },
+        {
+          "src": "../src/Olve.Operations",
+          "files": ["**/Olve.Operations.csproj"]
         }
       ],
       "dest": "api"
