@@ -127,6 +127,38 @@ public readonly partial struct Result
     }
 
     /// <summary>
+    ///     Concatenates a sequence of functions that produce results.
+    /// </summary>
+    /// <param name="elements">The functions that produce results.</param>
+    /// <returns>A successful result if all functions succeed; otherwise, all encountered problems.</returns>
+    public static Result Concat(params IEnumerable<Func<Result>> elements)
+    {
+        var results = elements.Select(x => x());
+
+        if (results.TryPickProblems(out var problems))
+        {
+            return problems;
+        }
+
+        return Success();
+    }
+
+    /// <summary>
+    ///     Executes a sequence of functions that return a <see cref="Result{TValue}"/>.
+    /// </summary>
+    /// <param name="action">The function to execute.</param>
+    /// <returns>The result of the function.</returns>
+    public Result IfProblem(Action<ResultProblemCollection> action)
+    {
+        if (Problems is not null)
+        {
+            action(Problems);
+        }
+
+        return this;
+    }
+
+    /// <summary>
     ///     Attempts to retrieve the problems associated with the result.
     /// </summary>
     /// <param name="problems">

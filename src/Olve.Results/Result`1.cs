@@ -126,6 +126,21 @@ public readonly struct Result<T>
     }
 
     /// <summary>
+    ///     Executes a sequence of functions that return a <see cref="Result{TValue}"/>.
+    /// </summary>
+    /// <param name="action">The function to execute.</param>
+    /// <returns>The result of the function.</returns>
+    public Result<T> IfProblem(Action<ResultProblemCollection> action)
+    {
+        if (Problems is not null)
+        {
+            action(Problems);
+        }
+
+        return this;
+    }
+
+    /// <summary>
     ///     Converts the specified value to a success result.
     /// </summary>
     /// <param name="value">The value to convert.</param>
