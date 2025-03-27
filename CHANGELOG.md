@@ -1,3 +1,10 @@
+## v0.15.0 (2025-03-27)
+
+### Feat
+
+- **Olve.Results**: added `Result.IfProblem`
+- adding static configurable default values to `ResultProblem.Tags`, `ResultProblem.Severity` and `ResultProblem.Source`
+
 ## v0.14.0 (2025-03-19)
 
 ### Feat
