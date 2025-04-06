@@ -1,0 +1,9 @@
+﻿{
+  "solution": {
+    "path": "Olve.Utilities.sln",
+    "projects": [
+      "src\\Olve.Paths\\Olve.Paths.csproj",
+      "tests\\Olve.Paths.Tests\\Olve.Paths.Tests.csproj"
+    ]
+  }
+}

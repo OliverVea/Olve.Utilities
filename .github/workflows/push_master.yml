@@ -83,38 +83,46 @@ jobs:
         if: "${{ steps.version-changed.outputs.changed == 'true' }}"
         run: echo "::notice::id=${{ steps.release.outputs.id }}"
 
-  publish-olve-utilities:
-    name: Publish Olve.Utilities to NuGet
+  publish-packages:
+    name: Publish NuGet Packages in Parallel
     needs:
       - bump-version
     if: "${{ needs.bump-version.outputs.changed == 'true' }}"
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - id: Olve.Utilities
+            project: ./src/Olve.Utilities
+            pattern: 'src/Olve.[Utilities][Results][Operations]/**'
+          - id: Olve.Results
+            project: ./src/Olve.Results
+            pattern: 'src/Olve.Results/**'
+          - id: Olve.Operations
+            project: ./src/Olve.Operations
+            pattern: 'src/Olve.[Operations][Results]/**'
+          - id: Olve.Paths
+            project: ./src/Olve.Paths
+            pattern: 'src/Olve.Paths/**'
+
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Publish Olve.Utilities to NuGet
-      uses: ./.github/actions/dotnet-publish
-      with:
-        project: ./src/Olve.Utilities
-        package-name: Olve.Utilities
-        version: ${{ needs.bump-version.outputs.version }}
-        nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+      - name: Check if ${{ matrix.id }} was changed
+        id: changed
+        uses: tj-actions/changed-files@v46  
+        with:
+          files: ${{ matrix.pattern }}
 
-    - name: Publish Olve.Results to NuGet
-      uses: ./.github/actions/dotnet-publish
-      with:
-        project: ./src/Olve.Results
-        package-name: Olve.Results
-        version: ${{ needs.bump-version.outputs.version }}
-        nuget-api-key: ${{ secrets.NUGET_API_KEY }}
-
-    - name: Publish Olve.Operations to NuGet
-      uses: ./.github/actions/dotnet-publish
-      with:
-        project: ./src/Olve.Operations
-        package-name: Olve.Operations
-        version: ${{ needs.bump-version.outputs.version }}
-        nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+      - name: Publish ${{ matrix.id }} to NuGet
+        if: steps.changed.outputs.any_changed == 'true'
+        uses: ./.github/actions/dotnet-publish
+        with:
+          project: ${{ matrix.project }}
+          package-name: ${{ matrix.id }}
+          version: ${{ needs.bump-version.outputs.version }}
+          nuget-api-key: ${{ secrets.NUGET_API_KEY }}
 
   publish-docs:
     name: Publish DocFX to GitHub Pages
@@ -126,30 +134,30 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Install .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.100
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.100
 
-    - name: .NET restore
-      shell: bash
-      run: |
-        dotnet restore
-        dotnet tool restore
+      - name: .NET restore
+        shell: bash
+        run: |
+          dotnet restore
+          dotnet tool restore
 
-    - run: dotnet docfx docs/docfx.json
+      - run: dotnet docfx docs/docfx.json
 
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        name: docfx-pages
-        path: 'docs/_site'
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          name: docfx-pages
+          path: 'docs/_site'
 
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
-      with:
-        artifact_name: docfx-pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          artifact_name: docfx-pages
