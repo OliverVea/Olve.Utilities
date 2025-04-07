@@ -1,57 +1,33 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Text;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Olve.Paths;
 
-public class PureUnixPath : PurePath
+
+[DebuggerDisplay("{Path}")]
+public class PureUnixPath : IPurePath
 {
     internal IReadOnlyList<string> Segments { get; }
-    internal bool IsFile { get; }
 
-    internal PureUnixPath(string[] segments, bool isFile, PathType pathType)
+    internal PureUnixPath(string[] segments, PathType pathType)
     {
         Segments = segments;
-        IsFile = isFile;
         Type = pathType;
+
+        Path = pathType == PathType.Absolute
+            ? $"/{string.Join('/', Segments)}"
+            : string.Join("/", Segments);
     }
-    
-    internal PureUnixPath(string path)
+
+    internal PureUnixPath(string path) : this(path.Split('/', StringSplitOptions.RemoveEmptyEntries), GetPathType(path))
     {
-        Segments = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        IsFile = !path.EndsWith('/');
-        
-        Type = GetPathType(path);
     }
 
-    public override PathPlatform Platform => PathPlatform.Unix;
-    public override PathType Type { get; }
+    public string Path { get; }
+    public PathPlatform Platform => PathPlatform.Unix;
+    public PathType Type { get; }
 
-    public override string GetFullString()
-    {
-        StringBuilder sb = new();
-
-        if (Type == PathType.Absolute)
-        {
-            sb.Append('/');
-        }
-
-        foreach (var segment in Segments.Take(Segments.Count - 1))
-        {
-            sb.Append(segment);
-            sb.Append('/');
-        }
-
-        sb.Append(Segments[^1]);
-
-        if (!IsFile)
-        {
-            sb.Append('/');
-        }
-
-        return sb.ToString();
-    }
-
-    public override bool TryGetParent([NotNullWhen(true)] out PurePath? parent)
+    public bool TryGetParentPure([NotNullWhen(true)] out IPurePath? parent)
     {
         if (Segments.Count <= 1)
         {
@@ -59,18 +35,12 @@ public class PureUnixPath : PurePath
             return false;
         }
 
-        parent = new PureUnixPath(Segments.Take(Segments.Count - 1).ToArray(), false, Type);
+        parent = new PureUnixPath(Segments.Take(Segments.Count - 1).ToArray(), Type);
         return true;
     }
 
-    public override bool TryGetFileName([NotNullWhen(true)] out string? fileName)
+    public bool TryGetName([NotNullWhen(true)] out string? fileName)
     {
-        if (!IsFile)
-        {
-            fileName = null;
-            return false;
-        }
-
         if (Segments.Count > 0)
         {
             fileName = Segments[^1];
@@ -81,27 +51,22 @@ public class PureUnixPath : PurePath
         return false;
     }
 
-    protected override PurePath Append(PurePath right)
+    public IPurePath Append(IPurePath right)
     {
-        if (IsFile)
-        {
-            throw new InvalidOperationException("Cannot append to a file path.");
-        }
-
         if (right is PureUnixPath unixRight)
         {
             return Append(unixRight);
         }
 
-        return Append(right.GetFullString());
+        return Append(right.Path);
     }
 
-    private PurePath Append(PureUnixPath right)
+    private IPurePath Append(PureUnixPath right)
     {
         if (right.Type == PathType.Stub)
         {
             var combinedSegments = Segments.Concat(right.Segments).ToArray();
-            return new PureUnixPath(combinedSegments, right.IsFile, Type);
+            return new PureUnixPath(combinedSegments, Type);
         }
 
         if (right.Type != PathType.Relative)
@@ -134,21 +99,18 @@ public class PureUnixPath : PurePath
             }
         }
         
-        return new PureUnixPath(segments.ToArray(), right.IsFile, Type);
+        return new PureUnixPath(segments.ToArray(), Type);
     }
 
-    protected override PurePath Append(string right)
+    public IPurePath Append(string right)
     {
-        if (IsFile)
-            throw new InvalidOperationException("Cannot append to a file path.");
-
         var rightPath = new PureUnixPath(right);
 
         if (rightPath.Type != PathType.Stub)
             throw new ArgumentException("Can only append stub strings (not absolute or relative paths).", nameof(right));
 
         var combinedSegments = Segments.Concat(rightPath.Segments).ToArray();
-        return new PureUnixPath(combinedSegments, rightPath.IsFile, this.Type);
+        return new PureUnixPath(combinedSegments, Type);
     }
 
 

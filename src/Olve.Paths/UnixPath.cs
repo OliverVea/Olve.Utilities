@@ -1,9 +1,11 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Olve.Paths;
 
-public class UnixPath : Path
+[DebuggerDisplay("{Path}")]
+public class UnixPath : IPath
 {
     private const string LinkStringPrefix = "file://";
     
@@ -22,7 +24,27 @@ public class UnixPath : Path
         _pathEnvironment = pathEnvironment ?? DefaultUnixPathEnvironment.Shared;
     }
 
-    public override bool TryGetAbsolute([NotNullWhen(true)] out Path? absolute)
+    public string Path => _pureUnixPath.Path;
+
+    public bool TryGetElementType(out ElementType type)
+    {
+        if (File.Exists(Path))
+        {
+            type = ElementType.File;
+            return true;
+        }
+
+        if (Directory.Exists(Path))
+        {
+            type = ElementType.Directory;
+            return true;
+        }
+
+        type = ElementType.None;
+        return false;
+    }
+
+    public bool TryGetAbsolute([NotNullWhen(true)] out IPath? absolute)
     {
         if (Type == PathType.Absolute)
         {
@@ -37,22 +59,32 @@ public class UnixPath : Path
             return false;
         }
 
-        absolute = Create(cwd) / _pureUnixPath;
+        absolute = Olve.Paths.Path.Create(cwd) / _pureUnixPath;
         
         return true;
     }
 
-    public override PathPlatform Platform => _pureUnixPath.Platform;
-    public override PathType Type => _pureUnixPath.Type;
-    public override string GetFullString() => _pureUnixPath.GetFullString();
+    public PathPlatform Platform => _pureUnixPath.Platform;
+    public PathType Type => _pureUnixPath.Type;
 
-    public override bool TryGetParent([NotNullWhen(true)] out PurePath? parent)
-        => _pureUnixPath.TryGetParent(out parent);
+    public bool TryGetParentPure([NotNullWhen(true)] out IPurePath? parent)
+        => _pureUnixPath.TryGetParentPure(out parent);
+    public bool TryGetParent([NotNullWhen(true)] out IPath? parent)
+    {
+        if (TryGetParentPure(out var parentPure))
+        {
+            parent = new UnixPath((PureUnixPath)parentPure, _pathEnvironment);
+            return true;
+        }
 
-    public override bool TryGetFileName([NotNullWhen(true)] out string? fileName) 
-        => _pureUnixPath.TryGetFileName(out fileName);
+        parent = null;
+        return false;
+    }
 
-    protected override Path AppendPath(PurePath right)
+    public bool TryGetName([NotNullWhen(true)] out string? fileName) 
+        => _pureUnixPath.TryGetName(out fileName);
+
+    public IPurePath Append(IPurePath right)
     {
         if (_pureUnixPath / right is not PureUnixPath pureUnixPath)
         {
@@ -62,7 +94,17 @@ public class UnixPath : Path
         return new UnixPath(pureUnixPath, _pathEnvironment);
     }
 
-    protected override Path AppendPath(string right)
+    public IPurePath Append(string right)
+    {
+        if ((IPurePath)_pureUnixPath / right is not PureUnixPath pureUnixPath)
+        {
+            throw new InvalidOperationException("Path segments could not be combined.");
+        }
+
+        return new UnixPath(pureUnixPath, _pathEnvironment);
+    }
+
+    public IPath AppendPath(IPurePath right)
     {
         if (_pureUnixPath / right is not PureUnixPath pureUnixPath)
         {
@@ -72,12 +114,22 @@ public class UnixPath : Path
         return new UnixPath(pureUnixPath, _pathEnvironment);
     }
 
-    public override string GetLinkString(int? lineNumber = null, int? columnNumber = null)
+    public IPath AppendPath(string right)
+    {
+        if ((IPurePath)_pureUnixPath / right is not PureUnixPath pureUnixPath)
+        {
+            throw new InvalidOperationException("Path segments could not be combined.");
+        }
+
+        return new UnixPath(pureUnixPath, _pathEnvironment);
+    }
+
+    public string GetLinkString(int? lineNumber = null, int? columnNumber = null)
     {
         StringBuilder sb = new();
 
         sb.Append(LinkStringPrefix);
-        sb.Append(GetFullString());
+        sb.Append(Path);
 
         if (lineNumber is { } l)
         {

@@ -2,16 +2,16 @@ namespace Olve.Paths;
 
 public static class PurePathMatchExtensions
 {
-    public static TOut Match<T, TOut>(this PurePath path, Func<T, TOut> action, Func<TOut> fallback) where T : PurePath
+    public static TOut Match<T, TOut>(this IPurePath path, Func<T, TOut> action, Func<TOut> fallback) where T : IPurePath
     {
         if (path is T t) return action.Invoke(t); 
         
         return fallback.Invoke();
     }
 
-    public static TOut Match<T1, T2, TOut>(this PurePath path, Func<T1, TOut> action1, Func<T2, TOut> action2, Func<TOut> fallback)
-        where T1 : PurePath
-        where T2 : PurePath
+    public static TOut Match<T1, T2, TOut>(this IPurePath path, Func<T1, TOut> action1, Func<T2, TOut> action2, Func<TOut> fallback)
+        where T1 : IPurePath
+        where T2 : IPurePath
     {
         if (path is T1 t1) return action1.Invoke(t1); 
         if (path is T2 t2) return action2.Invoke(t2);
@@ -19,10 +19,10 @@ public static class PurePathMatchExtensions
         return fallback.Invoke();
     }
 
-    public static TOut Match<T1, T2, T3, TOut>(this PurePath path, Func<T1, TOut> action1, Func<T2, TOut> action2, Func<T3, TOut> action3, Func<TOut> fallback) 
-        where T1 : PurePath
-        where T2 : PurePath
-        where T3 : PurePath
+    public static TOut Match<T1, T2, T3, TOut>(this IPurePath path, Func<T1, TOut> action1, Func<T2, TOut> action2, Func<T3, TOut> action3, Func<TOut> fallback) 
+        where T1 : IPurePath
+        where T2 : IPurePath
+        where T3 : IPurePath
     {
         if (path is T1 t1) return action1.Invoke(t1);
         if (path is T2 t2) return action2.Invoke(t2);
