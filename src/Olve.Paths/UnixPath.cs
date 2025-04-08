@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Security;
 using System.Text;
 
 namespace Olve.Paths;
@@ -79,6 +80,39 @@ public class UnixPath : IPath
 
         parent = null;
         return false;
+    }
+
+    public bool TryGetChildren([NotNullWhen(true)] out IEnumerable<IPath>? children)
+    {
+        var canGetChildren = TryGetElementType(out var type)
+            && type == ElementType.Directory
+            && Directory.Exists(Path);
+
+        if (!canGetChildren)
+        {
+            children = null;
+            return false;
+        }
+
+        children = GetChildren(Path);
+        return true;
+    }
+
+    // Todo: document exceptions
+    private IEnumerable<UnixPath> GetChildren(string path)
+    {
+        var directories = Directory.EnumerateDirectories(path);
+        var files = Directory.EnumerateFiles(path);
+
+        foreach (var directory in directories)
+        {
+            yield return new UnixPath(directory, _pathEnvironment);
+        }
+
+        foreach (var file in files)
+        {
+            yield return new UnixPath(file, _pathEnvironment);
+        }
     }
 
     public bool TryGetName([NotNullWhen(true)] out string? fileName) 

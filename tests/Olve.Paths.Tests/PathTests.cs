@@ -60,7 +60,7 @@ public class PathTests
     [Test]
     [Arguments("doesnotexist", ElementType.None)]
     [Arguments("testdata", ElementType.Directory)]
-    [Arguments("testdata/file.txt", ElementType.File)]
+    [Arguments("testdata/text-file.txt", ElementType.File)]
     public async Task TryGetElementType_OnVariousPaths_ReturnsExpectedResults(string pathString, ElementType expected)
     {
         // Arrange
@@ -69,7 +69,7 @@ public class PathTests
             Assert.Fail("Assembly executable path not found.");
         }
 
-        var path = assemblyPath.Parent! / pathString;
+        var path = assemblyPath.Parent / pathString;
 
         // Act
         var gotElementType = path.TryGetElementType(out var elementType);
@@ -77,6 +77,34 @@ public class PathTests
         // Assert
         await Assert.That(gotElementType).IsEqualTo(expected != ElementType.None);
         await Assert.That(elementType).IsEqualTo(expected);
+    }
+
+    [Test]
+    public async Task TryGetChildren_OnValidDirectory_ReturnsExpectedChildren()
+    {
+        // Arrange
+        string[] expectedElements = ["text-file.txt", "text-file-2.txt", "video-file.avi", "image-file.png", "dir"];
+
+        if (!Path.TryGetAssemblyExecutable(out var assemblyPath))
+        {
+            Assert.Fail("Assembly executable path not found.");
+        }
+
+        var path = assemblyPath.Parent / "testdata";
+
+        // Act
+        var gotChildren = path.TryGetChildren(out var children);
+        var childPaths = children?.Select(child => child.Name).ToList();
+
+        // Assert
+        await Assert.That(gotChildren).IsTrue();
+        await Assert.That(childPaths).IsNotNull();
+        await Assert.That(childPaths).HasCount().EqualTo(expectedElements.Length);
+
+        foreach (var (actual, expected) in childPaths!.Order().Zip(expectedElements.Order()))
+        {
+            await Assert.That(actual).EndsWith(expected);
+        }
     }
 
     private class ConstantPathEnvironment(string? cwd = null, string? executable = null) : IPathEnvironment

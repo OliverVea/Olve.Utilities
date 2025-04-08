@@ -8,11 +8,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\src\Olve.Paths.Glob\Olve.Paths.Glob.csproj" />
         <ProjectReference Include="..\..\src\Olve.Paths\Olve.Paths.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="testdata\text-file.txt">
+      <None Update="testdata\**">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
