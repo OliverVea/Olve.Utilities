@@ -15,6 +15,14 @@
         {
           "src": "../src/Olve.Operations",
           "files": ["**/Olve.Operations.csproj"]
+        },
+        {
+          "src": "../src/Olve.Paths",
+            "files": ["**/Olve.Paths.csproj"]
+        },
+        {
+          "src": "../src/Olve.Paths.Glob",
+            "files": ["**/Olve.Paths.Glob.csproj"]
         }
       ],
       "dest": "api"
