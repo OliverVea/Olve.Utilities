@@ -2,8 +2,17 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Olve.Paths;
 
+/// <summary>
+/// Represents a utility class for creating and managing platform-specific path abstractions.
+/// </summary>
 public static class Path
 {
+    /// <summary>
+    /// Creates a platform-specific pure path from the given string.
+    /// </summary>
+    /// <param name="path">The string path to convert.</param>
+    /// <returns>An instance of <see cref="IPurePath"/> representing the input path.</returns>
+    /// <exception cref="PlatformNotSupportedException">Thrown if the current platform is not Unix-based.</exception>
     public static IPurePath CreatePure(string path)
     {
         if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
@@ -13,7 +22,15 @@ public static class Path
 
         throw new PlatformNotSupportedException("Only Unix paths are currently supported.");
     }
-    
+
+    /// <summary>
+    /// Creates a platform-specific pure path from the given string and platform.
+    /// </summary>
+    /// <param name="path">The string path to convert.</param>
+    /// <param name="platform">The platform type to use for path interpretation.</param>
+    /// <returns>An instance of <see cref="IPurePath"/>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the platform is <see cref="PathPlatform.None"/>.</exception>
+    /// <exception cref="PlatformNotSupportedException">Thrown if the platform is not supported.</exception>
     public static IPurePath CreatePure(string path, PathPlatform platform)
     {
         path = path.Trim();
@@ -27,6 +44,13 @@ public static class Path
         };
     }
 
+    /// <summary>
+    /// Creates a platform-specific full path from the given string.
+    /// </summary>
+    /// <param name="path">The string path to convert.</param>
+    /// <param name="pathEnvironment">Optional environment to use for path resolution.</param>
+    /// <returns>An instance of <see cref="IPath"/>.</returns>
+    /// <exception cref="PlatformNotSupportedException">Thrown if the platform is not supported.</exception>
     public static IPath Create(string path, IPathEnvironment? pathEnvironment = null)
     {
         if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
@@ -37,6 +61,15 @@ public static class Path
         throw new PlatformNotSupportedException("Only Unix paths are currently supported.");
     }
 
+    /// <summary>
+    /// Creates a platform-specific full path from the given string and platform.
+    /// </summary>
+    /// <param name="path">The string path to convert.</param>
+    /// <param name="platform">The platform type to use for path interpretation.</param>
+    /// <param name="pathEnvironment">Optional environment to use for path resolution.</param>
+    /// <returns>An instance of <see cref="IPath"/>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when the platform is <see cref="PathPlatform.None"/>.</exception>
+    /// <exception cref="PlatformNotSupportedException">Thrown if the platform is not supported.</exception>
     public static IPath Create(string path, PathPlatform platform, IPathEnvironment? pathEnvironment = null)
     {
         return platform switch
@@ -48,6 +81,12 @@ public static class Path
         };
     }
 
+    /// <summary>
+    /// Attempts to retrieve the current assembly's executable as an <see cref="IPath"/>.
+    /// </summary>
+    /// <param name="path">When this method returns, contains the path to the executable, if successful.</param>
+    /// <param name="pathEnvironment">Optional path environment for path resolution.</param>
+    /// <returns><c>true</c> if successful; otherwise, <c>false</c>.</returns>
     public static bool TryGetAssemblyExecutable([NotNullWhen(true)] out IPath? path, IPathEnvironment? pathEnvironment = null)
     {
         pathEnvironment ??= DefaultUnixPathEnvironment.Shared;
@@ -61,6 +100,12 @@ public static class Path
         return true;
     }
 
+    /// <summary>
+    /// Attempts to retrieve the current assembly's executable as a pure path.
+    /// </summary>
+    /// <param name="purePath">When this method returns, contains the pure path to the executable, if successful.</param>
+    /// <param name="pathEnvironment">Optional path environment for path resolution.</param>
+    /// <returns><c>true</c> if successful; otherwise, <c>false</c>.</returns>
     public static bool TryGetAssemblyExecutablePure([NotNullWhen(true)] out IPurePath? purePath, IPathEnvironment? pathEnvironment = null)
     {
         if (TryGetAssemblyExecutable(out var path, pathEnvironment))
@@ -73,12 +118,21 @@ public static class Path
         return false;
     }
 
+    /// <summary>
+    /// Gets the current working directory as a pure path.
+    /// </summary>
+    /// <returns>An instance of <see cref="IPurePath"/> representing the current directory.</returns>
     public static IPurePath GetCurrentDirectory()
     {
         var path = Directory.GetCurrentDirectory();
         return CreatePure(path);
     }
 
+    /// <summary>
+    /// Gets the current user's home directory as a pure path.
+    /// </summary>
+    /// <returns>An instance of <see cref="IPurePath"/> representing the home directory.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if the HOME environment variable is not set.</exception>
     public static IPurePath GetHomeDirectory()
     {
         var home = Environment.GetEnvironmentVariable("HOME");

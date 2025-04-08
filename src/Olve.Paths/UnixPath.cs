@@ -1,12 +1,11 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Security;
 using System.Text;
 
 namespace Olve.Paths;
 
 [DebuggerDisplay("{Path}")]
-public class UnixPath : IPath
+internal class UnixPath : IPath
 {
     private const string LinkStringPrefix = "file://";
     
@@ -27,7 +26,7 @@ public class UnixPath : IPath
 
     public string Path => _pureUnixPath.Path;
 
-    public bool TryGetElementType(out ElementType type)
+    public bool TryGetElementType([NotNullWhen(true)] out ElementType? type)
     {
         if (File.Exists(Path))
         {

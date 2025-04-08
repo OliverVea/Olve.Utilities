@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace Olve.Paths;
 
-public class DefaultUnixPathEnvironment : IPathEnvironment
+internal class DefaultUnixPathEnvironment : IPathEnvironment
 {
     public static DefaultUnixPathEnvironment Shared { get; } = new();
     

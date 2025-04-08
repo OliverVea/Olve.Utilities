@@ -5,7 +5,7 @@ namespace Olve.Paths;
 
 
 [DebuggerDisplay("{Path}")]
-public class PureUnixPath : IPurePath
+internal class PureUnixPath : IPurePath
 {
     internal IReadOnlyList<string> Segments { get; }
 
