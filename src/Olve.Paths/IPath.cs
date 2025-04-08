@@ -22,6 +22,7 @@ public interface IPath : IPurePath
     IPath AppendPath(string right);
     static IPath operator /(IPath left, string right) => left.AppendPath(right);
 
+    bool Exists();
     string GetLinkString(int? lineNumber = null, int? columnNumber = null);
 }
 

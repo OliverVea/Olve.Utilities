@@ -105,6 +105,9 @@ jobs:
           - id: Olve.Paths
             project: ./src/Olve.Paths
             pattern: 'src/Olve.Paths/**'
+          - id: Olve.Paths.Glob
+            project: ./src/Olve.Paths.Glob
+            pattern: 'src/Olve.Paths[.Glob]/**'
 
     steps:
       - uses: actions/checkout@v4

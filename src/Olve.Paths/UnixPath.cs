@@ -158,6 +158,24 @@ public class UnixPath : IPath
         return new UnixPath(pureUnixPath, _pathEnvironment);
     }
 
+    public bool Exists()
+    {
+        if (TryGetElementType(out var type))
+        {
+            if (type == ElementType.File)
+            {
+                return File.Exists(Path);
+            }
+
+            if (type == ElementType.Directory)
+            {
+                return Directory.Exists(Path);
+            }
+        }
+
+        return false;
+    }
+
     public string GetLinkString(int? lineNumber = null, int? columnNumber = null)
     {
         StringBuilder sb = new();

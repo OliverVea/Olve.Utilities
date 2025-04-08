@@ -1,9 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
+        <Title>Olve.Paths.Glob</Title>
+        <Authors>Oliver Vea</Authors>
+        <Description>Olve.Paths.Glob is a library that provides a set of utilities for working with Olve.Paths paths and glob patterns.</Description>
+        <Copyright>Oliver Vea</Copyright>
+        <PackageProjectUrl>https://github.com/OliverVea/Olve.Utilities/src/Olve.Paths.Glob</PackageProjectUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/OliverVea/Olve.Utilities</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <IsTrimmable>true</IsTrimmable>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
 
     <ItemGroup>
