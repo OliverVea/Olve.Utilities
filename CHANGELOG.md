@@ -1,3 +1,14 @@
+## v0.17.0 (2025-04-08)
+
+### Feat
+
+- globbing
+- refactored purepath and path to be interfaces
+
+### Fix
+
+- actually builds
+
 ## v0.16.0 (2025-04-06)
 
 ### Feat
