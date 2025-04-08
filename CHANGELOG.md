@@ -1,3 +1,9 @@
+## v0.17.2 (2025-04-08)
+
+### Fix
+
+- setting workflow triggers
+
 ## v0.17.1 (2025-04-08)
 
 ### Fix
