@@ -1,3 +1,10 @@
+## v0.18.0 (2025-04-11)
+
+### Feat
+
+- using `Olve.Paths` in `Olve.Utilities`
+- using `Olve.Paths` for `ProblemOriginInformation`
+
 ## v0.17.2 (2025-04-08)
 
 ### Fix
