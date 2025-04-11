@@ -27,19 +27,10 @@ jobs:
         with:
           dotnet-version: 9.0.100
 
-      - name: .NET restore
-        shell: bash
-        run: |
-          dotnet restore
-          dotnet tool restore
-
-      - name: Build
-        shell: bash
-        run: dotnet build --no-restore -c Release /p:Version="1.0.0"
-
-      - name: Test
-        shell: bash
-        run: dotnet test --no-restore --no-build -c Release
+      - run: dotnet restore
+      - run: dotnet tool restore
+      - run: dotnet build --no-restore -c Release /p:Version="1.0.0"
+      - run: dotnet test --no-restore --no-build -c Release
 
   bump-version:
     name: Bump version and create changelog with commitizen
@@ -101,7 +92,6 @@ jobs:
             project: ./src/Olve.Operations
           - id: Olve.Paths
             project: ./src/Olve.Paths
-            pattern: 'src/Olve.Paths/**'
           - id: Olve.Paths.Glob
             project: ./src/Olve.Paths.Glob
 
