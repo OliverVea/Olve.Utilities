@@ -19,4 +19,8 @@
         <None Include="README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Olve.Paths\Olve.Paths.csproj" />
+    </ItemGroup>
+
 </Project>

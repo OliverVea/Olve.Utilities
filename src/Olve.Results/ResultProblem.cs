@@ -64,7 +64,10 @@ public class ResultProblem
         Message = message;
         Args = args;
 
-        OriginInformation = new ProblemOriginInformation(stackFrame.GetFileName() ?? string.Empty, stackFrame.GetFileLineNumber());
+        var path = Paths.Path.Create(stackFrame.GetFileName() ?? string.Empty);
+        var lineNumber = stackFrame.GetFileLineNumber();
+
+        OriginInformation = new ProblemOriginInformation(path, lineNumber);
     }
 
 
@@ -129,16 +132,9 @@ public class ResultProblem
     /// <returns>The formatted string.</returns>
     public string ToDebugString()
     {
-        StringBuilder sb = new();
+        var linkString = OriginInformation.LinkString;
+        var message = ToBriefString();
 
-        sb.Append("[");
-        sb.Append(OriginInformation.FilePath);
-        sb.Append(":l");
-        sb.Append(OriginInformation.LineNumber);
-        sb.Append("] ");
-
-        sb.Append(ToBriefString());
-
-        return sb.ToString();
+        return $"[{linkString}] {message}";
     }
 }

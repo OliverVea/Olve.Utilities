@@ -36,7 +36,7 @@ public class ResultTests
         var problem = new ResultProblem(Message);
 
         // Assert
-        await Assert.That(problem.OriginInformation.FilePath).EndsWith("ResultTests.cs");
+        await Assert.That(problem.OriginInformation.FilePath.Path).EndsWith("ResultTests.cs");
         await Assert.That(problem.OriginInformation.LineNumber).IsEqualTo(36);
     }
 
@@ -49,7 +49,7 @@ public class ResultTests
         var problem = GetResultProblem();
 
         // Assert
-        await Assert.That(problem.OriginInformation.FilePath).EndsWith("ResultTests.cs");
+        await Assert.That(problem.OriginInformation.FilePath.Path).EndsWith("ResultTests.cs");
         await Assert.That(problem.OriginInformation.LineNumber).IsEqualTo(58);
     }
 
@@ -71,7 +71,7 @@ public class ResultTests
         Console.WriteLine(debugString);
 
         // Assert
-        await Assert.That(debugString).EndsWith("ResultTests.cs:l58] some problem occurred");
+        await Assert.That(debugString).EndsWith("Olve.Utilities/tests/Olve.Results.Tests/ResultTests.cs:58] some problem occurred");
     }
 
     [Test]
