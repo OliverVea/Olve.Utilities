@@ -5,28 +5,12 @@
 - using `Olve.Paths` in `Olve.Utilities`
 - using `Olve.Paths` for `ProblemOriginInformation`
 
-## v0.17.2 (2025-04-08)
-
-### Fix
-
-- setting workflow triggers
-
-## v0.17.1 (2025-04-08)
-
-### Fix
-
-- bump
-
 ## v0.17.0 (2025-04-08)
 
 ### Feat
 
 - globbing
 - refactored purepath and path to be interfaces
-
-### Fix
-
-- actually builds
 
 ## v0.16.0 (2025-04-06)
 
