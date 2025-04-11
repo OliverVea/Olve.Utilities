@@ -1,4 +1,6 @@
-﻿namespace Olve.Utilities.Projects;
+﻿using Olve.Paths;
+
+namespace Olve.Utilities.Projects;
 
 /// <summary>
 ///     Provides utility methods for managing project folders, including root directory configuration,
@@ -17,7 +19,12 @@ public class ProjectFolderHelper(
 {
     private const string DefaultOrganization = "Olve";
 
-    private string? _rootDirectoryOverride;
+    private IPath? _rootDirectoryOverridePath;
+
+    private IPath DefaultRootDirectoryPath => Path.Create(DefaultRootDirectory);
+    private string DefaultRootDirectory => SpecialFolder is { } specialFolder
+        ? Environment.GetFolderPath(specialFolder)
+        : GetDefaultFolderForOperatingSystem();
 
     /// <summary>
     ///     Gets the name of the project.
@@ -38,43 +45,16 @@ public class ProjectFolderHelper(
     ///     Gets or sets the root directory for the project.
     ///     If not explicitly set, it defaults to the specified <see cref="SpecialFolder"/> or an OS-specific folder.
     /// </summary>
-    public string RootDirectory
+    public IPath RootDirectory
     {
-        get =>
-            _rootDirectoryOverride ?? (SpecialFolder is { } specialFolder
-                ? Environment.GetFolderPath(specialFolder)
-                : GetDefaultFolderForOperatingSystem());
-        set => _rootDirectoryOverride = value;
+        get => _rootDirectoryOverridePath ?? DefaultRootDirectoryPath;
+        set => _rootDirectoryOverridePath = value;
     }
 
     /// <summary>
     ///     Gets the full path to the project's root folder, combining the root directory, organization, and project name.
     /// </summary>
-    public string ProjectRootFolder => Path.Combine(
-        RootDirectory,
-        Organization,
-        ProjectName);
-
-    /// <summary>
-    ///     Indicates whether the project folder exists on the file system.
-    /// </summary>
-    public bool ProjectFolderExists => Directory.Exists(ProjectRootFolder);
-
-    /// <summary>
-    ///     Gets the full path to a subfolder within the project folder.
-    /// </summary>
-    /// <param name="subfolderName">The name of the subfolder.</param>
-    /// <returns>The full path to the specified subfolder.</returns>
-    public string GetSubfolder(string subfolderName) => Path.Combine(ProjectRootFolder, subfolderName);
-
-    /// <summary>
-    ///     Searches for files and directories within the project folder that match the specified search pattern.
-    /// </summary>
-    /// <param name="searchPattern">The search pattern to use (e.g., "*.txt" for text files).</param>
-    /// <returns>An enumerable collection of matching file system entries. Returns an empty collection if the folder doesn't exist.</returns>
-    public IEnumerable<string> Search(string searchPattern) => ProjectFolderExists
-        ? Directory.GetFileSystemEntries(ProjectRootFolder, searchPattern)
-        : Enumerable.Empty<string>();
+    public IPath ProjectRootFolder => RootDirectory / Organization / ProjectName;
 
     /// <summary>
     ///     Determines the default root folder based on the operating system.
@@ -87,7 +67,7 @@ public class ProjectFolderHelper(
         if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
         {
             return Environment.GetEnvironmentVariable("XDG_DATA_HOME")
-                   ?? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".local", "share");
+                   ?? System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".local", "share");
         }
 
         return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);

@@ -13,7 +13,8 @@ public class ProjectFolderHelperTests
         var helper = new ProjectFolderHelper(organization: organization, projectName: projectName);
         
         // Act
-        var rootFolder = helper.ProjectRootFolder;
+        var rootFolderPath = helper.ProjectRootFolder;
+        var rootFolder = rootFolderPath.Path;
         
         // Assert
         if (Environment.OSVersion.Platform == PlatformID.Unix)
