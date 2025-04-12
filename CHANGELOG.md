@@ -1,3 +1,9 @@
+## v0.19.0 (2025-04-12)
+
+### Feat
+
+- added directed graph and typed id classes
+
 ## v0.18.0 (2025-04-11)
 
 ### Feat
