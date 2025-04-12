@@ -33,7 +33,7 @@ jobs:
       - run: dotnet test --no-restore --no-build -c Release
 
   bump-version:
-    name: Bump version and create changelog with commitizen
+    name: Bump version and create changelog
     needs:
       - test
     runs-on: ubuntu-latest
