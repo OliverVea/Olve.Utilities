@@ -330,9 +330,9 @@ public class DirectedGraphTests
         var b = nodeIds[1];
         var c = nodeIds[2];
 
-        var edgeAB = graph.CreateEdge(a, b);
-        var edgeBC = graph.CreateEdge(b, c);
-        var edgeCA = graph.CreateEdge(c, a);
+        graph.CreateEdge(a, b);
+        graph.CreateEdge(b, c);
+        graph.CreateEdge(c, a);
 
         // Act
         var incomingA = graph.GetIncomingEdges(a);
