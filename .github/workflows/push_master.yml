@@ -105,7 +105,7 @@ jobs:
           files_from_source_file: ${{ matrix.project }}/workflow-triggers.txt
 
       - name: Publish ${{ matrix.id }} to NuGet
-        if: steps.changed.outputs.any_changed == 'true'
+        #if: steps.changed.outputs.any_changed == 'true'
         uses: ./.github/actions/dotnet-publish
         with:
           project: ${{ matrix.project }}

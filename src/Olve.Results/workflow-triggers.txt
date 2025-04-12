@@ -1,2 +1,2 @@
-.github/workflows/push_master.yml
+/.github/**
 src/Olve.Results/**

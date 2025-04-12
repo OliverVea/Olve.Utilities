@@ -1,2 +1,2 @@
-.github/workflows/push_master.yml
-src/Olve.Paths/**
+/.github/**
+/src/Olve.Paths/**
