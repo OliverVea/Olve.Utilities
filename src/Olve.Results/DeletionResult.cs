@@ -11,7 +11,7 @@ public readonly struct DeletionResult
     {
         Problems = problems;
 
-        Succeeded = found && problems is not null;
+        Succeeded = found && problems is null;
         WasNotFound = !found && problems is null;
     }
 

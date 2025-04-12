@@ -108,6 +108,43 @@ Olve.Utilities.Collections.ReadOnlyBidirectionalDictionary<T1, T2>.IsSynced.get 
 Olve.Utilities.Collections.ReadOnlyBidirectionalDictionary<T1, T2>.ReadOnlyBidirectionalDictionary(System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<T1, T2>>! collection) -> void
 Olve.Utilities.Collections.ReadOnlyBidirectionalDictionary<T1, T2>.SecondValues.get -> System.Collections.Generic.IReadOnlyCollection<T2>!
 Olve.Utilities.Extensions.OneOfTryGetExtensions
+Olve.Utilities.Graphs.DirectedGraph
+Olve.Utilities.Graphs.DirectedGraph.CreateNode() -> Olve.Results.Result<Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.Node>>
+Olve.Utilities.Graphs.DirectedGraph.DirectedGraph() -> void
+Olve.Utilities.Graphs.DirectedGraph.CreateEdge(Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.Node> from, Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.Node> to) -> Olve.Results.Result<Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.DirectedEdge>>
+Olve.Utilities.Graphs.DirectedGraph.DeleteEdge(Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.DirectedEdge> edgeId) -> Olve.Results.DeletionResult
+Olve.Utilities.Graphs.DirectedGraph.DeleteNode(Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.Node> nodeId) -> Olve.Results.DeletionResult
+Olve.Utilities.Graphs.DirectedGraph.EdgeIds.get -> System.Collections.Generic.IReadOnlyCollection<Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.DirectedEdge>>!
+Olve.Utilities.Graphs.DirectedGraph.Edges.get -> System.Collections.Generic.IReadOnlyCollection<Olve.Utilities.Graphs.DirectedEdge>!
+Olve.Utilities.Graphs.DirectedGraph.FollowEdge(Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.Node> from, Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.DirectedEdge> edgeId) -> Olve.Results.Result<Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.Node>>
+Olve.Utilities.Graphs.DirectedGraph.GetEdge(Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.DirectedEdge> edgeId) -> Olve.Results.Result<Olve.Utilities.Graphs.DirectedEdge>
+Olve.Utilities.Graphs.DirectedGraph.GetIncomingEdges(Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.Node> nodeId) -> Olve.Results.Result<System.Collections.Generic.IReadOnlySet<Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.DirectedEdge>>!>
+Olve.Utilities.Graphs.DirectedGraph.GetNode(Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.Node> nodeId) -> Olve.Results.Result<Olve.Utilities.Graphs.Node>
+Olve.Utilities.Graphs.DirectedGraph.GetOutgoingEdges(Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.Node> nodeId) -> Olve.Results.Result<System.Collections.Generic.IReadOnlySet<Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.DirectedEdge>>!>
+Olve.Utilities.Graphs.DirectedGraph.NodeIds.get -> System.Collections.Generic.IReadOnlyCollection<Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.Node>>!
+Olve.Utilities.Graphs.DirectedGraph.Nodes.get -> System.Collections.Generic.IReadOnlyCollection<Olve.Utilities.Graphs.Node>!
+Olve.Utilities.Graphs.DirectedEdge
+Olve.Utilities.Graphs.DirectedEdge.DirectedEdge() -> void
+Olve.Utilities.Graphs.DirectedEdge.DirectedEdge(Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.DirectedEdge> Id, Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.Node> From, Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.Node> To) -> void
+Olve.Utilities.Graphs.DirectedEdge.From.get -> Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.Node>
+Olve.Utilities.Graphs.DirectedEdge.From.init -> void
+Olve.Utilities.Graphs.DirectedEdge.Id.get -> Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.DirectedEdge>
+Olve.Utilities.Graphs.DirectedEdge.Id.init -> void
+Olve.Utilities.Graphs.DirectedEdge.To.get -> Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.Node>
+Olve.Utilities.Graphs.DirectedEdge.To.init -> void
+Olve.Utilities.Graphs.Node
+Olve.Utilities.Graphs.Node.Id.get -> Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.Node>
+Olve.Utilities.Graphs.Node.Id.init -> void
+Olve.Utilities.Graphs.Node.Node() -> void
+Olve.Utilities.Graphs.Node.Node(Olve.Utilities.Ids.Id<Olve.Utilities.Graphs.Node> Id) -> void
+Olve.Utilities.Ids.Id<T>
+Olve.Utilities.Ids.Id<T>.CompareTo(Olve.Utilities.Ids.Id<T> other) -> int
+Olve.Utilities.Ids.Id<T>.Id() -> void
+Olve.Utilities.Ids.Id<T>.Id(uint value) -> void
+Olve.Utilities.Ids.Id<T>.Value.get -> uint
+Olve.Utilities.Ids.ThreadSafeUintGenerator
+Olve.Utilities.Ids.ThreadSafeUintGenerator.Next() -> uint
+Olve.Utilities.Ids.ThreadSafeUintGenerator.ThreadSafeUintGenerator() -> void
 Olve.Utilities.IntegerMath2D.DeltaPosition
 Olve.Utilities.IntegerMath2D.DeltaPosition.DeltaPosition() -> void
 Olve.Utilities.IntegerMath2D.DeltaPosition.DeltaPosition(int X, int Y) -> void
@@ -211,6 +248,7 @@ Olve.Utilities.Types.Yes<T>.Value.get -> T
 Olve.Utilities.Types.Yes<T>.Value.init -> void
 Olve.Utilities.Types.Yes<T>.Yes() -> void
 Olve.Utilities.Types.Yes<T>.Yes(T Value) -> void
+override Olve.Utilities.Ids.Id<T>.ToString() -> string!
 override Olve.Utilities.Types.AlreadyExists.ToString() -> string!
 override Olve.Utilities.Types.AlreadyExists<T>.ToString() -> string!
 override Olve.Utilities.Types.Any.ToString() -> string!
@@ -356,6 +394,11 @@ static Olve.Utilities.CollectionExtensions.RandomExtensions.Shuffle<T>(this Syst
 static Olve.Utilities.Extensions.OneOfTryGetExtensions.GetT0OrDefault<T0, T1, T2>(this OneOf.OneOf<T0, T1, T2> oneOf, T0 defaultValue) -> T0
 static Olve.Utilities.Extensions.OneOfTryGetExtensions.GetT0OrDefault<T0, T1>(this OneOf.OneOf<T0, T1> oneOf, T0 defaultValue) -> T0
 static Olve.Utilities.Extensions.OneOfTryGetExtensions.GetT1OrDefault<T0, T1>(this OneOf.OneOf<T0, T1> oneOf, T1 defaultValue) -> T1
+static Olve.Utilities.Ids.Id<T>.New() -> Olve.Utilities.Ids.Id<T>
+static Olve.Utilities.Ids.Id<T>.operator <(Olve.Utilities.Ids.Id<T> left, Olve.Utilities.Ids.Id<T> right) -> bool
+static Olve.Utilities.Ids.Id<T>.operator <=(Olve.Utilities.Ids.Id<T> left, Olve.Utilities.Ids.Id<T> right) -> bool
+static Olve.Utilities.Ids.Id<T>.operator >(Olve.Utilities.Ids.Id<T> left, Olve.Utilities.Ids.Id<T> right) -> bool
+static Olve.Utilities.Ids.Id<T>.operator >=(Olve.Utilities.Ids.Id<T> left, Olve.Utilities.Ids.Id<T> right) -> bool
 static Olve.Utilities.IntegerMath2D.DeltaPosition.operator *(Olve.Utilities.IntegerMath2D.DeltaPosition a, int scalar) -> Olve.Utilities.IntegerMath2D.DeltaPosition
 static Olve.Utilities.IntegerMath2D.DeltaPosition.operator +(Olve.Utilities.IntegerMath2D.DeltaPosition a, Olve.Utilities.IntegerMath2D.DeltaPosition b) -> Olve.Utilities.IntegerMath2D.DeltaPosition
 static Olve.Utilities.IntegerMath2D.DeltaPosition.operator -(Olve.Utilities.IntegerMath2D.DeltaPosition a, Olve.Utilities.IntegerMath2D.DeltaPosition b) -> Olve.Utilities.IntegerMath2D.DeltaPosition
@@ -364,3 +407,4 @@ static Olve.Utilities.IntegerMath2D.Position.operator +(Olve.Utilities.IntegerMa
 static Olve.Utilities.IntegerMath2D.Position.operator -(Olve.Utilities.IntegerMath2D.Position a, Olve.Utilities.IntegerMath2D.Position b) -> Olve.Utilities.IntegerMath2D.DeltaPosition
 static Olve.Utilities.IntegerMath2D.Size.implicit operator Olve.Utilities.IntegerMath2D.Size((int Width, int Height) tuple) -> Olve.Utilities.IntegerMath2D.Size
 static Olve.Utilities.StringFormatting.DateTimeFormatter.FormatTimeAgo(System.DateTimeOffset now, System.DateTimeOffset then) -> string!
+static readonly Olve.Utilities.Ids.ThreadSafeUintGenerator.Shared -> Olve.Utilities.Ids.ThreadSafeUintGenerator!
