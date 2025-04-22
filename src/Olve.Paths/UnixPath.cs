@@ -20,7 +20,7 @@ internal class UnixPath : IPath
     
     internal UnixPath(string path, IPathEnvironment? pathEnvironment = null)
     {
-        _pureUnixPath = new PureUnixPath(path);
+        _pureUnixPath = PureUnixPath.FromPath(path);
         _pathEnvironment = pathEnvironment ?? DefaultUnixPathEnvironment.Shared;
     }
 

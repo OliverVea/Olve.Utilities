@@ -156,7 +156,7 @@ public static class Path
     private static PureUnixPath CreatePureUnixPath(string path)
     {
         path = ProcessUnixPath(path);
-        return new PureUnixPath(path);
+        return PureUnixPath.FromPath(path);
     }
 
     private static string ProcessUnixPath(string path)

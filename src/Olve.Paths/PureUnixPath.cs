@@ -7,9 +7,9 @@ namespace Olve.Paths;
 [DebuggerDisplay("{Path}")]
 internal class PureUnixPath : IPurePath
 {
-    internal IReadOnlyList<string> Segments { get; }
+    private IReadOnlyList<string> Segments { get; }
 
-    internal PureUnixPath(IReadOnlyList<string> segments, PathType pathType)
+    private PureUnixPath(IReadOnlyList<string> segments, PathType pathType)
     {
         Segments = segments;
         Type = pathType;
@@ -19,8 +19,12 @@ internal class PureUnixPath : IPurePath
             : string.Join('/', Segments);
     }
 
-    internal PureUnixPath(string path) : this(path.Split('/', StringSplitOptions.RemoveEmptyEntries), GetPathType(path))
+    public static PureUnixPath FromPath(string path)
     {
+        var segments = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var pathType = GetPathType(path);
+
+        return new PureUnixPath(segments, pathType);
     }
 
     public string Path { get; }
@@ -81,7 +85,7 @@ internal class PureUnixPath : IPurePath
 
     public IPurePath Append(string right)
     {
-        var rightPath = new PureUnixPath(right);
+        var rightPath = FromPath(right);
 
         if (rightPath.Type != PathType.Stub)
         {
