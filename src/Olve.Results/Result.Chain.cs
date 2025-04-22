@@ -37,7 +37,11 @@ public readonly partial struct Result
     /// <typeparam name="T2">The type of the second result value.</typeparam>
     /// <typeparam name="T3">The type of the third result value.</typeparam>
     /// <returns>The result of the third function if all succeed; otherwise, the first encountered problem.</returns>
-    public static Result<T3> Chain<T1, T2, T3>(Func<Result<T1>> a, Func<T1, Result<T2>> b, Func<T2, Result<T3>> c)
+    public static Result<T3> Chain<T1, T2, T3>(
+        Func<Result<T1>> a,
+        Func<T1, Result<T2>> b,
+        Func<T2, Result<T3>> c
+    )
     {
         var resultA = a();
         if (!resultA.Succeeded)
@@ -72,7 +76,12 @@ public readonly partial struct Result
     /// <typeparam name="T3">The type of the third result value.</typeparam>
     /// <typeparam name="T4">The type of the fourth result value.</typeparam>
     /// <returns>The result of the fourth function if all succeed; otherwise, the first encountered problem.</returns>
-    public static Result<T4> Chain<T1, T2, T3, T4>(Func<Result<T1>> a, Func<T1, Result<T2>> b, Func<T2, Result<T3>> c, Func<T3, Result<T4>> d)
+    public static Result<T4> Chain<T1, T2, T3, T4>(
+        Func<Result<T1>> a,
+        Func<T1, Result<T2>> b,
+        Func<T2, Result<T3>> c,
+        Func<T3, Result<T4>> d
+    )
     {
         var resultA = a();
         if (!resultA.Succeeded)

@@ -9,7 +9,6 @@ public interface IManyToManyLookup<TLeft, TRight> : IEnumerable<KeyValuePair<TLe
     where TLeft : notnull
     where TRight : notnull
 {
-
     /// <summary>
     ///     Gets all left-hand elements in the lookup.
     /// </summary>

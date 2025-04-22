@@ -17,7 +17,9 @@ namespace Olve.Operations;
 /// <typeparam name="TResponse">The type of the response returned by the operation.</typeparam>
 /// <param name="serviceProvider">The <see cref="IServiceProvider" /> used to resolve dependencies for the operation.</param>
 [SuppressMessage("Design", "MA0048:File name must match type name")]
-public class AsyncOperationFactory<TOperation, TRequest, TResponse>(IServiceProvider serviceProvider)
+public class AsyncOperationFactory<TOperation, TRequest, TResponse>(
+    IServiceProvider serviceProvider
+)
     where TOperation : IAsyncOperation<TRequest, TResponse>
 {
     /// <summary>

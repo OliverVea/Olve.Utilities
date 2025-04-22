@@ -1,14 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <RootNamespace>Olve.SG.CopyProperties.Text</RootNamespace>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\..\src\source-generators\Olve.SG.CopyProperties\Olve.SG.CopyProperties.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
-    </ItemGroup>
-
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Olve.SG.CopyProperties.Text</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference
+      Include="..\..\src\source-generators\Olve.SG.CopyProperties\Olve.SG.CopyProperties.csproj"
+      OutputItemType="Analyzer"
+      ReferenceOutputAssembly="false"
+    />
+  </ItemGroup>
 </Project>

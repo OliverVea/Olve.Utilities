@@ -6,7 +6,7 @@ namespace Olve.Paths;
 internal class DefaultUnixPathEnvironment : IPathEnvironment
 {
     public static DefaultUnixPathEnvironment Shared { get; } = new();
-    
+
     public bool TryGetCurrentDirectory([NotNullWhen(true)] out string? path)
     {
         path = Directory.GetCurrentDirectory();

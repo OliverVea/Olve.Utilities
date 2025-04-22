@@ -15,7 +15,8 @@ public static class TypeExtractionHelper
             StructDeclarationSyntax => "struct",
             InterfaceDeclarationSyntax => "interface",
             _ => throw new InvalidOperationException(
-                $"The destination type must be a class or a struct. Was {typeDeclaration.Kind()}.")
+                $"The destination type must be a class or a struct. Was {typeDeclaration.Kind()}."
+            ),
         };
     }
 

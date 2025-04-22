@@ -81,7 +81,10 @@ public readonly struct Result<T>
     ///     When this method returns <see langword="false" />, contains the problems. Otherwise, <see langword="null" />.
     /// </param>
     /// <returns><see langword="true" /> if a value exists; otherwise, <see langword="false" />.</returns>
-    public bool TryPickValue([NotNullWhen(true)] out T? value, [NotNullWhen(false)] out ResultProblemCollection? problems)
+    public bool TryPickValue(
+        [NotNullWhen(true)] out T? value,
+        [NotNullWhen(false)] out ResultProblemCollection? problems
+    )
     {
         value = Value;
         problems = Problems;
@@ -98,8 +101,10 @@ public readonly struct Result<T>
     ///     When this method returns <see langword="false" />, contains the value. Otherwise, <see langword="null" />.
     /// </param>
     /// <returns><see langword="true" /> if problems exist; otherwise, <see langword="false" />.</returns>
-    public bool TryPickProblems([NotNullWhen(true)] out ResultProblemCollection? problems,
-        [NotNullWhen(false)] out T? value)
+    public bool TryPickProblems(
+        [NotNullWhen(true)] out ResultProblemCollection? problems,
+        [NotNullWhen(false)] out T? value
+    )
     {
         problems = Problems;
         value = Value;
@@ -159,5 +164,6 @@ public readonly struct Result<T>
     /// </summary>
     /// <param name="problems">The problems to convert.</param>
     /// <returns>A failure result.</returns>
-    public static implicit operator Result<T>(ResultProblemCollection problems) => Failure(problems);
+    public static implicit operator Result<T>(ResultProblemCollection problems) =>
+        Failure(problems);
 }

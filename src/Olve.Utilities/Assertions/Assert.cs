@@ -48,7 +48,10 @@ public static class Assert
     /// <param name="message">The message to include in the exception.</param>
     /// <exception cref="AssertionError">Thrown if the collection is not empty.</exception>
     [Conditional("DEBUG")]
-    public static void IsEmpty<T>(IEnumerable<T> collection, string message = "Collection should be empty.")
+    public static void IsEmpty<T>(
+        IEnumerable<T> collection,
+        string message = "Collection should be empty."
+    )
     {
         if (collection.Any())
         {
@@ -64,7 +67,10 @@ public static class Assert
     /// <param name="message">The message to include in the exception.</param>
     /// <exception cref="AssertionError">Thrown if the collection is empty.</exception>
     [Conditional("DEBUG")]
-    public static void IsNotEmpty<T>(IEnumerable<T> collection, string message = "Collection should not be empty.")
+    public static void IsNotEmpty<T>(
+        IEnumerable<T> collection,
+        string message = "Collection should not be empty."
+    )
     {
         if (!collection.Any())
         {

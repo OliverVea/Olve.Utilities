@@ -15,5 +15,6 @@ public readonly record struct Size(int Width, int Height)
     /// </summary>
     /// <param name="tuple">The width and height of the size.</param>
     /// <returns>A new <see cref="Size" /> with the specified width and height.</returns>
-    public static implicit operator Size((int Width, int Height) tuple) => new(tuple.Width, tuple.Height);
+    public static implicit operator Size((int Width, int Height) tuple) =>
+        new(tuple.Width, tuple.Height);
 }

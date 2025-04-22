@@ -22,9 +22,16 @@ public static class PathExtensions
     /// Determines whether pattern matching should ignore case. Defaults to <c>false</c>.
     /// </param>
     /// <returns><c>true</c> if the path was absolute and any matches were found; otherwise, <c>false</c>.</returns>
-    public static bool TryGlob(this IPath path, string pattern, [NotNullWhen(true)] out IEnumerable<IPath>? matches, bool ignoreCase = false)
+    public static bool TryGlob(
+        this IPath path,
+        string pattern,
+        [NotNullWhen(true)] out IEnumerable<IPath>? matches,
+        bool ignoreCase = false
+    )
     {
-        var stringComparison = ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+        var stringComparison = ignoreCase
+            ? StringComparison.OrdinalIgnoreCase
+            : StringComparison.Ordinal;
         Matcher matcher = new(stringComparison);
 
         matcher.AddInclude(pattern);
@@ -39,7 +46,7 @@ public static class PathExtensions
         var pathString = absolutePath.Path;
 
         DirectoryInfo directoryInfo = new(pathString);
-        DirectoryInfoWrapper directoryInfoWrapper = new (directoryInfo);
+        DirectoryInfoWrapper directoryInfoWrapper = new(directoryInfo);
 
         var result = matcher.Execute(directoryInfoWrapper);
 
@@ -51,6 +58,7 @@ public static class PathExtensions
     {
         return result.Files.Select(x => MapToPath(x, rootPath));
     }
+
     private static IPath MapToPath(FilePatternMatch file, IPath rootPath)
     {
         return rootPath / file.Path;

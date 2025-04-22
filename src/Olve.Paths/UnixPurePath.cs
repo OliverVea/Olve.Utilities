@@ -3,7 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Olve.Paths;
 
-
 [DebuggerDisplay("{Path}")]
 internal class UnixPurePath : IPurePath
 {
@@ -14,9 +13,10 @@ internal class UnixPurePath : IPurePath
         Segments = segments;
         Type = pathType;
 
-        Path = pathType == PathType.Absolute
-            ? $"/{string.Join('/', Segments)}"
-            : string.Join('/', Segments);
+        Path =
+            pathType == PathType.Absolute
+                ? $"/{string.Join('/', Segments)}"
+                : string.Join('/', Segments);
     }
 
     public static UnixPurePath FromPath(string path)
@@ -75,11 +75,13 @@ internal class UnixPurePath : IPurePath
 
         if (right.Type != PathType.Relative)
         {
-            throw new NotSupportedException("Absolute paths cannot be on the right hand side of a path concatenation");
+            throw new NotSupportedException(
+                "Absolute paths cannot be on the right hand side of a path concatenation"
+            );
         }
 
         var segments = SegmentsHelper.EvaluateAndConcatenateSegments(Segments, right.Segments);
-        
+
         return new UnixPurePath(segments.ToArray(), Type);
     }
 
@@ -89,26 +91,29 @@ internal class UnixPurePath : IPurePath
 
         if (rightPath.Type != PathType.Stub)
         {
-            throw new ArgumentException("Can only append stub strings (not absolute or relative paths).", nameof(right));
+            throw new ArgumentException(
+                "Can only append stub strings (not absolute or relative paths).",
+                nameof(right)
+            );
         }
 
         var combinedSegments = Segments.Concat(rightPath.Segments).ToArray();
         return new UnixPurePath(combinedSegments, Type);
     }
 
-
     private const char AbsoluteStart = '/';
     private const char RelativeStart = '.';
-    
+
     private static PathType GetPathType(string path)
     {
-        if (path.Length == 0) return PathType.Stub;
+        if (path.Length == 0)
+            return PathType.Stub;
 
         return path[0] switch
         {
             AbsoluteStart => PathType.Absolute,
             RelativeStart => PathType.Relative,
-            _ => PathType.Stub
+            _ => PathType.Stub,
         };
     }
 }

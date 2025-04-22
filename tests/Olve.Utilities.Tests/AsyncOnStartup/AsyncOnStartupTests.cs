@@ -28,12 +28,8 @@ public class AsyncOnStartupTests
         // Assert
         var executedAfter = service.Executed;
 
-        await Assert
-            .That(executedBefore)
-            .IsFalse();
-        await Assert
-            .That(executedAfter)
-            .IsTrue();
+        await Assert.That(executedBefore).IsFalse();
+        await Assert.That(executedAfter).IsTrue();
     }
 
     [Test]
@@ -47,7 +43,13 @@ public class AsyncOnStartupTests
 
         var startupOperations = Enumerable
             .Range(0, 100)
-            .Select(x => new StartupOperation(x, () => { dict[x] = Interlocked.Increment(ref executed); }))
+            .Select(x => new StartupOperation(
+                x,
+                () =>
+                {
+                    dict[x] = Interlocked.Increment(ref executed);
+                }
+            ))
             .Shuffle()
             .ToList();
 
@@ -64,12 +66,9 @@ public class AsyncOnStartupTests
         // Assert
         foreach (var (priority, executionOrder) in dict)
         {
-            await Assert
-                .That(executionOrder)
-                .IsEqualTo(priority);
+            await Assert.That(executionOrder).IsEqualTo(priority);
         }
     }
-
 
     private class StartupOperation(int priority = 0, Action? onExecution = null) : IAsyncOnStartup
     {

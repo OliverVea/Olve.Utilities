@@ -20,9 +20,7 @@ public class ProjectFileNameHelperTests
         var fileName = helper.GetFileName(elements);
 
         // Assert
-        await Assert
-            .That(fileName)
-            .IsEqualTo(expected);
+        await Assert.That(fileName).IsEqualTo(expected);
     }
 
     [Test]
@@ -39,9 +37,7 @@ public class ProjectFileNameHelperTests
         var fileName = helper.GetFileName(elements);
 
         // Assert
-        await Assert
-            .That(fileName)
-            .IsEqualTo(expected);
+        await Assert.That(fileName).IsEqualTo(expected);
     }
 
     [Test]
@@ -58,9 +54,7 @@ public class ProjectFileNameHelperTests
         var fileName = helper.GetFileName(elements);
 
         // Assert
-        await Assert
-            .That(fileName)
-            .IsEqualTo(expected);
+        await Assert.That(fileName).IsEqualTo(expected);
     }
 
     [Test]
@@ -76,9 +70,7 @@ public class ProjectFileNameHelperTests
         var fileName = helper.GetFileName(elements);
 
         // Assert
-        await Assert
-            .That(fileName)
-            .IsEqualTo(expected);
+        await Assert.That(fileName).IsEqualTo(expected);
     }
 
     [Test]
@@ -93,9 +85,7 @@ public class ProjectFileNameHelperTests
         var fileName = helper.GetFileName(elements);
 
         // Assert
-        await Assert
-            .That(fileName)
-            .IsEqualTo(string.Empty);
+        await Assert.That(fileName).IsEqualTo(string.Empty);
     }
 
     [Test]
@@ -113,9 +103,7 @@ public class ProjectFileNameHelperTests
         var elements = helper.GetElements(fileName);
 
         // Assert
-        await Assert
-            .That(elements)
-            .IsEquivalentTo(expected, CollectionOrdering.Matching);
+        await Assert.That(elements).IsEquivalentTo(expected, CollectionOrdering.Matching);
     }
 
     [Test]
@@ -132,9 +120,7 @@ public class ProjectFileNameHelperTests
         var elements = helper.GetElements(fileName);
 
         // Assert
-        await Assert
-            .That(elements)
-            .IsEquivalentTo(expected, CollectionOrdering.Matching);
+        await Assert.That(elements).IsEquivalentTo(expected, CollectionOrdering.Matching);
     }
 
     [Test]
@@ -151,9 +137,7 @@ public class ProjectFileNameHelperTests
         var elements = helper.GetElements(fileName);
 
         // Assert
-        await Assert
-            .That(elements)
-            .IsEquivalentTo(expected, CollectionOrdering.Matching);
+        await Assert.That(elements).IsEquivalentTo(expected, CollectionOrdering.Matching);
     }
 
     [Test]
@@ -169,9 +153,7 @@ public class ProjectFileNameHelperTests
         var elements = helper.GetElements(fileName);
 
         // Assert
-        await Assert
-            .That(elements)
-            .IsEquivalentTo(expected, CollectionOrdering.Matching);
+        await Assert.That(elements).IsEquivalentTo(expected, CollectionOrdering.Matching);
     }
 
     [Test]
@@ -186,8 +168,6 @@ public class ProjectFileNameHelperTests
         var elements = helper.GetElements(fileName);
 
         // Assert
-        await Assert
-            .That(elements)
-            .IsEmpty();
+        await Assert.That(elements).IsEmpty();
     }
 }

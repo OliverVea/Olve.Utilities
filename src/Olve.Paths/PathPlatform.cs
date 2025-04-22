@@ -18,5 +18,5 @@ public enum PathPlatform
     /// <summary>
     /// Indicates a Unix-style path.
     /// </summary>
-    Unix
+    Unix,
 }

@@ -3,7 +3,6 @@ namespace Olve.Utilities.CollectionExtensions;
 
 public static class EnumerableOneOfExtensions
 {
-
     #region AnyT0 - AnyT7
 
     public static bool AnyT0<T0>(this IEnumerable<OneOf<T0>> source)
@@ -71,7 +70,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT0<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static bool AnyT0<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -84,7 +85,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT0<T0, T1, T2, T3, T4, T5, T6>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+    public static bool AnyT0<T0, T1, T2, T3, T4, T5, T6>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -97,7 +100,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT0<T0, T1, T2, T3, T4, T5, T6, T7>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+    public static bool AnyT0<T0, T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -162,7 +167,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT1<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static bool AnyT1<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -175,7 +182,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT1<T0, T1, T2, T3, T4, T5, T6>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+    public static bool AnyT1<T0, T1, T2, T3, T4, T5, T6>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -188,7 +197,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT1<T0, T1, T2, T3, T4, T5, T6, T7>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+    public static bool AnyT1<T0, T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -240,7 +251,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT2<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static bool AnyT2<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -253,7 +266,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT2<T0, T1, T2, T3, T4, T5, T6>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+    public static bool AnyT2<T0, T1, T2, T3, T4, T5, T6>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -266,7 +281,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT2<T0, T1, T2, T3, T4, T5, T6, T7>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+    public static bool AnyT2<T0, T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -305,7 +322,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT3<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static bool AnyT3<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -318,7 +337,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT3<T0, T1, T2, T3, T4, T5, T6>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+    public static bool AnyT3<T0, T1, T2, T3, T4, T5, T6>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -331,7 +352,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT3<T0, T1, T2, T3, T4, T5, T6, T7>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+    public static bool AnyT3<T0, T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -357,7 +380,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT4<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static bool AnyT4<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -370,7 +395,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT4<T0, T1, T2, T3, T4, T5, T6>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+    public static bool AnyT4<T0, T1, T2, T3, T4, T5, T6>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -383,7 +410,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT4<T0, T1, T2, T3, T4, T5, T6, T7>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+    public static bool AnyT4<T0, T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -396,7 +425,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT5<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static bool AnyT5<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -409,7 +440,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT5<T0, T1, T2, T3, T4, T5, T6>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+    public static bool AnyT5<T0, T1, T2, T3, T4, T5, T6>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -422,7 +455,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT5<T0, T1, T2, T3, T4, T5, T6, T7>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+    public static bool AnyT5<T0, T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -435,7 +470,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT6<T0, T1, T2, T3, T4, T5, T6>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+    public static bool AnyT6<T0, T1, T2, T3, T4, T5, T6>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -448,7 +485,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT6<T0, T1, T2, T3, T4, T5, T6, T7>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+    public static bool AnyT6<T0, T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -461,7 +500,9 @@ public static class EnumerableOneOfExtensions
         return false;
     }
 
-    public static bool AnyT7<T0, T1, T2, T3, T4, T5, T6, T7>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+    public static bool AnyT7<T0, T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -543,7 +584,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT0<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static bool AllT0<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -556,7 +599,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT0<T0, T1, T2, T3, T4, T5, T6>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+    public static bool AllT0<T0, T1, T2, T3, T4, T5, T6>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -569,7 +614,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT0<T0, T1, T2, T3, T4, T5, T6, T7>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+    public static bool AllT0<T0, T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -634,7 +681,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT1<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static bool AllT1<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -647,7 +696,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT1<T0, T1, T2, T3, T4, T5, T6>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+    public static bool AllT1<T0, T1, T2, T3, T4, T5, T6>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -660,7 +711,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT1<T0, T1, T2, T3, T4, T5, T6, T7>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+    public static bool AllT1<T0, T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -712,7 +765,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT2<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static bool AllT2<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -725,7 +780,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT2<T0, T1, T2, T3, T4, T5, T6>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+    public static bool AllT2<T0, T1, T2, T3, T4, T5, T6>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -738,7 +795,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT2<T0, T1, T2, T3, T4, T5, T6, T7>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+    public static bool AllT2<T0, T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -777,7 +836,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT3<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static bool AllT3<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -790,7 +851,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT3<T0, T1, T2, T3, T4, T5, T6>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+    public static bool AllT3<T0, T1, T2, T3, T4, T5, T6>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -803,7 +866,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT3<T0, T1, T2, T3, T4, T5, T6, T7>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+    public static bool AllT3<T0, T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -829,7 +894,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT4<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static bool AllT4<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -842,7 +909,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT4<T0, T1, T2, T3, T4, T5, T6>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+    public static bool AllT4<T0, T1, T2, T3, T4, T5, T6>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -855,7 +924,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT4<T0, T1, T2, T3, T4, T5, T6, T7>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+    public static bool AllT4<T0, T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -868,7 +939,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT5<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static bool AllT5<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -881,7 +954,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT5<T0, T1, T2, T3, T4, T5, T6>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+    public static bool AllT5<T0, T1, T2, T3, T4, T5, T6>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -894,7 +969,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT5<T0, T1, T2, T3, T4, T5, T6, T7>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+    public static bool AllT5<T0, T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -907,7 +984,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT6<T0, T1, T2, T3, T4, T5, T6>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+    public static bool AllT6<T0, T1, T2, T3, T4, T5, T6>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -920,7 +999,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT6<T0, T1, T2, T3, T4, T5, T6, T7>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+    public static bool AllT6<T0, T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -933,7 +1014,9 @@ public static class EnumerableOneOfExtensions
         return true;
     }
 
-    public static bool AllT7<T0, T1, T2, T3, T4, T5, T6, T7>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+    public static bool AllT7<T0, T1, T2, T3, T4, T5, T6, T7>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -983,7 +1066,9 @@ public static class EnumerableOneOfExtensions
         }
     }
 
-    public static IEnumerable<T0> OfT0<T0, T1, T2, T3>(this IEnumerable<OneOf<T0, T1, T2, T3>> source)
+    public static IEnumerable<T0> OfT0<T0, T1, T2, T3>(
+        this IEnumerable<OneOf<T0, T1, T2, T3>> source
+    )
     {
         foreach (var item in source)
         {
@@ -994,7 +1079,9 @@ public static class EnumerableOneOfExtensions
         }
     }
 
-    public static IEnumerable<T0> OfT0<T0, T1, T2, T3, T4>(this IEnumerable<OneOf<T0, T1, T2, T3, T4>> source)
+    public static IEnumerable<T0> OfT0<T0, T1, T2, T3, T4>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1005,7 +1092,9 @@ public static class EnumerableOneOfExtensions
         }
     }
 
-    public static IEnumerable<T0> OfT0<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static IEnumerable<T0> OfT0<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1017,7 +1106,8 @@ public static class EnumerableOneOfExtensions
     }
 
     public static IEnumerable<T0> OfT0<T0, T1, T2, T3, T4, T5, T6>(
-        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1029,7 +1119,8 @@ public static class EnumerableOneOfExtensions
     }
 
     public static IEnumerable<T0> OfT0<T0, T1, T2, T3, T4, T5, T6, T7>(
-        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1062,7 +1153,9 @@ public static class EnumerableOneOfExtensions
         }
     }
 
-    public static IEnumerable<T1> OfT1<T0, T1, T2, T3>(this IEnumerable<OneOf<T0, T1, T2, T3>> source)
+    public static IEnumerable<T1> OfT1<T0, T1, T2, T3>(
+        this IEnumerable<OneOf<T0, T1, T2, T3>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1073,7 +1166,9 @@ public static class EnumerableOneOfExtensions
         }
     }
 
-    public static IEnumerable<T1> OfT1<T0, T1, T2, T3, T4>(this IEnumerable<OneOf<T0, T1, T2, T3, T4>> source)
+    public static IEnumerable<T1> OfT1<T0, T1, T2, T3, T4>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1084,7 +1179,9 @@ public static class EnumerableOneOfExtensions
         }
     }
 
-    public static IEnumerable<T1> OfT1<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static IEnumerable<T1> OfT1<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1096,7 +1193,8 @@ public static class EnumerableOneOfExtensions
     }
 
     public static IEnumerable<T1> OfT1<T0, T1, T2, T3, T4, T5, T6>(
-        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1108,7 +1206,8 @@ public static class EnumerableOneOfExtensions
     }
 
     public static IEnumerable<T1> OfT1<T0, T1, T2, T3, T4, T5, T6, T7>(
-        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1130,7 +1229,9 @@ public static class EnumerableOneOfExtensions
         }
     }
 
-    public static IEnumerable<T2> OfT2<T0, T1, T2, T3>(this IEnumerable<OneOf<T0, T1, T2, T3>> source)
+    public static IEnumerable<T2> OfT2<T0, T1, T2, T3>(
+        this IEnumerable<OneOf<T0, T1, T2, T3>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1141,7 +1242,9 @@ public static class EnumerableOneOfExtensions
         }
     }
 
-    public static IEnumerable<T2> OfT2<T0, T1, T2, T3, T4>(this IEnumerable<OneOf<T0, T1, T2, T3, T4>> source)
+    public static IEnumerable<T2> OfT2<T0, T1, T2, T3, T4>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1152,7 +1255,9 @@ public static class EnumerableOneOfExtensions
         }
     }
 
-    public static IEnumerable<T2> OfT2<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static IEnumerable<T2> OfT2<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1164,7 +1269,8 @@ public static class EnumerableOneOfExtensions
     }
 
     public static IEnumerable<T2> OfT2<T0, T1, T2, T3, T4, T5, T6>(
-        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1176,7 +1282,8 @@ public static class EnumerableOneOfExtensions
     }
 
     public static IEnumerable<T2> OfT2<T0, T1, T2, T3, T4, T5, T6, T7>(
-        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1187,7 +1294,9 @@ public static class EnumerableOneOfExtensions
         }
     }
 
-    public static IEnumerable<T3> OfT3<T0, T1, T2, T3>(this IEnumerable<OneOf<T0, T1, T2, T3>> source)
+    public static IEnumerable<T3> OfT3<T0, T1, T2, T3>(
+        this IEnumerable<OneOf<T0, T1, T2, T3>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1198,7 +1307,9 @@ public static class EnumerableOneOfExtensions
         }
     }
 
-    public static IEnumerable<T3> OfT3<T0, T1, T2, T3, T4>(this IEnumerable<OneOf<T0, T1, T2, T3, T4>> source)
+    public static IEnumerable<T3> OfT3<T0, T1, T2, T3, T4>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1209,7 +1320,9 @@ public static class EnumerableOneOfExtensions
         }
     }
 
-    public static IEnumerable<T3> OfT3<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static IEnumerable<T3> OfT3<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1221,7 +1334,8 @@ public static class EnumerableOneOfExtensions
     }
 
     public static IEnumerable<T3> OfT3<T0, T1, T2, T3, T4, T5, T6>(
-        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1233,7 +1347,8 @@ public static class EnumerableOneOfExtensions
     }
 
     public static IEnumerable<T3> OfT3<T0, T1, T2, T3, T4, T5, T6, T7>(
-        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1244,7 +1359,9 @@ public static class EnumerableOneOfExtensions
         }
     }
 
-    public static IEnumerable<T4> OfT4<T0, T1, T2, T3, T4>(this IEnumerable<OneOf<T0, T1, T2, T3, T4>> source)
+    public static IEnumerable<T4> OfT4<T0, T1, T2, T3, T4>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1255,7 +1372,9 @@ public static class EnumerableOneOfExtensions
         }
     }
 
-    public static IEnumerable<T4> OfT4<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static IEnumerable<T4> OfT4<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1267,7 +1386,8 @@ public static class EnumerableOneOfExtensions
     }
 
     public static IEnumerable<T4> OfT4<T0, T1, T2, T3, T4, T5, T6>(
-        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1279,7 +1399,8 @@ public static class EnumerableOneOfExtensions
     }
 
     public static IEnumerable<T4> OfT4<T0, T1, T2, T3, T4, T5, T6, T7>(
-        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1290,7 +1411,9 @@ public static class EnumerableOneOfExtensions
         }
     }
 
-    public static IEnumerable<T5> OfT5<T0, T1, T2, T3, T4, T5>(this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source)
+    public static IEnumerable<T5> OfT5<T0, T1, T2, T3, T4, T5>(
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1302,7 +1425,8 @@ public static class EnumerableOneOfExtensions
     }
 
     public static IEnumerable<T5> OfT5<T0, T1, T2, T3, T4, T5, T6>(
-        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1314,7 +1438,8 @@ public static class EnumerableOneOfExtensions
     }
 
     public static IEnumerable<T5> OfT5<T0, T1, T2, T3, T4, T5, T6, T7>(
-        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1326,7 +1451,8 @@ public static class EnumerableOneOfExtensions
     }
 
     public static IEnumerable<T6> OfT6<T0, T1, T2, T3, T4, T5, T6>(
-        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source)
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1338,7 +1464,8 @@ public static class EnumerableOneOfExtensions
     }
 
     public static IEnumerable<T6> OfT6<T0, T1, T2, T3, T4, T5, T6, T7>(
-        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1350,7 +1477,8 @@ public static class EnumerableOneOfExtensions
     }
 
     public static IEnumerable<T7> OfT7<T0, T1, T2, T3, T4, T5, T6, T7>(
-        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source)
+        this IEnumerable<OneOf<T0, T1, T2, T3, T4, T5, T6, T7>> source
+    )
     {
         foreach (var item in source)
         {
@@ -1362,5 +1490,4 @@ public static class EnumerableOneOfExtensions
     }
 
     # endregion
-
 }

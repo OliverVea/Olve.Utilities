@@ -39,7 +39,8 @@ public readonly partial struct Result
     /// </summary>
     /// <param name="problems">The problems associated with the failure.</param>
     /// <returns>A failure result.</returns>
-    public static Result Failure(params IEnumerable<ResultProblem> problems) => new(new ResultProblemCollection(problems));
+    public static Result Failure(params IEnumerable<ResultProblem> problems) =>
+        new(new ResultProblemCollection(problems));
 
     /// <summary>
     ///     Attempts to execute the specified action and returns a <see cref="Result"/>.
@@ -58,7 +59,12 @@ public readonly partial struct Result
     ///     containing details of the caught exception.
     /// </returns>
     [DebuggerHidden]
-    public static Result Try<TException>(Action action, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string? message = null, params object[] args) where TException : Exception
+    public static Result Try<TException>(
+        Action action,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string? message = null,
+        params object[] args
+    )
+        where TException : Exception
     {
         try
         {
@@ -91,7 +97,12 @@ public readonly partial struct Result
     ///     otherwise, a failure result containing details of the caught exception.
     /// </returns>
     [DebuggerHidden]
-    public static Result<TValue> Try<TValue, TException>(Func<TValue> action, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string? message = null, params object[] args) where TException : Exception
+    public static Result<TValue> Try<TValue, TException>(
+        Func<TValue> action,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string? message = null,
+        params object[] args
+    )
+        where TException : Exception
     {
         try
         {

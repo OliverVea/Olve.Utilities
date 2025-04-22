@@ -10,7 +10,8 @@ public class PropertyModel(
     string initializer,
     string? xmlComment,
     string[] attributes,
-    string[] namespaces)
+    string[] namespaces
+)
 {
     public string Type { get; } = type;
     public string Name { get; } = name;
@@ -22,13 +23,15 @@ public class PropertyModel(
     public string[] Namespaces { get; } = namespaces;
 
     // Deconstruct
-    public void Deconstruct(out string type,
+    public void Deconstruct(
+        out string type,
         out string name,
         out PropertyAccessModifiersModel accessModifiers,
         out string initializer,
         out string? xmlComment,
         out string[] attributes,
-        out string[] namespaces)
+        out string[] namespaces
+    )
     {
         type = Type;
         name = Name;

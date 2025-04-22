@@ -14,12 +14,8 @@ public class HashSetExtensionTests
         var returnValue = set.Set(4, true);
 
         // Assert
-        await Assert
-            .That(set)
-            .Contains(4);
-        await Assert
-            .That(returnValue)
-            .IsTrue();
+        await Assert.That(set).Contains(4);
+        await Assert.That(returnValue).IsTrue();
     }
 
     [Test]
@@ -32,12 +28,8 @@ public class HashSetExtensionTests
         var returnValue = set.Set(2, false);
 
         // Assert
-        await Assert
-            .That(set)
-            .DoesNotContain(2);
-        await Assert
-            .That(returnValue)
-            .IsTrue();
+        await Assert.That(set).DoesNotContain(2);
+        await Assert.That(returnValue).IsTrue();
     }
 
     [Test]
@@ -50,12 +42,8 @@ public class HashSetExtensionTests
         var returnValue = set.Set(2, true);
 
         // Assert
-        await Assert
-            .That(set)
-            .Contains(2);
-        await Assert
-            .That(returnValue)
-            .IsFalse();
+        await Assert.That(set).Contains(2);
+        await Assert.That(returnValue).IsFalse();
     }
 
     [Test]
@@ -68,12 +56,8 @@ public class HashSetExtensionTests
         var returnValue = set.Set(4, false);
 
         // Assert
-        await Assert
-            .That(set)
-            .DoesNotContain(4);
-        await Assert
-            .That(returnValue)
-            .IsFalse();
+        await Assert.That(set).DoesNotContain(4);
+        await Assert.That(returnValue).IsFalse();
     }
 
     [Test]
@@ -86,12 +70,8 @@ public class HashSetExtensionTests
         var returnValue = set.Toggle(4);
 
         // Assert
-        await Assert
-            .That(set)
-            .Contains(4);
-        await Assert
-            .That(returnValue)
-            .IsTrue();
+        await Assert.That(set).Contains(4);
+        await Assert.That(returnValue).IsTrue();
     }
 
     [Test]
@@ -104,11 +84,7 @@ public class HashSetExtensionTests
         var returnValue = set.Toggle(2);
 
         // Assert
-        await Assert
-            .That(set)
-            .DoesNotContain(2);
-        await Assert
-            .That(returnValue)
-            .IsFalse();
+        await Assert.That(set).DoesNotContain(2);
+        await Assert.That(returnValue).IsFalse();
     }
 }

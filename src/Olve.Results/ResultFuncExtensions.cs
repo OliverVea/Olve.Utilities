@@ -11,9 +11,10 @@ public static class ResultFuncExtensions
     /// <param name="action">The <see cref="Action{T}" /> to convert.</param>
     /// <typeparam name="T">The type of the parameter for the action.</typeparam>
     /// <returns>A <see cref="Func{T, Result}" /> that invokes the action and returns a successful result.</returns>
-    public static Func<T, Result> ToResultFunc<T>(this Action<T> action) => t =>
-    {
-        action(t);
-        return Result.Success();
-    };
+    public static Func<T, Result> ToResultFunc<T>(this Action<T> action) =>
+        t =>
+        {
+            action(t);
+            return Result.Success();
+        };
 }

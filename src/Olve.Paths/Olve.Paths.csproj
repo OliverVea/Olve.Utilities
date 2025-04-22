@@ -1,23 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <Title>Olve.Paths</Title>
-        <Authors>Oliver Vea</Authors>
-        <Description>Olve.Paths is a library that provides a set of utilities for working with file paths.</Description>
-        <Copyright>Oliver Vea</Copyright>
-        <PackageProjectUrl>https://github.com/OliverVea/Olve.Utilities/src/Olve.Paths</PackageProjectUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <RepositoryUrl>https://github.com/OliverVea/Olve.Utilities</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <IsTrimmable>true</IsTrimmable>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\"/>
-    </ItemGroup>
-
+  <PropertyGroup>
+    <Title>Olve.Paths</Title>
+    <Authors>Oliver Vea</Authors>
+    <Description>Olve.Paths is a library that provides a set of utilities for working with file paths.</Description>
+    <Copyright>Oliver Vea</Copyright>
+    <PackageProjectUrl>https://github.com/OliverVea/Olve.Utilities/src/Olve.Paths</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/OliverVea/Olve.Utilities</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IsTrimmable>true</IsTrimmable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 </Project>

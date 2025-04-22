@@ -57,7 +57,7 @@ public class DirectedGraphTests
         await Assert.That(edge.From).IsEqualTo(from);
         await Assert.That(edge.To).IsEqualTo(to);
     }
-        
+
     [Test]
     public async Task CreateEdge_SameFromTo_CreatesDistinctEdges()
     {
@@ -75,7 +75,7 @@ public class DirectedGraphTests
         await Assert.That(edgeResult2.Succeeded).IsTrue();
         await Assert.That(edgeResult1.Value).IsNotEqualTo(edgeResult2.Value);
     }
-        
+
     [Test]
     public async Task CreateEdge_OppositeDirection_Succeeds()
     {
@@ -295,7 +295,7 @@ public class DirectedGraphTests
         await Assert.That(outgoingEdges!.Contains(edgeId1)).IsTrue();
         await Assert.That(outgoingEdges.Contains(edgeId2)).IsTrue();
     }
-    
+
     [Test]
     public async Task CreateFullMesh_AllNodesConnectedToEachOther()
     {
@@ -310,7 +310,8 @@ public class DirectedGraphTests
         {
             foreach (var to in nodeIds)
             {
-                if (from.Equals(to)) continue;
+                if (from.Equals(to))
+                    continue;
                 var result = graph.CreateEdge(from, to);
                 await Assert.That(result.Succeeded).IsTrue();
                 createdEdges.Add(result.Value);
@@ -320,7 +321,7 @@ public class DirectedGraphTests
         // Assert: all expected edges are created
         await Assert.That(createdEdges.Count).IsEqualTo(expectedEdgeCount);
     }
-    
+
     [Test]
     public async Task IncomingOutgoing_DoNotOverlap()
     {

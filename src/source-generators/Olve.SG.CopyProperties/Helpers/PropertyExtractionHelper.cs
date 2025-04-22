@@ -9,7 +9,9 @@ public static class PropertyExtractionHelper
     {
         var type = propertySymbol.Type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat);
         var name = propertySymbol.Name;
-        var accessModifiers = PropertyAccessModifiersExtractionHelper.GetAccessModifiers(propertySymbol);
+        var accessModifiers = PropertyAccessModifiersExtractionHelper.GetAccessModifiers(
+            propertySymbol
+        );
         var accessibility = propertySymbol.DeclaredAccessibility;
 
         var initializer = "";
@@ -20,8 +22,10 @@ public static class PropertyExtractionHelper
             .GetAttributes()
             .Select(attr =>
             {
-                var attributeName = attr.AttributeClass?.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)
-                                    ?? "";
+                var attributeName =
+                    attr.AttributeClass?.ToDisplayString(
+                        SymbolDisplayFormat.MinimallyQualifiedFormat
+                    ) ?? "";
                 if (attributeName.EndsWith("Attribute"))
                 {
                     attributeName = attributeName.Substring(0, attributeName.Length - 9);
@@ -40,13 +44,15 @@ public static class PropertyExtractionHelper
             .Distinct()
             .ToArray();
 
-        return new PropertyModel(type,
+        return new PropertyModel(
+            type,
             name,
             accessModifiers,
             accessibility,
             initializer,
             xmlComment,
             attributes,
-            namespaces);
+            namespaces
+        );
     }
 }

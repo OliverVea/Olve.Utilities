@@ -6,10 +6,9 @@ public class ResultTests
 {
     private const string Message = "some problem occurred";
 
-    private static string GetPlatformString(string path)
-        => OperatingSystem.IsWindows()
-            ? path.Replace("/", "\\")
-            : path;
+    private static string GetPlatformString(string path) =>
+        OperatingSystem.IsWindows() ? path.Replace("/", "\\") : path;
+
     private void SyntaxTesting()
     {
         const string message = "Hi!";
@@ -75,8 +74,9 @@ public class ResultTests
         Console.WriteLine(debugString);
 
         // Assert
-        var expected =
-            GetPlatformString("Olve.Utilities/tests/Olve.Results.Tests/ResultTests.cs:62] some problem occurred");
+        var expected = GetPlatformString(
+            "Olve.Utilities/tests/Olve.Results.Tests/ResultTests.cs:62] some problem occurred"
+        );
         await Assert.That(debugString).EndsWith(expected);
     }
 
@@ -88,10 +88,15 @@ public class ResultTests
     public async Task Test4(bool aSucceeds, bool bSucceeds, bool bInvokedExpected, bool expected)
     {
         // Arrange
-        bool aInvoked = false, bInvoked = false;
+        bool aInvoked = false,
+            bInvoked = false;
 
-        Func<Result> a = aSucceeds ? () => Success(() => aInvoked = true) : () => Fail(() => aInvoked = true);
-        Func<Result> b = bSucceeds ? () => Success(() => bInvoked = true) : () => Fail(() => bInvoked = true);
+        Func<Result> a = aSucceeds
+            ? () => Success(() => aInvoked = true)
+            : () => Fail(() => aInvoked = true);
+        Func<Result> b = bSucceeds
+            ? () => Success(() => bInvoked = true)
+            : () => Fail(() => bInvoked = true);
 
         // Act
         var actual = Result.Chain(a, b);
@@ -119,7 +124,9 @@ public class ResultTests
     public async Task Test5()
     {
         // Arrange
-        Func<Result<int>> a = () => Result.Success(1), b = () => Result.Success(2), c = () => Result.Success(3);
+        Func<Result<int>> a = () => Result.Success(1),
+            b = () => Result.Success(2),
+            c = () => Result.Success(3);
 
         // Act
         var result = Result.Concat(a, b, c);
@@ -139,13 +146,23 @@ public class ResultTests
     [Arguments(true, false, true, false)]
     [Arguments(false, true, false, false)]
     [Arguments(true, true, true, true)]
-    public async Task Result_Then(bool aSucceeds, bool bSucceeds, bool bInvokedExpected, bool expected)
+    public async Task Result_Then(
+        bool aSucceeds,
+        bool bSucceeds,
+        bool bInvokedExpected,
+        bool expected
+    )
     {
         // Arrange
-        bool aInvoked = false, bInvoked = false;
+        bool aInvoked = false,
+            bInvoked = false;
 
-        Func<Result<int>> a = aSucceeds ? () => SuccessInt(() => aInvoked = true) : () => FailInt(() => aInvoked = true);
-        Func<int, Result<int>> b = bSucceeds ? v => SuccessInt(() => bInvoked = true, v) : v => FailInt(() => bInvoked = true, v);
+        Func<Result<int>> a = aSucceeds
+            ? () => SuccessInt(() => aInvoked = true)
+            : () => FailInt(() => aInvoked = true);
+        Func<int, Result<int>> b = bSucceeds
+            ? v => SuccessInt(() => bInvoked = true, v)
+            : v => FailInt(() => bInvoked = true, v);
 
         // Act
         var actual = Result.Chain(a, b);

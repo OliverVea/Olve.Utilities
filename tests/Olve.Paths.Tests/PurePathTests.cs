@@ -9,7 +9,10 @@ public class PurePathTests
     [Arguments("./file", "file")]
     [Arguments("/home/user", "user")]
     [Arguments("/dir/ ", "dir")]
-    public async Task TryGetName_OnVariousPaths_ReturnsExpectedResult(string filePath, string? expectedFileName)
+    public async Task TryGetName_OnVariousPaths_ReturnsExpectedResult(
+        string filePath,
+        string? expectedFileName
+    )
     {
         // Arrange
         var path = Path.CreatePure(filePath, PathPlatform.Unix);
@@ -28,7 +31,10 @@ public class PurePathTests
     [Arguments("/home", null)]
     [Arguments("./user", ".")]
     [Arguments("/home/user", "/home")]
-    public async Task TryGetParent_OnVariousPaths_ReturnsExpectedResults(string filePath, string? expectedParentPath)
+    public async Task TryGetParent_OnVariousPaths_ReturnsExpectedResults(
+        string filePath,
+        string? expectedParentPath
+    )
     {
         // Arrange
         var path = Path.CreatePure(filePath, PathPlatform.Unix);
@@ -47,7 +53,11 @@ public class PurePathTests
     [Arguments("/home/user", "file.txt", "/home/user/file.txt")]
     [Arguments("/home/user", "docs", "/home/user/docs")]
     [Arguments("/home", "user", "/home/user")]
-    public async Task DivisionOperator_OnVariousPaths_ReturnsExpectedResults(string left, string right, string expected)
+    public async Task DivisionOperator_OnVariousPaths_ReturnsExpectedResults(
+        string left,
+        string right,
+        string expected
+    )
     {
         // Arrange
         var leftPath = Path.CreatePure(left, PathPlatform.Unix);
@@ -55,11 +65,11 @@ public class PurePathTests
         // Act
         var actualPath = leftPath / right;
         var actual = actualPath.Path;
-        
+
         // Assert
         await Assert.That(actual).IsEqualTo(expected);
     }
-    
+
     [Test]
     [Arguments("/home/user/file.txt", PathType.Absolute)]
     [Arguments("/", PathType.Absolute)]
@@ -86,7 +96,7 @@ public class PurePathTests
         // Act
         var canGetExecutable = Path.TryGetAssemblyExecutable(out var path);
         var executableString = path?.Path;
-        
+
         // Assert
         await Assert.That(canGetExecutable).IsTrue();
         await Assert.That(File.Exists(executableString)).IsTrue();
@@ -96,7 +106,10 @@ public class PurePathTests
     [Test]
     [Arguments(new[] { "/home", "user", "file.txt" }, "/home/user/file.txt")]
     [Arguments(new[] { "/home", "user/file.txt" }, "/home/user/file.txt")]
-    public async Task DivisionOperator_ChainedPath_EvaluatesCorrectly(string[] segments, string expected)
+    public async Task DivisionOperator_ChainedPath_EvaluatesCorrectly(
+        string[] segments,
+        string expected
+    )
     {
         // Arrange
         var path = Path.CreatePure(segments[0], PathPlatform.Unix);

@@ -13,7 +13,8 @@ namespace Olve.Utilities.Paginations;
 /// <param name="totalCount">The total count of items.</param>
 /// <typeparam name="T">The type of the items in the paginated result.</typeparam>
 [method: SetsRequiredMembers]
-public sealed class PaginatedResult<T>(IList<T> items, Pagination pagination, int totalCount) : IReadOnlyList<T>
+public sealed class PaginatedResult<T>(IList<T> items, Pagination pagination, int totalCount)
+    : IReadOnlyList<T>
 {
     private ReadOnlyCollection<T> Items { get; } = items.AsReadOnly();
 
@@ -36,7 +37,6 @@ public sealed class PaginatedResult<T>(IList<T> items, Pagination pagination, in
     /// </summary>
     [Range(0, int.MaxValue)]
     public required int Page { get; init; } = pagination.Page;
-
 
     /// <summary>
     ///     The size of the page.

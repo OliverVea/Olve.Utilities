@@ -22,7 +22,8 @@ public class ProjectFileNameHelper(string? delimiter = null, string? extension =
     /// </summary>
     /// <param name="elements">The elements to include in the file name.</param>
     /// <returns>The file name.</returns>
-    public string GetFileName(IEnumerable<string> elements) => $"{string.Join(FileNameDelimiter, elements)}{FileExtension}";
+    public string GetFileName(IEnumerable<string> elements) =>
+        $"{string.Join(FileNameDelimiter, elements)}{FileExtension}";
 
     /// <summary>
     ///     Gets the elements from a file name.
@@ -30,11 +31,17 @@ public class ProjectFileNameHelper(string? delimiter = null, string? extension =
     /// <param name="fileName">The file name.</param>
     /// <param name="comparisonType">The comparison to use when checking the file extension.</param>
     /// <returns>The elements.</returns>
-    public IEnumerable<string> GetElements(string fileName, StringComparison comparisonType = StringComparison.Ordinal)
+    public IEnumerable<string> GetElements(
+        string fileName,
+        StringComparison comparisonType = StringComparison.Ordinal
+    )
     {
         if (!fileName.EndsWith(FileExtension, comparisonType))
         {
-            throw new ArgumentException("The file name does not have the expected extension.", nameof(fileName));
+            throw new ArgumentException(
+                "The file name does not have the expected extension.",
+                nameof(fileName)
+            );
         }
 
         if (fileName.Length == FileExtension.Length)
@@ -47,7 +54,6 @@ public class ProjectFileNameHelper(string? delimiter = null, string? extension =
             return [fileName[..^FileExtension.Length]];
         }
 
-        return fileName[..^FileExtension.Length]
-            .Split(FileNameDelimiter);
+        return fileName[..^FileExtension.Length].Split(FileNameDelimiter);
     }
 }

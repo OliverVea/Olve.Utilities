@@ -19,8 +19,10 @@ public static class EnumerableExtensions
     ///     Please note that this method is lazy and will not execute the action on each item until the enumerable is
     ///     enumerated.
     /// </remarks>
-    public static IEnumerable<TOut> ForEach<TIn, TOut>(this IEnumerable<TIn> enumerable, Func<TIn, TOut> action) =>
-        enumerable.Select(action);
+    public static IEnumerable<TOut> ForEach<TIn, TOut>(
+        this IEnumerable<TIn> enumerable,
+        Func<TIn, TOut> action
+    ) => enumerable.Select(action);
 
     /// <summary>
     ///     Performs an action on each item in the enumerable.
@@ -57,7 +59,10 @@ public static class EnumerableExtensions
     /// if the cast was successful, or <c>null</c> otherwise.
     /// </param>
     /// <returns><c>true</c> if the cast was successful; otherwise, <c>false</c>.</returns>
-    public static bool TryAsReadOnlySet<T>(this IEnumerable<T> enumerable, [NotNullWhen(true)] out IReadOnlySet<T>? readOnlySet)
+    public static bool TryAsReadOnlySet<T>(
+        this IEnumerable<T> enumerable,
+        [NotNullWhen(true)] out IReadOnlySet<T>? readOnlySet
+    )
     {
         switch (enumerable)
         {
@@ -83,7 +88,10 @@ public static class EnumerableExtensions
     /// if the cast was successful, or <c>null</c> otherwise.
     /// </param>
     /// <returns><c>true</c> if the cast was successful; otherwise, <c>false</c>.</returns>
-    public static bool TryAsSet<T>(this IEnumerable<T> enumerable, [NotNullWhen(true)] out ISet<T>? set)
+    public static bool TryAsSet<T>(
+        this IEnumerable<T> enumerable,
+        [NotNullWhen(true)] out ISet<T>? set
+    )
     {
         switch (enumerable)
         {

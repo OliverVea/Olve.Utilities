@@ -6,7 +6,9 @@ namespace Olve.Results.Tests;
 public class Result_Try
 {
     private void ThrowsException() => ThrowsException(() => new Exception());
-    private void ThrowsException<T>(Func<T> exceptionFactory) where T : Exception
+
+    private void ThrowsException<T>(Func<T> exceptionFactory)
+        where T : Exception
     {
         throw exceptionFactory();
     }
@@ -45,12 +47,20 @@ public class Result_Try
         NotSupportedException exception = new();
 
         // Act
-        var result = Result.Try<Exception>(() => ThrowsException(() => exception), "Could not call method '{0}'", 43);
+        var result = Result.Try<Exception>(
+            () => ThrowsException(() => exception),
+            "Could not call method '{0}'",
+            43
+        );
 
         // Assert
         await Assert.That(result.Succeeded).IsFalse();
         var actualProblem = result.Problems?.Single();
-        await Assert.That(actualProblem).IsNotNull().And.HasMember(x => x!.Message).EqualTo("Could not call method '{0}'");
+        await Assert
+            .That(actualProblem)
+            .IsNotNull()
+            .And.HasMember(x => x!.Message)
+            .EqualTo("Could not call method '{0}'");
     }
 
     [Test]
@@ -60,7 +70,9 @@ public class Result_Try
         NotSupportedException exception = new();
 
         // Act & Assert
-        Assert.Throws<NotSupportedException>(() => Result.Try<ArgumentException>(() => ThrowsException(() => exception)));
+        Assert.Throws<NotSupportedException>(() =>
+            Result.Try<ArgumentException>(() => ThrowsException(() => exception))
+        );
     }
 
     [Test]

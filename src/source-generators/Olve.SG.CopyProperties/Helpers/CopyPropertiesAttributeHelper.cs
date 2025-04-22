@@ -8,17 +8,16 @@ public static class CopyPropertiesAttributeHelper
     public const string GeneratedFileName = ClassName + ".g.cs";
     public const string FullyQualifiedName = Namespace + "." + ClassName;
 
-    public const string SourceCode =
-        $$"""
-          namespace {{Namespace}};
+    public const string SourceCode = $$"""
+        namespace {{Namespace}};
 
-          [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface, Inherited = false, AllowMultiple = true)]
-          public class {{ClassName}} : Attribute
-          {
-             public {{ClassName}}(Type source)
-             {
-                 
-             }
-          }
-          """;
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface, Inherited = false, AllowMultiple = true)]
+        public class {{ClassName}} : Attribute
+        {
+           public {{ClassName}}(Type source)
+           {
+               
+           }
+        }
+        """;
 }

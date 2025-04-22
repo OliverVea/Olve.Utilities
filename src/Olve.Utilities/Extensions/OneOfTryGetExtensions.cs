@@ -41,10 +41,7 @@ public static class OneOfTryGetExtensions
     /// <returns>The value of the <see cref="OneOf{T0, T1}" /> if it is of type <typeparamref name="T1" />, otherwise the default value.</returns>
     public static T1 GetT1OrDefault<T0, T1>(this OneOf<T0, T1> oneOf, T1 defaultValue)
     {
-        return oneOf.Match(
-            _ => defaultValue,
-            t1 => t1
-        );
+        return oneOf.Match(_ => defaultValue, t1 => t1);
     }
 
     /// <summary>
@@ -62,10 +59,6 @@ public static class OneOfTryGetExtensions
     /// <returns>The value of the <see cref="OneOf{T0, T1, T2}" /> if it is of type <typeparamref name="T0" />, otherwise the default value.</returns>
     public static T0 GetT0OrDefault<T0, T1, T2>(this OneOf<T0, T1, T2> oneOf, T0 defaultValue)
     {
-        return oneOf.Match(
-            t0 => t0,
-            _ => defaultValue,
-            _ => defaultValue
-        );
+        return oneOf.Match(t0 => t0, _ => defaultValue, _ => defaultValue);
     }
 }

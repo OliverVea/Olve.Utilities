@@ -20,9 +20,11 @@ public class ManyToManyLookup<TLeft, TRight> : IManyToManyLookup<TLeft, TRight>
     /// <param name="initialItems">The initial items to populate the lookup with.</param>
     /// <param name="leftComparer">The equality comparer for left-hand elements.</param>
     /// <param name="rightComparer">The equality comparer for right-hand elements.</param>
-    public ManyToManyLookup(IEnumerable<KeyValuePair<TLeft, TRight>>? initialItems = null,
+    public ManyToManyLookup(
+        IEnumerable<KeyValuePair<TLeft, TRight>>? initialItems = null,
         IEqualityComparer<TLeft>? leftComparer = null,
-        IEqualityComparer<TRight>? rightComparer = null)
+        IEqualityComparer<TRight>? rightComparer = null
+    )
     {
         _leftToRights = new Dictionary<TLeft, HashSet<TRight>>(leftComparer);
         _rightToLefts = new Dictionary<TRight, HashSet<TLeft>>(rightComparer);
@@ -42,15 +44,11 @@ public class ManyToManyLookup<TLeft, TRight> : IManyToManyLookup<TLeft, TRight>
 
     /// <inheritdoc />
     public OneOf<IReadOnlySet<TRight>, NotFound> Get(TLeft left) =>
-        _leftToRights.TryGetValue(left, out var rights)
-            ? rights
-            : new NotFound();
+        _leftToRights.TryGetValue(left, out var rights) ? rights : new NotFound();
 
     /// <inheritdoc />
     public OneOf<IReadOnlySet<TLeft>, NotFound> Get(TRight right) =>
-        _rightToLefts.TryGetValue(right, out var lefts)
-            ? lefts
-            : new NotFound();
+        _rightToLefts.TryGetValue(right, out var lefts) ? lefts : new NotFound();
 
     /// <inheritdoc />
     public void Set(TLeft left, ISet<TRight> rights)
@@ -59,8 +57,7 @@ public class ManyToManyLookup<TLeft, TRight> : IManyToManyLookup<TLeft, TRight>
         {
             foreach (var right in existingRights)
             {
-                _rightToLefts[right]
-                    .Remove(left);
+                _rightToLefts[right].Remove(left);
                 if (_rightToLefts[right].Count == 0)
                 {
                     _rightToLefts.Remove(right);
@@ -74,7 +71,7 @@ public class ManyToManyLookup<TLeft, TRight> : IManyToManyLookup<TLeft, TRight>
             return;
         }
 
-        _leftToRights[left] = [..rights];
+        _leftToRights[left] = [.. rights];
         foreach (var right in rights)
         {
             if (!_rightToLefts.TryGetValue(right, out var lefts))
@@ -94,8 +91,7 @@ public class ManyToManyLookup<TLeft, TRight> : IManyToManyLookup<TLeft, TRight>
         {
             foreach (var left in existingLefts)
             {
-                _leftToRights[left]
-                    .Remove(right);
+                _leftToRights[left].Remove(right);
                 if (_leftToRights[left].Count == 0)
                 {
                     _leftToRights.Remove(left);
@@ -109,7 +105,7 @@ public class ManyToManyLookup<TLeft, TRight> : IManyToManyLookup<TLeft, TRight>
             return;
         }
 
-        _rightToLefts[right] = [..lefts];
+        _rightToLefts[right] = [.. lefts];
         foreach (var left in lefts)
         {
             if (!_leftToRights.TryGetValue(left, out var rights))
@@ -159,15 +155,13 @@ public class ManyToManyLookup<TLeft, TRight> : IManyToManyLookup<TLeft, TRight>
             return false;
         }
 
-        _leftToRights[left]
-            .Remove(right);
+        _leftToRights[left].Remove(right);
         if (_leftToRights[left].Count == 0)
         {
             _leftToRights.Remove(left);
         }
 
-        _rightToLefts[right]
-            .Remove(left);
+        _rightToLefts[right].Remove(left);
         if (_rightToLefts[right].Count == 0)
         {
             _rightToLefts.Remove(right);
@@ -193,8 +187,7 @@ public class ManyToManyLookup<TLeft, TRight> : IManyToManyLookup<TLeft, TRight>
 
         foreach (var right in rights)
         {
-            _rightToLefts[right]
-                .Remove(left);
+            _rightToLefts[right].Remove(left);
             if (_rightToLefts[right].Count == 0)
             {
                 _rightToLefts.Remove(right);
@@ -215,8 +208,7 @@ public class ManyToManyLookup<TLeft, TRight> : IManyToManyLookup<TLeft, TRight>
 
         foreach (var left in lefts)
         {
-            _leftToRights[left]
-                .Remove(right);
+            _leftToRights[left].Remove(right);
             if (_leftToRights[left].Count == 0)
             {
                 _leftToRights.Remove(left);

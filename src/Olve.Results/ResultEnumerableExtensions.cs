@@ -13,7 +13,8 @@ public static class ResultEnumerableExtensions
     /// </summary>
     /// <param name="results">The collection of <see cref="Result" /> objects.</param>
     /// <returns><c>true</c> if any result in the collection failed; otherwise, <c>false</c>.</returns>
-    public static bool HasProblems(this IEnumerable<Result> results) => results.Any(r => !r.Succeeded);
+    public static bool HasProblems(this IEnumerable<Result> results) =>
+        results.Any(r => !r.Succeeded);
 
     /// <summary>
     ///     Determines whether any of the results in the collection indicate failure.
@@ -21,7 +22,8 @@ public static class ResultEnumerableExtensions
     /// <typeparam name="T">The type of the result value.</typeparam>
     /// <param name="results">The collection of <see cref="Result{T}" /> objects.</param>
     /// <returns><c>true</c> if any result in the collection failed; otherwise, <c>false</c>.</returns>
-    public static bool HasProblems<T>(this IEnumerable<Result<T>> results) => results.Any(r => !r.Succeeded);
+    public static bool HasProblems<T>(this IEnumerable<Result<T>> results) =>
+        results.Any(r => !r.Succeeded);
 
     /// <summary>
     ///   Attempts to collect problems from the results in the collection.
@@ -32,7 +34,10 @@ public static class ResultEnumerableExtensions
     ///     failed results. If the collection had no problems, this parameter is set to <c>null</c>.
     /// </param>
     /// <returns><c>true</c> if any result in the collection had problems; otherwise, <c>false</c>.</returns>
-    public static bool TryPickProblems(this IEnumerable<Result> results, [NotNullWhen(true)] out ResultProblemCollection? problems)
+    public static bool TryPickProblems(
+        this IEnumerable<Result> results,
+        [NotNullWhen(true)] out ResultProblemCollection? problems
+    )
     {
         problems = null;
         var hadProblems = false;
@@ -64,7 +69,10 @@ public static class ResultEnumerableExtensions
     /// <returns>
     ///     <c>true</c> if any result in the collection had problems; otherwise, <c>false</c>.
     /// </returns>
-    public static bool TryPickProblems<T>(this IEnumerable<Result<T>> results, [NotNullWhen(true)] out ResultProblemCollection? problems)
+    public static bool TryPickProblems<T>(
+        this IEnumerable<Result<T>> results,
+        [NotNullWhen(true)] out ResultProblemCollection? problems
+    )
     {
         problems = null;
         var hadProblems = false;
@@ -100,9 +108,11 @@ public static class ResultEnumerableExtensions
     /// <returns>
     ///     <c>true</c> if any result in the collection had problems; otherwise, <c>false</c>.
     /// </returns>
-    public static bool TryPickProblems<T>(this IEnumerable<Result<T>> results,
+    public static bool TryPickProblems<T>(
+        this IEnumerable<Result<T>> results,
         [NotNullWhen(true)] out ResultProblemCollection? problems,
-        [NotNullWhen(false)] out IList<T>? values)
+        [NotNullWhen(false)] out IList<T>? values
+    )
     {
         values = null;
         problems = null;
@@ -129,7 +139,6 @@ public static class ResultEnumerableExtensions
         return hadProblems;
     }
 
-
     /// <summary>
     ///     Retrieves all problems from the results in the collection.
     /// </summary>
@@ -154,7 +163,5 @@ public static class ResultEnumerableExtensions
     /// <param name="results">The collection of <see cref="Result{T}" /> objects.</param>
     /// <returns>An <see cref="IEnumerable{T}" /> of successful result values.</returns>
     public static IEnumerable<T> GetValues<T>(this IEnumerable<Result<T>> results) =>
-        results
-            .Select(r => r.Value)
-            .OfType<T>();
+        results.Select(r => r.Value).OfType<T>();
 }

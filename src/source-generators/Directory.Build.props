@@ -1,26 +1,27 @@
 <Project>
-    <PropertyGroup>
-        <TargetFramework>netstandard2.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <LangVersion>latest</LangVersion>
-
-        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-        <IsRoslynComponent>true</IsRoslynComponent>
-
-        <IsPackable>true</IsPackable>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-        <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all"/>
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false"/>
-    </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <IsPackable>true</IsPackable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+  </ItemGroup>
+  <ItemGroup>
+    <None
+      Include="$(OutputPath)\$(AssemblyName).dll"
+      Pack="true"
+      PackagePath="analyzers/dotnet/cs"
+      Visible="false"
+    />
+  </ItemGroup>
 </Project>

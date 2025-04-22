@@ -14,53 +14,65 @@ public class CopyPropertiesGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        context.RegisterPostInitializationOutput(ctx => ctx.AddSource(
-            CopyPropertiesAttributeHelper.GeneratedFileName,
-            SourceText.From(CopyPropertiesAttributeHelper.SourceCode, Encoding.UTF8)));
+        context.RegisterPostInitializationOutput(ctx =>
+            ctx.AddSource(
+                CopyPropertiesAttributeHelper.GeneratedFileName,
+                SourceText.From(CopyPropertiesAttributeHelper.SourceCode, Encoding.UTF8)
+            )
+        );
 
-        var toGenerate = context
-            .SyntaxProvider
-            .ForAttributeWithMetadataName(
-                CopyPropertiesAttributeHelper.FullyQualifiedName,
-                static (_, _) => true,
-                static (ctx, _) => GetClassOrStructToGenerate(ctx));
+        var toGenerate = context.SyntaxProvider.ForAttributeWithMetadataName(
+            CopyPropertiesAttributeHelper.FullyQualifiedName,
+            static (_, _) => true,
+            static (ctx, _) => GetClassOrStructToGenerate(ctx)
+        );
 
-
-        context.RegisterSourceOutput(toGenerate,
+        context.RegisterSourceOutput(
+            toGenerate,
             static (spc, source) =>
             {
                 var (model, message, success) = source;
 
                 if (model is null || !success)
                 {
-                    spc.ReportDiagnostic(Diagnostic.Create(
-                        new DiagnosticDescriptor(
-                            "CP002",
-                            "CopyProperties",
-                            message ?? "No model was generated.",
-                            "CopyProperties",
-                            DiagnosticSeverity.Error,
-                            true),
-                        Location.None));
+                    spc.ReportDiagnostic(
+                        Diagnostic.Create(
+                            new DiagnosticDescriptor(
+                                "CP002",
+                                "CopyProperties",
+                                message ?? "No model was generated.",
+                                "CopyProperties",
+                                DiagnosticSeverity.Error,
+                                true
+                            ),
+                            Location.None
+                        )
+                    );
                     return;
                 }
 
                 Execute(model, spc);
 
-                spc.ReportDiagnostic(Diagnostic.Create(
-                    new DiagnosticDescriptor(
-                        "CP003",
-                        "CopyProperties",
-                        $"Generated {model.TypeType} {model.TypeName}.",
-                        "CopyProperties",
-                        DiagnosticSeverity.Info,
-                        true),
-                    Location.None));
-            });
+                spc.ReportDiagnostic(
+                    Diagnostic.Create(
+                        new DiagnosticDescriptor(
+                            "CP003",
+                            "CopyProperties",
+                            $"Generated {model.TypeType} {model.TypeName}.",
+                            "CopyProperties",
+                            DiagnosticSeverity.Info,
+                            true
+                        ),
+                        Location.None
+                    )
+                );
+            }
+        );
     }
 
     private static (GeneratedTypeModel? Model, string Log, bool Success) GetClassOrStructToGenerate(
-        GeneratorAttributeSyntaxContext context)
+        GeneratorAttributeSyntaxContext context
+    )
     {
         var sb = new StringBuilder();
 
@@ -78,12 +90,12 @@ public class CopyPropertiesGenerator : IIncrementalGenerator
         }
 
         var allAttributes = destinationDeclaration
-            .AttributeLists
-            .SelectMany(al => al.Attributes)
+            .AttributeLists.SelectMany(al => al.Attributes)
             .ToArray();
 
         sb.Append(
-            $"Found {allAttributes.Length} attributes with names: {string.Join(", ", allAttributes.Select(a => a.Name.ToString()))}\t");
+            $"Found {allAttributes.Length} attributes with names: {string.Join(", ", allAttributes.Select(a => a.Name.ToString()))}\t"
+        );
 
         var copyPropertyAttributes = allAttributes
             .Where(a => a.Name.ToString() == CopyPropertiesAttributeHelper.AttributeName)
@@ -92,8 +104,7 @@ public class CopyPropertiesGenerator : IIncrementalGenerator
         sb.Append($"Found {copyPropertyAttributes.Length} CopyProperties attributes.\t");
 
         var typeOfExpressions = copyPropertyAttributes
-            .Select(a => a.ArgumentList?.Arguments.FirstOrDefault()
-                ?.Expression)
+            .Select(a => a.ArgumentList?.Arguments.FirstOrDefault()?.Expression)
             .OfType<TypeOfExpressionSyntax>()
             .ToArray();
 
@@ -108,9 +119,11 @@ public class CopyPropertiesGenerator : IIncrementalGenerator
 
         sb.Append($"Found {sourceSymbols.Length} source symbols.\t");
 
-        var model = GeneratedTypeExtractionHelper.ExtractGeneratedType(sourceSymbols,
+        var model = GeneratedTypeExtractionHelper.ExtractGeneratedType(
+            sourceSymbols,
             destinationSymbol,
-            destinationDeclaration);
+            destinationDeclaration
+        );
 
         return (model, sb.ToString(), sourceSymbols.Length > 0);
     }
@@ -121,14 +134,18 @@ public class CopyPropertiesGenerator : IIncrementalGenerator
 
         spc.AddSource($"{source.TypeName}.g.cs", SourceText.From(sourceCode, Encoding.UTF8));
 
-        spc.ReportDiagnostic(Diagnostic.Create(
-            new DiagnosticDescriptor(
-                "CP001",
-                "CopyProperties",
-                $"Generated {source.TypeType} {source.TypeName}.",
-                "CopyProperties",
-                DiagnosticSeverity.Info,
-                true),
-            Location.None));
+        spc.ReportDiagnostic(
+            Diagnostic.Create(
+                new DiagnosticDescriptor(
+                    "CP001",
+                    "CopyProperties",
+                    $"Generated {source.TypeType} {source.TypeName}.",
+                    "CopyProperties",
+                    DiagnosticSeverity.Info,
+                    true
+                ),
+                Location.None
+            )
+        );
     }
 }
