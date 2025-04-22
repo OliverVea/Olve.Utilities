@@ -5,11 +5,11 @@ namespace Olve.Paths;
 
 
 [DebuggerDisplay("{Path}")]
-internal class PureUnixPath : IPurePath
+internal class UnixPurePath : IPurePath
 {
     private IReadOnlyList<string> Segments { get; }
 
-    private PureUnixPath(IReadOnlyList<string> segments, PathType pathType)
+    private UnixPurePath(IReadOnlyList<string> segments, PathType pathType)
     {
         Segments = segments;
         Type = pathType;
@@ -19,12 +19,12 @@ internal class PureUnixPath : IPurePath
             : string.Join('/', Segments);
     }
 
-    public static PureUnixPath FromPath(string path)
+    public static UnixPurePath FromPath(string path)
     {
         var segments = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
         var pathType = GetPathType(path);
 
-        return new PureUnixPath(segments, pathType);
+        return new UnixPurePath(segments, pathType);
     }
 
     public string Path { get; }
@@ -39,7 +39,7 @@ internal class PureUnixPath : IPurePath
             return false;
         }
 
-        parent = new PureUnixPath(Segments.Take(Segments.Count - 1).ToArray(), Type);
+        parent = new UnixPurePath(Segments.Take(Segments.Count - 1).ToArray(), Type);
         return true;
     }
 
@@ -57,7 +57,7 @@ internal class PureUnixPath : IPurePath
 
     public IPurePath Append(IPurePath right)
     {
-        if (right is PureUnixPath unixRight)
+        if (right is UnixPurePath unixRight)
         {
             return Append(unixRight);
         }
@@ -65,12 +65,12 @@ internal class PureUnixPath : IPurePath
         return Append(right.Path);
     }
 
-    private IPurePath Append(PureUnixPath right)
+    private IPurePath Append(UnixPurePath right)
     {
         if (right.Type == PathType.Stub)
         {
             var combinedSegments = Segments.Concat(right.Segments).ToArray();
-            return new PureUnixPath(combinedSegments, Type);
+            return new UnixPurePath(combinedSegments, Type);
         }
 
         if (right.Type != PathType.Relative)
@@ -80,7 +80,7 @@ internal class PureUnixPath : IPurePath
 
         var segments = SegmentsHelper.EvaluateAndConcatenateSegments(Segments, right.Segments);
         
-        return new PureUnixPath(segments.ToArray(), Type);
+        return new UnixPurePath(segments.ToArray(), Type);
     }
 
     public IPurePath Append(string right)
@@ -93,7 +93,7 @@ internal class PureUnixPath : IPurePath
         }
 
         var combinedSegments = Segments.Concat(rightPath.Segments).ToArray();
-        return new PureUnixPath(combinedSegments, Type);
+        return new UnixPurePath(combinedSegments, Type);
     }
 
 

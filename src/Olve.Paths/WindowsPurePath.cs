@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Olve.Paths;
 
 [DebuggerDisplay("{Path}")]
-internal class PureWindowsPath : IPurePath
+internal class WindowsPurePath : IPurePath
 {
     public char? DriveLetter { get; }
     internal IReadOnlyList<string> Segments { get; }
@@ -14,7 +14,7 @@ internal class PureWindowsPath : IPurePath
     public PathPlatform Platform { get; }
     public PathType Type { get; }
 
-    internal PureWindowsPath(char? driveLetter, IReadOnlyList<string> segments, PathType pathType)
+    internal WindowsPurePath(char? driveLetter, IReadOnlyList<string> segments, PathType pathType)
     {
         // Todo: prettify this logic
         var driveShouldBeNull = pathType != PathType.Absolute;
@@ -39,10 +39,10 @@ internal class PureWindowsPath : IPurePath
             : string.Join(PathSeparator, segments);
     }
 
-    public static PureWindowsPath FromPath(string path)
+    public static WindowsPurePath FromPath(string path)
     {
         ParsePath(path, out var drive, out var pathType, out var segments);
-        return new PureWindowsPath(drive, segments, pathType);
+        return new WindowsPurePath(drive, segments, pathType);
     }
 
     public bool TryGetParentPure([NotNullWhen(true)] out IPurePath? parent)
@@ -53,7 +53,7 @@ internal class PureWindowsPath : IPurePath
             return false;
         }
 
-        parent = new PureWindowsPath(DriveLetter, Segments.Take(Segments.Count - 1).ToArray(), Type);
+        parent = new WindowsPurePath(DriveLetter, Segments.Take(Segments.Count - 1).ToArray(), Type);
         return true;
     }
 
@@ -71,7 +71,7 @@ internal class PureWindowsPath : IPurePath
 
     public IPurePath Append(IPurePath right)
     {
-        if (right is PureWindowsPath unixRight)
+        if (right is WindowsPurePath unixRight)
         {
             return Append(unixRight);
         }
@@ -79,12 +79,12 @@ internal class PureWindowsPath : IPurePath
         return Append(right.Path);
     }
 
-    private IPurePath Append(PureWindowsPath right)
+    private IPurePath Append(WindowsPurePath right)
     {
         if (right.Type == PathType.Stub)
         {
             var combinedSegments = Segments.Concat(right.Segments).ToArray();
-            return new PureWindowsPath(DriveLetter, combinedSegments, Type);
+            return new WindowsPurePath(DriveLetter, combinedSegments, Type);
         }
 
         if (right.Type != PathType.Relative)
@@ -94,7 +94,7 @@ internal class PureWindowsPath : IPurePath
 
         var segments = SegmentsHelper.EvaluateAndConcatenateSegments(Segments, right.Segments);
 
-        return new PureWindowsPath(DriveLetter, segments, Type);
+        return new WindowsPurePath(DriveLetter, segments, Type);
     }
 
     public IPurePath Append(string right)
@@ -108,7 +108,7 @@ internal class PureWindowsPath : IPurePath
 
         var segments = SegmentsHelper.EvaluateAndConcatenateSegments(Segments, rightPath.Segments);
         
-        return new PureWindowsPath(DriveLetter, segments, Type);
+        return new WindowsPurePath(DriveLetter, segments, Type);
     }
 
     private const char PathSeparator = '\\';

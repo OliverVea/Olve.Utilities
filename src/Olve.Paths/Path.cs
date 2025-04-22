@@ -153,10 +153,10 @@ public static class Path
         return new UnixPath(path, pathEnvironment);
     }
 
-    private static PureUnixPath CreatePureUnixPath(string path)
+    private static UnixPurePath CreatePureUnixPath(string path)
     {
         path = ProcessUnixPath(path);
-        return PureUnixPath.FromPath(path);
+        return UnixPurePath.FromPath(path);
     }
 
     private static string ProcessUnixPath(string path)
@@ -174,10 +174,10 @@ public static class Path
         return new WindowsPath(path, pathEnvironment);
     }
 
-    private static PureWindowsPath CreatePureWindowsPath(string path)
+    private static WindowsPurePath CreatePureWindowsPath(string path)
     {
         path = ProcessWindowsPath(path);
-        return PureWindowsPath.FromPath(path);
+        return WindowsPurePath.FromPath(path);
     }
 
     private static string ProcessWindowsPath(string path)

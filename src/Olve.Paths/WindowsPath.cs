@@ -7,34 +7,34 @@ internal class WindowsPath : IPath
 {
     private const string LinkStringPrefix = "file://";
     
-    private readonly PureWindowsPath _pureWindowsPath;
+    private readonly WindowsPurePath _windowsPurePath;
     private readonly IPathEnvironment _pathEnvironment;
 
-    private WindowsPath(PureWindowsPath path, IPathEnvironment? pathEnvironment = null)
+    private WindowsPath(WindowsPurePath path, IPathEnvironment? pathEnvironment = null)
     {
-        _pureWindowsPath = path;
+        _windowsPurePath = path;
         _pathEnvironment = pathEnvironment ?? DefaultUnixPathEnvironment.Shared;
     }
     
     internal WindowsPath(string path, IPathEnvironment? pathEnvironment = null)
     {
-        _pureWindowsPath = PureWindowsPath.FromPath(path);
+        _windowsPurePath = WindowsPurePath.FromPath(path);
         _pathEnvironment = pathEnvironment ?? DefaultUnixPathEnvironment.Shared;
     }
 
-    public string Path => _pureWindowsPath.Path;
+    public string Path => _windowsPurePath.Path;
     public PathPlatform Platform => PathPlatform.Windows;
-    public PathType Type => _pureWindowsPath.Type;
+    public PathType Type => _windowsPurePath.Type;
     
     public bool TryGetParentPure([NotNullWhen(true)] out IPurePath? parent)
-        => _pureWindowsPath.TryGetParentPure(out parent);
+        => _windowsPurePath.TryGetParentPure(out parent);
 
     public bool TryGetName([NotNullWhen(true)] out string? fileName)
-        => _pureWindowsPath.TryGetName(out fileName);
+        => _windowsPurePath.TryGetName(out fileName);
 
     public IPurePath Append(IPurePath right)
     {
-        if (_pureWindowsPath / right is not PureWindowsPath pureWindowsPath)
+        if (_windowsPurePath / right is not WindowsPurePath pureWindowsPath)
         {
             throw new InvalidOperationException("Path segments could not be combined.");
         }
@@ -44,7 +44,7 @@ internal class WindowsPath : IPath
 
     public IPurePath Append(string right)
     {
-        if ((IPurePath)_pureWindowsPath / right is not PureWindowsPath pureWindowsPath)
+        if ((IPurePath)_windowsPurePath / right is not WindowsPurePath pureWindowsPath)
         {
             throw new InvalidOperationException("Path segments could not be combined.");
         }
@@ -54,13 +54,13 @@ internal class WindowsPath : IPath
 
     public bool TryGetElementType(out ElementType type)
     {
-        if (File.Exists(_pureWindowsPath.Path))
+        if (File.Exists(_windowsPurePath.Path))
         {
             type = ElementType.File;
             return true;
         }
 
-        if (Directory.Exists(_pureWindowsPath.Path))
+        if (Directory.Exists(_windowsPurePath.Path))
         {
             type = ElementType.Directory;
             return true;
@@ -85,7 +85,7 @@ internal class WindowsPath : IPath
             return false;
         }
 
-        absolute = Olve.Paths.Path.Create(cwd) / _pureWindowsPath;
+        absolute = Olve.Paths.Path.Create(cwd) / _windowsPurePath;
         
         return true;
     }
@@ -94,7 +94,7 @@ internal class WindowsPath : IPath
     {
         if (TryGetParentPure(out var parentPure))
         {
-            parent = new WindowsPath((PureWindowsPath)parentPure, _pathEnvironment);
+            parent = new WindowsPath((WindowsPurePath)parentPure, _pathEnvironment);
             return true;
         }
 
@@ -136,7 +136,7 @@ internal class WindowsPath : IPath
 
     public IPath AppendPath(IPurePath right)
     {
-        if (_pureWindowsPath / right is not PureWindowsPath pureWindowsPath)
+        if (_windowsPurePath / right is not WindowsPurePath pureWindowsPath)
         {
             throw new InvalidOperationException("Path segments could not be combined.");
         }
@@ -146,7 +146,7 @@ internal class WindowsPath : IPath
 
     public IPath AppendPath(string right)
     {
-        if ((IPurePath)_pureWindowsPath / right is not PureWindowsPath pureWindowsPath)
+        if ((IPurePath)_windowsPurePath / right is not WindowsPurePath pureWindowsPath)
         {
             throw new InvalidOperationException("Path segments could not be combined.");
         }

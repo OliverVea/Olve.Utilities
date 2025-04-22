@@ -9,27 +9,27 @@ internal class UnixPath : IPath
 {
     private const string LinkStringPrefix = "file://";
     
-    private readonly PureUnixPath _pureUnixPath;
+    private readonly UnixPurePath _unixPurePath;
     private readonly IPathEnvironment _pathEnvironment;
 
-    private UnixPath(PureUnixPath path, IPathEnvironment? pathEnvironment = null)
+    private UnixPath(UnixPurePath path, IPathEnvironment? pathEnvironment = null)
     {
-        _pureUnixPath = path;
+        _unixPurePath = path;
         _pathEnvironment = pathEnvironment ?? DefaultUnixPathEnvironment.Shared;
     }
     
     internal UnixPath(string path, IPathEnvironment? pathEnvironment = null)
     {
-        _pureUnixPath = PureUnixPath.FromPath(path);
+        _unixPurePath = UnixPurePath.FromPath(path);
         _pathEnvironment = pathEnvironment ?? DefaultUnixPathEnvironment.Shared;
     }
 
-    public string Path => _pureUnixPath.Path;
-    public PathPlatform Platform => _pureUnixPath.Platform;
-    public PathType Type => _pureUnixPath.Type;
+    public string Path => _unixPurePath.Path;
+    public PathPlatform Platform => _unixPurePath.Platform;
+    public PathType Type => _unixPurePath.Type;
 
     public bool TryGetParentPure([NotNullWhen(true)] out IPurePath? parent)
-        => _pureUnixPath.TryGetParentPure(out parent);
+        => _unixPurePath.TryGetParentPure(out parent);
 
     public bool TryGetElementType([NotNullWhen(true)] out ElementType type)
     {
@@ -64,7 +64,7 @@ internal class UnixPath : IPath
             return false;
         }
 
-        absolute = Olve.Paths.Path.Create(cwd) / _pureUnixPath;
+        absolute = Olve.Paths.Path.Create(cwd) / _unixPurePath;
         
         return true;
     }
@@ -73,7 +73,7 @@ internal class UnixPath : IPath
     {
         if (TryGetParentPure(out var parentPure))
         {
-            parent = new UnixPath((PureUnixPath)parentPure, _pathEnvironment);
+            parent = new UnixPath((UnixPurePath)parentPure, _pathEnvironment);
             return true;
         }
 
@@ -115,11 +115,11 @@ internal class UnixPath : IPath
     }
 
     public bool TryGetName([NotNullWhen(true)] out string? fileName) 
-        => _pureUnixPath.TryGetName(out fileName);
+        => _unixPurePath.TryGetName(out fileName);
 
     public IPurePath Append(IPurePath right)
     {
-        if (_pureUnixPath / right is not PureUnixPath pureUnixPath)
+        if (_unixPurePath / right is not UnixPurePath pureUnixPath)
         {
             throw new InvalidOperationException("Path segments could not be combined.");
         }
@@ -129,7 +129,7 @@ internal class UnixPath : IPath
 
     public IPurePath Append(string right)
     {
-        if ((IPurePath)_pureUnixPath / right is not PureUnixPath pureUnixPath)
+        if ((IPurePath)_unixPurePath / right is not UnixPurePath pureUnixPath)
         {
             throw new InvalidOperationException("Path segments could not be combined.");
         }
@@ -139,7 +139,7 @@ internal class UnixPath : IPath
 
     public IPath AppendPath(IPurePath right)
     {
-        if (_pureUnixPath / right is not PureUnixPath pureUnixPath)
+        if (_unixPurePath / right is not UnixPurePath pureUnixPath)
         {
             throw new InvalidOperationException("Path segments could not be combined.");
         }
@@ -149,7 +149,7 @@ internal class UnixPath : IPath
 
     public IPath AppendPath(string right)
     {
-        if ((IPurePath)_pureUnixPath / right is not PureUnixPath pureUnixPath)
+        if ((IPurePath)_unixPurePath / right is not UnixPurePath pureUnixPath)
         {
             throw new InvalidOperationException("Path segments could not be combined.");
         }
