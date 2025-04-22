@@ -21,22 +21,27 @@ internal class WindowsPurePath : IPurePath
         var driveIsNull = driveLetter == null;
         if (driveIsNull && !driveShouldBeNull)
         {
-            throw new ArgumentException($"{nameof(driveLetter)} must be defined in an absolute path.");
+            throw new ArgumentException(
+                $"{nameof(driveLetter)} must be defined in an absolute path."
+            );
         }
 
         if (!driveIsNull && driveShouldBeNull)
         {
-            throw new ArgumentException($"{nameof(driveLetter)} can only be defined in an absolute path.");
+            throw new ArgumentException(
+                $"{nameof(driveLetter)} can only be defined in an absolute path."
+            );
         }
-        
+
         DriveLetter = driveLetter;
         Segments = segments;
         Type = pathType;
         Platform = PathPlatform.Windows;
-        
-        Path = pathType == PathType.Absolute
-            ? $"{driveLetter}{DriveSeparator}{PathSeparator}{string.Join(PathSeparator, segments)}"
-            : string.Join(PathSeparator, segments);
+
+        Path =
+            pathType == PathType.Absolute
+                ? $"{driveLetter}{DriveSeparator}{PathSeparator}{string.Join(PathSeparator, segments)}"
+                : string.Join(PathSeparator, segments);
     }
 
     public static WindowsPurePath FromPath(string path)
@@ -53,7 +58,11 @@ internal class WindowsPurePath : IPurePath
             return false;
         }
 
-        parent = new WindowsPurePath(DriveLetter, Segments.Take(Segments.Count - 1).ToArray(), Type);
+        parent = new WindowsPurePath(
+            DriveLetter,
+            Segments.Take(Segments.Count - 1).ToArray(),
+            Type
+        );
         return true;
     }
 
@@ -89,7 +98,9 @@ internal class WindowsPurePath : IPurePath
 
         if (right.Type != PathType.Relative)
         {
-            throw new NotSupportedException("Absolute paths cannot be on the right hand side of a path concatenation");
+            throw new NotSupportedException(
+                "Absolute paths cannot be on the right hand side of a path concatenation"
+            );
         }
 
         var segments = SegmentsHelper.EvaluateAndConcatenateSegments(Segments, right.Segments);
@@ -103,11 +114,14 @@ internal class WindowsPurePath : IPurePath
 
         if (rightPath.Type != PathType.Stub)
         {
-            throw new ArgumentException("Can only append stub strings (not absolute or relative paths).", nameof(right));
+            throw new ArgumentException(
+                "Can only append stub strings (not absolute or relative paths).",
+                nameof(right)
+            );
         }
 
         var segments = SegmentsHelper.EvaluateAndConcatenateSegments(Segments, rightPath.Segments);
-        
+
         return new WindowsPurePath(DriveLetter, segments, Type);
     }
 
@@ -116,9 +130,14 @@ internal class WindowsPurePath : IPurePath
     private const char DriveSeparator = ':';
     private const char RelativeStart = '.';
     private static readonly char[] PathSegmentSeparators = [PathSeparator, AltPathSeparator];
-    
-    private static void ParsePath(string path, out char? driveLetter, out PathType pathType, out IReadOnlyList<string> segments)
-    {       
+
+    private static void ParsePath(
+        string path,
+        out char? driveLetter,
+        out PathType pathType,
+        out IReadOnlyList<string> segments
+    )
+    {
         if (path.Length == 0 || (segments = GetSegments(path)).Count == 0)
         {
             driveLetter = null;
@@ -126,12 +145,14 @@ internal class WindowsPurePath : IPurePath
             segments = [];
             return;
         }
-        
+
         var firstSegment = segments[0];
 
-        if (firstSegment.Length == 2
+        if (
+            firstSegment.Length == 2
             && char.IsLetter(firstSegment[0])
-            && firstSegment[1] == DriveSeparator)
+            && firstSegment[1] == DriveSeparator
+        )
         {
             driveLetter = path[0];
             pathType = PathType.Absolute;
@@ -145,7 +166,9 @@ internal class WindowsPurePath : IPurePath
         pathType = isRelative ? PathType.Relative : PathType.Stub;
     }
 
-    
-    private const StringSplitOptions SegmentSplitOptions = StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
-    private static string[] GetSegments(string path) => path.Split(PathSegmentSeparators, SegmentSplitOptions);
+    private const StringSplitOptions SegmentSplitOptions =
+        StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries;
+
+    private static string[] GetSegments(string path) =>
+        path.Split(PathSegmentSeparators, SegmentSplitOptions);
 }

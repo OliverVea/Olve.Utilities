@@ -1,11 +1,11 @@
 <Project>
-    <PropertyGroup>
-        <TargetFramework>.net9.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-        <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>.net9.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
+  </PropertyGroup>
 </Project>

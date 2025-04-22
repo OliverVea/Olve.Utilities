@@ -18,7 +18,10 @@ public static class PropertyAccessModifiersExtractionHelper
         var isSet = methodSymbol.MethodKind == MethodKind.PropertySet;
         var isInit = isSet && methodSymbol.IsInitOnly;
 
-        var verb = isInit ? "init" : isSet ? "set" : "get";
+        var verb =
+            isInit ? "init"
+            : isSet ? "set"
+            : "get";
         var accessibility = methodSymbol.DeclaredAccessibility;
 
         return new PropertyAccessModifierModel(accessibility, verb);

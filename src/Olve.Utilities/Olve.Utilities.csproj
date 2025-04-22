@@ -1,40 +1,36 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-    <PropertyGroup>
-        <Title>Olve.Utilities</Title>
-        <Authors>Oliver Vea</Authors>
-        <Description>Various pieces of utility</Description>
-        <Copyright>Oliver Vea</Copyright>
-        <PackageProjectUrl>https://github.com/OliverVea/Olve.Utilities</PackageProjectUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <RepositoryUrl>https://github.com/OliverVea/Olve.Utilities</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <IsTrimmable>true</IsTrimmable>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <None Include="../../README.md" Pack="true" PackagePath="\"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Meziantou.Analyzer">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions"/>
-        <PackageReference Include="OneOf"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Olve.Paths\Olve.Paths.csproj" />
-        <ProjectReference Include="..\Olve.Results\Olve.Results.csproj" />
-    </ItemGroup>
+  <PropertyGroup>
+    <Title>Olve.Utilities</Title>
+    <Authors>Oliver Vea</Authors>
+    <Description>Various pieces of utility</Description>
+    <Copyright>Oliver Vea</Copyright>
+    <PackageProjectUrl>https://github.com/OliverVea/Olve.Utilities</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/OliverVea/Olve.Utilities</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IsTrimmable>true</IsTrimmable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Meziantou.Analyzer">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="OneOf" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Olve.Paths\Olve.Paths.csproj" />
+    <ProjectReference Include="..\Olve.Results\Olve.Results.csproj" />
+  </ItemGroup>
 </Project>

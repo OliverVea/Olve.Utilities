@@ -13,7 +13,6 @@ public class BidirectionalDictionary<T1, T2> : IBidirectionalDictionary<T1, T2>
     where T1 : notnull
     where T2 : notnull
 {
-
     private readonly IDictionary<T1, T2> _firstToSecond;
     private readonly IDictionary<T2, T1> _secondToFirst;
 
@@ -21,13 +20,17 @@ public class BidirectionalDictionary<T1, T2> : IBidirectionalDictionary<T1, T2>
     ///     Initializes a new instance of the <see cref="BidirectionalDictionary{TFirst, TSecond}" /> class that is empty,
     ///     has the default initial capacity, and uses the default equality comparer for the key type.
     /// </summary>
-    public BidirectionalDictionary(IEnumerable<KeyValuePair<T1, T2>>? collection = null,
+    public BidirectionalDictionary(
+        IEnumerable<KeyValuePair<T1, T2>>? collection = null,
         IEqualityComparer<T1>? firstComparer = null,
-        IEqualityComparer<T2>? secondComparer = null)
+        IEqualityComparer<T2>? secondComparer = null
+    )
     {
         _firstToSecond = new Dictionary<T1, T2>(collection ?? [], firstComparer);
-        _secondToFirst = new Dictionary<T2, T1>(_firstToSecond.Select(x => new KeyValuePair<T2, T1>(x.Value, x.Key)),
-            secondComparer);
+        _secondToFirst = new Dictionary<T2, T1>(
+            _firstToSecond.Select(x => new KeyValuePair<T2, T1>(x.Value, x.Key)),
+            secondComparer
+        );
     }
 
     /// <inheritdoc />
@@ -37,19 +40,18 @@ public class BidirectionalDictionary<T1, T2> : IBidirectionalDictionary<T1, T2>
     public int Count => _firstToSecond.Count;
 
     /// <inheritdoc />
-    public bool TryAdd(T1 first, T2 second) => _firstToSecond.TryAdd(first, second) && _secondToFirst.TryAdd(second, first);
+    public bool TryAdd(T1 first, T2 second) =>
+        _firstToSecond.TryAdd(first, second) && _secondToFirst.TryAdd(second, first);
 
     /// <inheritdoc />
     public void Set(T1 first, T2 second)
     {
-        if (Get(second)
-            .TryPickT0(out var existingFirst, out _))
+        if (Get(second).TryPickT0(out var existingFirst, out _))
         {
             _firstToSecond.Remove(existingFirst);
         }
 
-        if (Get(first)
-            .TryPickT0(out var existingSecond, out _))
+        if (Get(first).TryPickT0(out var existingSecond, out _))
         {
             _secondToFirst.Remove(existingSecond);
         }
@@ -85,24 +87,18 @@ public class BidirectionalDictionary<T1, T2> : IBidirectionalDictionary<T1, T2>
     }
 
     /// <inheritdoc />
-    public bool Contains(T1 first)
-        => _firstToSecond.ContainsKey(first);
+    public bool Contains(T1 first) => _firstToSecond.ContainsKey(first);
 
     /// <inheritdoc />
-    public bool Contains(T2 second)
-        => _secondToFirst.ContainsKey(second);
+    public bool Contains(T2 second) => _secondToFirst.ContainsKey(second);
 
     /// <inheritdoc />
     public OneOf<T2, NotFound> Get(T1 first) =>
-        _firstToSecond.TryGetValue(first, out var second)
-            ? second
-            : new NotFound();
+        _firstToSecond.TryGetValue(first, out var second) ? second : new NotFound();
 
     /// <inheritdoc />
     public OneOf<T1, NotFound> Get(T2 second) =>
-        _secondToFirst.TryGetValue(second, out var first)
-            ? first
-            : new NotFound();
+        _secondToFirst.TryGetValue(second, out var first) ? first : new NotFound();
 
     /// <inheritdoc />
     /// <remarks>Instantiates an array with the values.</remarks>

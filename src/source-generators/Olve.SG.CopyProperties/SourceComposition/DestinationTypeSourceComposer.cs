@@ -12,8 +12,7 @@ public static class DestinationTypeSourceComposer
 
         // Collect all unique namespaces
         var namespaces = model
-            .Properties
-            .SelectMany(p => p.Namespaces)
+            .Properties.SelectMany(p => p.Namespaces)
             .Distinct()
             .OrderBy(ns => ns);
 
@@ -85,10 +84,9 @@ public static class DestinationTypeSourceComposer
             Accessibility.Internal => "internal",
             Accessibility.ProtectedOrInternal => "protected internal",
             Accessibility.ProtectedAndInternal => "private protected",
-            _ => "internal"
+            _ => "internal",
         };
     }
-
 
     private static string FormatXmlComment(string rawXml)
     {

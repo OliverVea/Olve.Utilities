@@ -26,7 +26,10 @@ public class PathTests
     [Arguments("file", "/home/user/file")]
     [Arguments("dir/", "/home/user/dir")]
     [Arguments("../", "/home")]
-    public async Task TryGetAbsoluteLinux_WithVariousPathsFromHomeDirectory_AreEvaluatedCorrectly(string target, string? expected)
+    public async Task TryGetAbsoluteLinux_WithVariousPathsFromHomeDirectory_AreEvaluatedCorrectly(
+        string target,
+        string? expected
+    )
     {
         // Arrange
         ConstantPathEnvironment pathEnvironment = new("/home/user/");
@@ -40,13 +43,16 @@ public class PathTests
         await Assert.That(gotAbsolute).IsEqualTo(expected != null);
         await Assert.That(absolute).IsEqualTo(expected);
     }
-    
+
     [Test, WindowsOnly]
     [Arguments("file.txt", @"C:\users\user\file.txt")]
     [Arguments("file", @"C:\users\user\file")]
     [Arguments("dir/", @"C:\users\user\dir")]
     [Arguments("../", @"C:\users")]
-    public async Task TryGetAbsoluteWindows_WithVariousPathsFromHomeDirectory_AreEvaluatedCorrectly(string target, string? expected)
+    public async Task TryGetAbsoluteWindows_WithVariousPathsFromHomeDirectory_AreEvaluatedCorrectly(
+        string target,
+        string? expected
+    )
     {
         // Arrange
         ConstantPathEnvironment pathEnvironment = new(@"C:\users\user\");
@@ -66,7 +72,9 @@ public class PathTests
     [Arguments("file")]
     [Arguments("dir/")]
     [Arguments("../")]
-    public void TryGetAbsolute_WithVariousPathsFromHomeDirectoryAndDefaultPathEnvironment_DoesNotThrow(string target)
+    public void TryGetAbsolute_WithVariousPathsFromHomeDirectoryAndDefaultPathEnvironment_DoesNotThrow(
+        string target
+    )
     {
         // Arrange
         var path = Path.Create(target);
@@ -115,7 +123,10 @@ public class PathTests
     [Arguments("doesnotexist", ElementType.None)]
     [Arguments("testdata", ElementType.Directory)]
     [Arguments("testdata/text-file.txt", ElementType.File)]
-    public async Task TryGetElementType_OnVariousPaths_ReturnsExpectedResults(string pathString, ElementType expected)
+    public async Task TryGetElementType_OnVariousPaths_ReturnsExpectedResults(
+        string pathString,
+        ElementType expected
+    )
     {
         // Arrange
         if (!Path.TryGetAssemblyExecutable(out var assemblyPath))
@@ -137,7 +148,14 @@ public class PathTests
     public async Task TryGetChildren_OnValidDirectory_ReturnsExpectedChildren()
     {
         // Arrange
-        string[] expectedElements = ["text-file.txt", "text-file-2.txt", "video-file.avi", "image-file.png", "dir"];
+        string[] expectedElements =
+        [
+            "text-file.txt",
+            "text-file-2.txt",
+            "video-file.avi",
+            "image-file.png",
+            "dir",
+        ];
 
         if (!Path.TryGetAssemblyExecutable(out var assemblyPath))
         {
@@ -161,7 +179,8 @@ public class PathTests
         }
     }
 
-    private class ConstantPathEnvironment(string? cwd = null, string? executable = null) : IPathEnvironment
+    private class ConstantPathEnvironment(string? cwd = null, string? executable = null)
+        : IPathEnvironment
     {
         public bool TryGetCurrentDirectory([NotNullWhen(true)] out string? path)
         {

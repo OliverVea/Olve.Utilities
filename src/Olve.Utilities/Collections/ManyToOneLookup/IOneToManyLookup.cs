@@ -5,7 +5,8 @@
 /// </summary>
 /// <typeparam name="TLeft">The type of the left-hand elements.</typeparam>
 /// <typeparam name="TRight">The type of the right-hand elements.</typeparam>
-public interface IOneToManyLookup<TLeft, TRight> : IEnumerable<KeyValuePair<TLeft, IReadOnlySet<TRight>>>
+public interface IOneToManyLookup<TLeft, TRight>
+    : IEnumerable<KeyValuePair<TLeft, IReadOnlySet<TRight>>>
     where TLeft : notnull
     where TRight : notnull
 {

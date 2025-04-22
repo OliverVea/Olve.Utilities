@@ -7,7 +7,8 @@ public class GeneratedTypeModel(
     string typeType,
     string typeName,
     Accessibility typeAccessibility,
-    PropertyModel[] properties)
+    PropertyModel[] properties
+)
 {
     public string Namespace { get; } = @namespace;
     public string TypeType { get; } = typeType;

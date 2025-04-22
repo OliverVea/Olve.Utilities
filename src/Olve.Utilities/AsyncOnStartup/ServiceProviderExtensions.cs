@@ -15,13 +15,12 @@ public static class ServiceProviderExtensions
     /// <remarks>Will run in order of <see cref="IAsyncOnStartup.Priority" />.</remarks>
     public static async ValueTask RunAsyncOnStartup(
         this IServiceProvider serviceProvider,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         var asyncOnStartups = serviceProvider.GetServices<IAsyncOnStartup>();
 
-        var asyncOnStartupGroups = asyncOnStartups
-            .GroupBy(x => x.Priority)
-            .OrderBy(x => x.Key);
+        var asyncOnStartupGroups = asyncOnStartups.GroupBy(x => x.Priority).OrderBy(x => x.Key);
 
         foreach (var asyncOnStartupGroup in asyncOnStartupGroups)
         {

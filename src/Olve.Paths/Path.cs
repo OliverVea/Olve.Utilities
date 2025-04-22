@@ -23,7 +23,7 @@ public static class Path
         {
             return CreatePureWindowsPath(path);
         }
-        
+
         return new UnsupportedPurePath();
     }
 
@@ -42,7 +42,7 @@ public static class Path
         {
             PathPlatform.Unix => CreatePureUnixPath(path),
             PathPlatform.Windows => CreatePureWindowsPath(path),
-            _ => new UnsupportedPurePath()
+            _ => new UnsupportedPurePath(),
         };
     }
 
@@ -63,7 +63,7 @@ public static class Path
         {
             return CreateWindowsPath(path, pathEnvironment);
         }
-        
+
         return new UnsupportedPath();
     }
 
@@ -75,13 +75,17 @@ public static class Path
     /// <param name="pathEnvironment">Optional environment to use for path resolution.</param>
     /// <returns>An instance of <see cref="IPath"/>.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the platform is <see cref="PathPlatform.None"/>.</exception>
-    public static IPath Create(string path, PathPlatform platform, IPathEnvironment? pathEnvironment = null)
+    public static IPath Create(
+        string path,
+        PathPlatform platform,
+        IPathEnvironment? pathEnvironment = null
+    )
     {
         return platform switch
         {
             PathPlatform.Unix => CreateUnixPath(path, pathEnvironment),
             PathPlatform.Windows => CreateWindowsPath(path, pathEnvironment),
-            _ => new UnsupportedPath()
+            _ => new UnsupportedPath(),
         };
     }
 
@@ -91,7 +95,10 @@ public static class Path
     /// <param name="path">When this method returns, contains the path to the executable, if successful.</param>
     /// <param name="pathEnvironment">Optional path environment for path resolution.</param>
     /// <returns><c>true</c> if successful; otherwise, <c>false</c>.</returns>
-    public static bool TryGetAssemblyExecutable([NotNullWhen(true)] out IPath? path, IPathEnvironment? pathEnvironment = null)
+    public static bool TryGetAssemblyExecutable(
+        [NotNullWhen(true)] out IPath? path,
+        IPathEnvironment? pathEnvironment = null
+    )
     {
         pathEnvironment ??= DefaultUnixPathEnvironment.Shared;
         if (!pathEnvironment.TryGetAssemblyExecutable(out var executable))
@@ -110,7 +117,10 @@ public static class Path
     /// <param name="purePath">When this method returns, contains the pure path to the executable, if successful.</param>
     /// <param name="pathEnvironment">Optional path environment for path resolution.</param>
     /// <returns><c>true</c> if successful; otherwise, <c>false</c>.</returns>
-    public static bool TryGetAssemblyExecutablePure([NotNullWhen(true)] out IPurePath? purePath, IPathEnvironment? pathEnvironment = null)
+    public static bool TryGetAssemblyExecutablePure(
+        [NotNullWhen(true)] out IPurePath? purePath,
+        IPathEnvironment? pathEnvironment = null
+    )
     {
         if (TryGetAssemblyExecutable(out var path, pathEnvironment))
         {
@@ -141,7 +151,9 @@ public static class Path
         var home = Environment.GetEnvironmentVariable("HOME");
         if (string.IsNullOrEmpty(home))
         {
-            throw new InvalidOperationException("Could not determine the HOME environment variable.");
+            throw new InvalidOperationException(
+                "Could not determine the HOME environment variable."
+            );
         }
 
         return CreatePure(home);

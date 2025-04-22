@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <PackageId>Olve.SG.CopyProperties</PackageId>
-        <Title>Olve.SG.CopyProperties</Title>
-        <Authors>Oliver Vea</Authors>
-        <Description>Source generator for copying properties from one type declaration to another.</Description>
-        <Copyright>Oliver Vea</Copyright>
-        <PackageProjectUrl>https://github.com/OliverVea/Olve.Utilities</PackageProjectUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <RepositoryUrl>https://github.com/OliverVea/Olve.Utilities</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
-    </PropertyGroup>
+  <PropertyGroup>
+    <PackageId>Olve.SG.CopyProperties</PackageId>
+    <Title>Olve.SG.CopyProperties</Title>
+    <Authors>Oliver Vea</Authors>
+    <Description>Source generator for copying properties from one type declaration to another.</Description>
+    <Copyright>Oliver Vea</Copyright>
+    <PackageProjectUrl>https://github.com/OliverVea/Olve.Utilities</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/OliverVea/Olve.Utilities</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+  </PropertyGroup>
 </Project>

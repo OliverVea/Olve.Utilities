@@ -11,10 +11,10 @@ public class DirectedGraph
 {
     private readonly Dictionary<Id<Node>, Node> _nodes = new();
     private readonly Dictionary<Id<DirectedEdge>, DirectedEdge> _edges = new();
-    
+
     private readonly Dictionary<Id<Node>, ISet<Id<DirectedEdge>>> _incomingEdgesForNode = new();
     private readonly Dictionary<Id<Node>, ISet<Id<DirectedEdge>>> _outgoingEdgesForNode = new();
-    
+
     /// <summary>
     /// Gets all node IDs in the graph.
     /// </summary>
@@ -32,7 +32,7 @@ public class DirectedGraph
 
     /// <summary>
     /// Gets all directed edges in the graph.
-    /// </summary>      
+    /// </summary>
     public IReadOnlyCollection<DirectedEdge> Edges => _edges.Values;
 
     /// <summary>
@@ -46,9 +46,9 @@ public class DirectedGraph
     {
         var nodeId = Id<Node>.New();
         Node node = new(nodeId);
-        
+
         _nodes.Add(nodeId, node);
-        
+
         return nodeId;
     }
 
@@ -98,7 +98,7 @@ public class DirectedGraph
                 DeleteEdge(edgeId);
             }
         }
-        
+
         _incomingEdgesForNode.Remove(nodeId);
         _outgoingEdgesForNode.Remove(nodeId);
 
@@ -120,20 +120,20 @@ public class DirectedGraph
     {
         var edgeId = Id<DirectedEdge>.New();
         DirectedEdge directedEdge = new(edgeId, from, to);
-        
+
         _edges.Add(edgeId, directedEdge);
 
         AddOutgoingEdgeForNode(from, edgeId);
         AddIncomingEdgeForNode(to, edgeId);
-        
+
         return edgeId;
     }
 
-    private bool AddIncomingEdgeForNode(Id<Node> nodeId, Id<DirectedEdge> edgeId)
-        => _incomingEdgesForNode.GetOrAdd(nodeId, () => new HashSet<Id<DirectedEdge>>()).Add(edgeId);
+    private bool AddIncomingEdgeForNode(Id<Node> nodeId, Id<DirectedEdge> edgeId) =>
+        _incomingEdgesForNode.GetOrAdd(nodeId, () => new HashSet<Id<DirectedEdge>>()).Add(edgeId);
 
-    private bool AddOutgoingEdgeForNode(Id<Node> nodeId, Id<DirectedEdge> edgeId)
-        => _outgoingEdgesForNode.GetOrAdd(nodeId, () => new HashSet<Id<DirectedEdge>>()).Add(edgeId);
+    private bool AddOutgoingEdgeForNode(Id<Node> nodeId, Id<DirectedEdge> edgeId) =>
+        _outgoingEdgesForNode.GetOrAdd(nodeId, () => new HashSet<Id<DirectedEdge>>()).Add(edgeId);
 
     /// <summary>
     /// Gets the directed edge with the specified ID.
@@ -168,9 +168,9 @@ public class DirectedGraph
 
         RemoveFromOutgoingEdges(edge.From, edgeId);
         RemoveFromIncomingEdges(edge.To, edgeId);
-        
+
         _edges.Remove(edgeId);
-        
+
         return DeletionResult.Success();
     }
 
@@ -229,15 +229,15 @@ public class DirectedGraph
         {
             return new ResultProblem("Could not find edge with id '{0}'.", edgeId);
         }
-        
+
         if (edge.From != from)
         {
             return new ResultProblem("Edge '{0}' does not start at node '{1}'.", edgeId, from);
         }
-        
+
         return edge.To;
     }
-    
+
     /// <summary>
     /// Gets the set of incoming edge IDs for the specified node.
     /// </summary>
@@ -255,7 +255,7 @@ public class DirectedGraph
 
         return Result.Success((IReadOnlySet<Id<DirectedEdge>>)edges);
     }
-    
+
     /// <summary>
     /// Gets the set of outgoing edge IDs for the specified node.
     /// </summary>

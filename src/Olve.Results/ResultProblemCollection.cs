@@ -9,12 +9,11 @@ namespace Olve.Results;
 ///     Represents a collection of problems encountered during an operation.
 /// </summary>
 /// <param name="problems">The problems encountered during the operation.</param>
-public class ResultProblemCollection(params IEnumerable<ResultProblem> problems) : IEnumerable<ResultProblem>
+public class ResultProblemCollection(params IEnumerable<ResultProblem> problems)
+    : IEnumerable<ResultProblem>
 {
     /// <inheritdoc />
-    public IEnumerator<ResultProblem> GetEnumerator() => problems
-        .AsEnumerable()
-        .GetEnumerator();
+    public IEnumerator<ResultProblem> GetEnumerator() => problems.AsEnumerable().GetEnumerator();
 
     /// <inheritdoc />
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -41,9 +40,10 @@ public class ResultProblemCollection(params IEnumerable<ResultProblem> problems)
     /// <param name="message">The format string for the problem message.</param>
     /// <param name="args">The arguments to format the message.</param>
     /// <returns>A new collection with the formatted problem prepended.</returns>
-    public ResultProblemCollection Prepend([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
-        params object[] args)
-        => Prepend(new ResultProblem(null, message, args: args, stackFrame: new StackFrame(1, true)));
+    public ResultProblemCollection Prepend(
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
+        params object[] args
+    ) => Prepend(new ResultProblem(null, message, args: args, stackFrame: new StackFrame(1, true)));
 
     /// <summary>
     ///     Prepends a new problem from an exception to the collection using a formatted message.
@@ -52,16 +52,23 @@ public class ResultProblemCollection(params IEnumerable<ResultProblem> problems)
     /// <param name="message">The format string for the problem message.</param>
     /// <param name="args">The arguments to format the message.</param>
     /// <returns>A new collection with the formatted problem prepended.</returns>
-    public ResultProblemCollection Prepend(Exception exception, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
-        params object[] args)
-        => Prepend(new ResultProblem(exception, message, args: args, stackFrame: new StackFrame(1, true)));
+    public ResultProblemCollection Prepend(
+        Exception exception,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
+        params object[] args
+    ) =>
+        Prepend(
+            new ResultProblem(exception, message, args: args, stackFrame: new StackFrame(1, true))
+        );
 
     /// <summary>
     ///     Merges multiple problem collections together into a single collection.
     /// </summary>
     /// <param name="problemCollections">The problem collections to merge.</param>
     /// <returns>A new collection containing all problems from the specified collections.</returns>
-    public static ResultProblemCollection Merge(params IEnumerable<ResultProblemCollection> problemCollections)
+    public static ResultProblemCollection Merge(
+        params IEnumerable<ResultProblemCollection> problemCollections
+    )
     {
         var allProblems = problemCollections.SelectMany(x => x);
         return new ResultProblemCollection(allProblems);

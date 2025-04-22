@@ -18,7 +18,7 @@ public static class RandomExtensions
     {
         return source.OrderBy(_ => Random.Next());
     }
-    
+
     /// <summary>
     /// Picks a random element from the enumerable.
     /// </summary>
@@ -29,7 +29,7 @@ public static class RandomExtensions
     {
         return source.Shuffle().First();
     }
-    
+
     /// <summary>
     /// Picks a random element from the enumerable or returns the default value if the enumerable is empty.
     /// </summary>
@@ -40,7 +40,7 @@ public static class RandomExtensions
     {
         return source.Shuffle().FirstOrDefault();
     }
-    
+
     /// <summary>
     /// Picks a random element from the enumerable or returns the specified default value if the enumerable is empty.
     /// </summary>

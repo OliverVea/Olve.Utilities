@@ -26,7 +26,12 @@ public static class DateTimeFormatter
         return $"{number} {unit}{(number > 1 ? "s" : "")} ago";
     }
 
-    private static bool TryGetNumberAndUnit(DateTimeOffset now, DateTimeOffset then, out int number, out string unit)
+    private static bool TryGetNumberAndUnit(
+        DateTimeOffset now,
+        DateTimeOffset then,
+        out int number,
+        out string unit
+    )
     {
         // Handle years and months using calendar-based logic
         if (TryGetYearsAndMonths(now, then, out number, out unit))
@@ -70,7 +75,12 @@ public static class DateTimeFormatter
         return false;
     }
 
-    private static bool TryGetYearsAndMonths(DateTimeOffset now, DateTimeOffset then, out int number, out string unit)
+    private static bool TryGetYearsAndMonths(
+        DateTimeOffset now,
+        DateTimeOffset then,
+        out int number,
+        out string unit
+    )
     {
         var years = now.Year - then.Year;
         var months = now.Month - then.Month;

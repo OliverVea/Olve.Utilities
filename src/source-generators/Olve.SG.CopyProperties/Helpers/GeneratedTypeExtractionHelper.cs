@@ -6,9 +6,11 @@ namespace Olve.SG.CopyProperties.Helpers;
 
 public static class GeneratedTypeExtractionHelper
 {
-    public static GeneratedTypeModel ExtractGeneratedType(INamedTypeSymbol[] sourceSymbols,
+    public static GeneratedTypeModel ExtractGeneratedType(
+        INamedTypeSymbol[] sourceSymbols,
         INamedTypeSymbol destinationSymbol,
-        TypeDeclarationSyntax typeDeclaration)
+        TypeDeclarationSyntax typeDeclaration
+    )
     {
         var properties = sourceSymbols
             .SelectMany(PropertyEnumerationHelper.GetProperties)
@@ -21,7 +23,8 @@ public static class GeneratedTypeExtractionHelper
             typeName,
             destinationSymbol.Name,
             destinationSymbol.DeclaredAccessibility,
-            properties);
+            properties
+        );
     }
 
     /*

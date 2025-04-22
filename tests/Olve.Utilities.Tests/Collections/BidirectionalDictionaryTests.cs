@@ -5,7 +5,8 @@ namespace Olve.Utilities.Tests.Collections;
 public class BidirectionalDictionaryTests
 {
     private static IBidirectionalDictionary<T1, T2> GetNewBidirectionalDictionary<T1, T2>()
-        where T1 : notnull where T2 : notnull => new BidirectionalDictionary<T1, T2>();
+        where T1 : notnull
+        where T2 : notnull => new BidirectionalDictionary<T1, T2>();
 
     [Test]
     public async Task Set_WithNewKeyValuePair_PairIsAdded()
@@ -17,12 +18,8 @@ public class BidirectionalDictionaryTests
         dictionary.Set(1, "one");
 
         // Assert
-        await Assert
-            .That(dictionary.FirstValues)
-            .Contains(1);
-        await Assert
-            .That(dictionary.SecondValues)
-            .Contains("one");
+        await Assert.That(dictionary.FirstValues).Contains(1);
+        await Assert.That(dictionary.SecondValues).Contains("one");
     }
 
     [Test]
@@ -40,37 +37,21 @@ public class BidirectionalDictionaryTests
         dictionary.Set(first, validSecond);
 
         // Assert
-        await Assert
-            .That(dictionary.FirstValues)
-            .Contains(1);
-        await Assert
-            .That(dictionary.SecondValues)
-            .Contains("uno");
-        await Assert
-            .That(dictionary.SecondValues)
-            .DoesNotContain("one");
+        await Assert.That(dictionary.FirstValues).Contains(1);
+        await Assert.That(dictionary.SecondValues).Contains("uno");
+        await Assert.That(dictionary.SecondValues).DoesNotContain("one");
 
         var firstWithValidSecond = dictionary.Get(validSecond);
         var firstWithInvalidSecond = dictionary.Get(invalidSecond);
         var secondFromFirst = dictionary.Get(first);
 
-        await Assert
-            .That(firstWithValidSecond.IsT0)
-            .IsTrue();
-        await Assert
-            .That(firstWithValidSecond.AsT0)
-            .IsEqualTo(first);
+        await Assert.That(firstWithValidSecond.IsT0).IsTrue();
+        await Assert.That(firstWithValidSecond.AsT0).IsEqualTo(first);
 
-        await Assert
-            .That(firstWithInvalidSecond.IsT0)
-            .IsFalse();
+        await Assert.That(firstWithInvalidSecond.IsT0).IsFalse();
 
-        await Assert
-            .That(secondFromFirst.IsT0)
-            .IsTrue();
-        await Assert
-            .That(secondFromFirst.AsT0)
-            .IsEqualTo(validSecond);
+        await Assert.That(secondFromFirst.IsT0).IsTrue();
+        await Assert.That(secondFromFirst.AsT0).IsEqualTo(validSecond);
     }
 
     [Test]
@@ -84,15 +65,9 @@ public class BidirectionalDictionaryTests
         var removed = dictionary.TryRemove(1);
 
         // Assert
-        await Assert
-            .That(removed)
-            .IsTrue();
-        await Assert
-            .That(dictionary.FirstValues)
-            .DoesNotContain(1);
-        await Assert
-            .That(dictionary.SecondValues)
-            .DoesNotContain("one");
+        await Assert.That(removed).IsTrue();
+        await Assert.That(dictionary.FirstValues).DoesNotContain(1);
+        await Assert.That(dictionary.SecondValues).DoesNotContain("one");
     }
 
     [Test]
@@ -106,15 +81,9 @@ public class BidirectionalDictionaryTests
         var removed = dictionary.TryRemove("two");
 
         // Assert
-        await Assert
-            .That(removed)
-            .IsTrue();
-        await Assert
-            .That(dictionary.FirstValues)
-            .DoesNotContain(2);
-        await Assert
-            .That(dictionary.SecondValues)
-            .DoesNotContain("two");
+        await Assert.That(removed).IsTrue();
+        await Assert.That(dictionary.FirstValues).DoesNotContain(2);
+        await Assert.That(dictionary.SecondValues).DoesNotContain("two");
     }
 
     [Test]
@@ -128,9 +97,7 @@ public class BidirectionalDictionaryTests
         var containsKey = dictionary.Contains(3);
 
         // Assert
-        await Assert
-            .That(containsKey)
-            .IsTrue();
+        await Assert.That(containsKey).IsTrue();
     }
 
     [Test]
@@ -144,9 +111,7 @@ public class BidirectionalDictionaryTests
         var containsValue = dictionary.Contains("four");
 
         // Assert
-        await Assert
-            .That(containsValue)
-            .IsTrue();
+        await Assert.That(containsValue).IsTrue();
     }
 
     [Test]
@@ -156,7 +121,9 @@ public class BidirectionalDictionaryTests
         var dictionary = GetNewBidirectionalDictionary<string, string>();
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => Task.Run(() => dictionary.Set(null!, "value")));
+        await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            Task.Run(() => dictionary.Set(null!, "value"))
+        );
     }
 
     [Test]
@@ -166,7 +133,9 @@ public class BidirectionalDictionaryTests
         var dictionary = GetNewBidirectionalDictionary<string, string>();
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => Task.Run(() => dictionary.Set("key", null!)));
+        await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            Task.Run(() => dictionary.Set("key", null!))
+        );
     }
 
     [Test]
@@ -179,9 +148,7 @@ public class BidirectionalDictionaryTests
         var result = dictionary.Get(5);
 
         // Assert
-        await Assert
-            .That(result.IsT0)
-            .IsFalse();
+        await Assert.That(result.IsT0).IsFalse();
     }
 
     [Test]
@@ -194,9 +161,7 @@ public class BidirectionalDictionaryTests
         var result = dictionary.Get("non-existent");
 
         // Assert
-        await Assert
-            .That(result.IsT0)
-            .IsFalse();
+        await Assert.That(result.IsT0).IsFalse();
     }
 
     [Test]
@@ -211,11 +176,7 @@ public class BidirectionalDictionaryTests
         dictionary.Clear();
 
         // Assert
-        await Assert
-            .That(dictionary.FirstValues)
-            .IsEmpty();
-        await Assert
-            .That(dictionary.SecondValues)
-            .IsEmpty();
+        await Assert.That(dictionary.FirstValues).IsEmpty();
+        await Assert.That(dictionary.SecondValues).IsEmpty();
     }
 }

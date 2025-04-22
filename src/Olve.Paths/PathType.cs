@@ -18,5 +18,5 @@ public enum PathType
     /// <summary>
     /// An absolute path.
     /// </summary>
-    Absolute
+    Absolute,
 }

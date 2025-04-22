@@ -15,9 +15,7 @@ public class EnumerableOneOfExtensions
         var result = source.OfT0();
 
         // Assert
-        await Assert
-            .That(result)
-            .IsEquivalentTo([1, 3]);
+        await Assert.That(result).IsEquivalentTo([1, 3]);
     }
 
     [Test]
@@ -30,9 +28,7 @@ public class EnumerableOneOfExtensions
         var result = source.OfT0();
 
         // Assert
-        await Assert
-            .That(result)
-            .IsEquivalentTo([1]);
+        await Assert.That(result).IsEquivalentTo([1]);
     }
 
     [Test]
@@ -45,8 +41,6 @@ public class EnumerableOneOfExtensions
         var result = source.OfT1();
 
         // Assert
-        await Assert
-            .That(result)
-            .IsEquivalentTo(["3"]);
+        await Assert.That(result).IsEquivalentTo(["3"]);
     }
 }

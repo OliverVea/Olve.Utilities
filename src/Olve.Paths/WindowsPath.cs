@@ -6,7 +6,7 @@ namespace Olve.Paths;
 internal class WindowsPath : IPath
 {
     private const string LinkStringPrefix = "file://";
-    
+
     private readonly WindowsPurePath _windowsPurePath;
     private readonly IPathEnvironment _pathEnvironment;
 
@@ -15,7 +15,7 @@ internal class WindowsPath : IPath
         _windowsPurePath = path;
         _pathEnvironment = pathEnvironment ?? DefaultUnixPathEnvironment.Shared;
     }
-    
+
     internal WindowsPath(string path, IPathEnvironment? pathEnvironment = null)
     {
         _windowsPurePath = WindowsPurePath.FromPath(path);
@@ -25,12 +25,12 @@ internal class WindowsPath : IPath
     public string Path => _windowsPurePath.Path;
     public PathPlatform Platform => PathPlatform.Windows;
     public PathType Type => _windowsPurePath.Type;
-    
-    public bool TryGetParentPure([NotNullWhen(true)] out IPurePath? parent)
-        => _windowsPurePath.TryGetParentPure(out parent);
 
-    public bool TryGetName([NotNullWhen(true)] out string? fileName)
-        => _windowsPurePath.TryGetName(out fileName);
+    public bool TryGetParentPure([NotNullWhen(true)] out IPurePath? parent) =>
+        _windowsPurePath.TryGetParentPure(out parent);
+
+    public bool TryGetName([NotNullWhen(true)] out string? fileName) =>
+        _windowsPurePath.TryGetName(out fileName);
 
     public IPurePath Append(IPurePath right)
     {
@@ -48,7 +48,7 @@ internal class WindowsPath : IPath
         {
             throw new InvalidOperationException("Path segments could not be combined.");
         }
-        
+
         return new WindowsPath(pureWindowsPath, _pathEnvironment);
     }
 
@@ -78,15 +78,17 @@ internal class WindowsPath : IPath
             return true;
         }
 
-        if (Type is not PathType.Relative and not PathType.Stub
-            || !_pathEnvironment.TryGetCurrentDirectory(out var cwd))
+        if (
+            Type is not PathType.Relative and not PathType.Stub
+            || !_pathEnvironment.TryGetCurrentDirectory(out var cwd)
+        )
         {
             absolute = null;
             return false;
         }
 
         absolute = Olve.Paths.Path.Create(cwd) / _windowsPurePath;
-        
+
         return true;
     }
 
@@ -104,9 +106,10 @@ internal class WindowsPath : IPath
 
     public bool TryGetChildren([NotNullWhen(true)] out IEnumerable<IPath>? children)
     {
-        var canGetChildren = TryGetElementType(out var type)
-                             && type == ElementType.Directory
-                             && Directory.Exists(Path);
+        var canGetChildren =
+            TryGetElementType(out var type)
+            && type == ElementType.Directory
+            && Directory.Exists(Path);
 
         if (!canGetChildren)
         {
@@ -117,7 +120,7 @@ internal class WindowsPath : IPath
         children = GetChildren(Path);
         return true;
     }
-    
+
     private IEnumerable<WindowsPath> GetChildren(string path)
     {
         var directories = Directory.EnumerateDirectories(path);
@@ -189,7 +192,7 @@ internal class WindowsPath : IPath
                 sb.Append(c);
             }
         }
-        
+
         var linkText = sb.ToString();
 
         return linkText;

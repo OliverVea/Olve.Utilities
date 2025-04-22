@@ -1,12 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <OutputType>Exe</OutputType>
-        <PublishTrimmed>true</PublishTrimmed>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\..\src\Olve.Utilities\Olve.Utilities.csproj"/>
-        <TrimmerRootAssembly Include="Olve.Utilities"/>
-    </ItemGroup>
-
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <PublishTrimmed>true</PublishTrimmed>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Olve.Utilities\Olve.Utilities.csproj" />
+    <TrimmerRootAssembly Include="Olve.Utilities" />
+  </ItemGroup>
 </Project>

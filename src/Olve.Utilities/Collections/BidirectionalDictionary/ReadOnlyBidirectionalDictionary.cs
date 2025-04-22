@@ -14,7 +14,6 @@ public class ReadOnlyBidirectionalDictionary<T1, T2> : IReadOnlyBidirectionalDic
     where T1 : notnull
     where T2 : notnull
 {
-
     private readonly IReadOnlyDictionary<T1, T2> _firstToSecond;
     private readonly IReadOnlyDictionary<T2, T1> _secondToFirst;
 
@@ -29,8 +28,12 @@ public class ReadOnlyBidirectionalDictionary<T1, T2> : IReadOnlyBidirectionalDic
     /// </param>
     public ReadOnlyBidirectionalDictionary(IEnumerable<KeyValuePair<T1, T2>> collection)
     {
-        _firstToSecond = new ReadOnlyDictionary<T1, T2>(collection.ToDictionary(k => k.Key, v => v.Value));
-        _secondToFirst = new ReadOnlyDictionary<T2, T1>(_firstToSecond.ToDictionary(k => k.Value, v => v.Key));
+        _firstToSecond = new ReadOnlyDictionary<T1, T2>(
+            collection.ToDictionary(k => k.Key, v => v.Value)
+        );
+        _secondToFirst = new ReadOnlyDictionary<T2, T1>(
+            _firstToSecond.ToDictionary(k => k.Value, v => v.Key)
+        );
     }
 
     /// <inheritdoc />
@@ -40,24 +43,18 @@ public class ReadOnlyBidirectionalDictionary<T1, T2> : IReadOnlyBidirectionalDic
     public int Count => _firstToSecond.Count;
 
     /// <inheritdoc />
-    public bool Contains(T1 first)
-        => _firstToSecond.ContainsKey(first);
+    public bool Contains(T1 first) => _firstToSecond.ContainsKey(first);
 
     /// <inheritdoc />
-    public bool Contains(T2 second)
-        => _secondToFirst.ContainsKey(second);
+    public bool Contains(T2 second) => _secondToFirst.ContainsKey(second);
 
     /// <inheritdoc />
     public OneOf<T2, NotFound> Get(T1 first) =>
-        _firstToSecond.TryGetValue(first, out var second)
-            ? second
-            : new NotFound();
+        _firstToSecond.TryGetValue(first, out var second) ? second : new NotFound();
 
     /// <inheritdoc />
     public OneOf<T1, NotFound> Get(T2 second) =>
-        _secondToFirst.TryGetValue(second, out var first)
-            ? first
-            : new NotFound();
+        _secondToFirst.TryGetValue(second, out var first) ? first : new NotFound();
 
     /// <inheritdoc />
     /// <remarks>Instantiates an array with the values.</remarks>
@@ -74,8 +71,7 @@ public class ReadOnlyBidirectionalDictionary<T1, T2> : IReadOnlyBidirectionalDic
     /// <returns>
     ///     The <see cref="IEnumerator{T}" /> of the <see cref="ReadOnlyBidirectionalDictionary{TFirst, TSecond}" />
     /// </returns>
-    public IEnumerator<KeyValuePair<T1, T2>> GetEnumerator()
-        => _firstToSecond.GetEnumerator();
+    public IEnumerator<KeyValuePair<T1, T2>> GetEnumerator() => _firstToSecond.GetEnumerator();
 
     /// <summary>
     ///     Gets the <see cref="IEnumerator" /> of the <see cref="ReadOnlyBidirectionalDictionary{TFirst, TSecond}" />.

@@ -15,16 +15,18 @@ namespace Olve.Utilities.Projects;
 public class ProjectFolderHelper(
     string projectName,
     string organization = ProjectFolderHelper.DefaultOrganization,
-    Environment.SpecialFolder? specialFolder = null)
+    Environment.SpecialFolder? specialFolder = null
+)
 {
     private const string DefaultOrganization = "Olve";
 
     private IPath? _rootDirectoryOverridePath;
 
     private IPath DefaultRootDirectoryPath => Path.Create(DefaultRootDirectory);
-    private string DefaultRootDirectory => SpecialFolder is { } specialFolder
-        ? Environment.GetFolderPath(specialFolder)
-        : GetDefaultFolderForOperatingSystem();
+    private string DefaultRootDirectory =>
+        SpecialFolder is { } specialFolder
+            ? Environment.GetFolderPath(specialFolder)
+            : GetDefaultFolderForOperatingSystem();
 
     /// <summary>
     ///     Gets the name of the project.
@@ -67,7 +69,11 @@ public class ProjectFolderHelper(
         if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
         {
             return Environment.GetEnvironmentVariable("XDG_DATA_HOME")
-                   ?? System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".local", "share");
+                ?? System.IO.Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+                    ".local",
+                    "share"
+                );
         }
 
         return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);

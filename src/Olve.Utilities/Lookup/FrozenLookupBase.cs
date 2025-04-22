@@ -15,7 +15,8 @@ public class FrozenLookupBase<TKey, TValue>(IEnumerable<KeyValuePair<TKey, TValu
 {
     private readonly FrozenDictionary<TKey, TValue> _dictionary = items.ToFrozenDictionary(
         x => x.Key,
-        x => x.Value);
+        x => x.Value
+    );
 
     /// <summary>
     ///     Gets the keys in the lookup.
@@ -62,7 +63,8 @@ public class FrozenLookupBase<TKey, TValue>(IEnumerable<KeyValuePair<TKey, TValu
     /// </summary>
     /// <param name="key">The key to get the value for.</param>
     /// <returns>The value associated with the key, or a <see cref="NotFound" /> object if the key is not in the lookup.</returns>
-    public OneOf<TValue, NotFound> GetValue(TKey key) => _dictionary.TryGetValue(key, out var value)
-        ? OneOf<TValue, NotFound>.FromT0(value)
-        : new NotFound();
+    public OneOf<TValue, NotFound> GetValue(TKey key) =>
+        _dictionary.TryGetValue(key, out var value)
+            ? OneOf<TValue, NotFound>.FromT0(value)
+            : new NotFound();
 }

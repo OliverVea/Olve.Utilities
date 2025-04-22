@@ -36,10 +36,11 @@ public class ResultProblem
     /// <param name="message">The message describing the problem.</param>
     /// <param name="args">Optional arguments providing additional details about the problem.</param>
     [StackTraceHidden]
-    public ResultProblem([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
-        params object[] args) : this(null, message, args, new StackFrame(1, true))
-    {
-    }
+    public ResultProblem(
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
+        params object[] args
+    )
+        : this(null, message, args, new StackFrame(1, true)) { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ResultProblem" /> class from an <see cref="System.Exception"/>.
@@ -48,17 +49,19 @@ public class ResultProblem
     /// <param name="message">The message describing the problem.</param>
     /// <param name="args">Optional arguments providing additional details about the problem.</param>
     [StackTraceHidden]
-    public ResultProblem(Exception exception,
-        [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
-        string message,
-        params object[] args) : this(exception, message, args, new StackFrame(1, true))
-    {
-    }
+    public ResultProblem(
+        Exception exception,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
+        params object[] args
+    )
+        : this(exception, message, args, new StackFrame(1, true)) { }
 
-    internal ResultProblem(Exception? exception,
+    internal ResultProblem(
+        Exception? exception,
         string message,
         object[] args,
-        StackFrame stackFrame)
+        StackFrame stackFrame
+    )
     {
         Exception = exception;
         Message = message;
@@ -69,7 +72,6 @@ public class ResultProblem
 
         OriginInformation = new ProblemOriginInformation(path, lineNumber);
     }
-
 
     /// <summary>
     ///     Gets the message describing the problem.
@@ -109,7 +111,6 @@ public class ResultProblem
     /// </summary>
     public ProblemOriginInformation OriginInformation { get; }
 
-
     /// <summary>
     ///     Formats the problem as a string.
     ///     If <see cref="DefaultPrintDebug"/> is <see langword="true" />, <see cref="ToDebugString"/> is used; otherwise, <see cref="ToBriefString"/> is used.
@@ -117,14 +118,14 @@ public class ResultProblem
     /// <returns>The formatted string.</returns>
     public override string ToString() => DefaultPrintDebug ? ToDebugString() : ToBriefString();
 
-
     /// <summary>
     ///    Formats the problem as a string for brief display, omitting references to code locations.
     /// </summary>
     /// <returns>The formatted string.</returns>
-    public string ToBriefString() => Exception != null
-        ? $"{string.Format(Message, Args)} ({Exception.GetType().Name}: {Exception.Message})"
-        : string.Format(Message, Args);
+    public string ToBriefString() =>
+        Exception != null
+            ? $"{string.Format(Message, Args)} ({Exception.GetType().Name}: {Exception.Message})"
+            : string.Format(Message, Args);
 
     /// <summary>
     ///    Formats the problem as a string for debugging purposes.

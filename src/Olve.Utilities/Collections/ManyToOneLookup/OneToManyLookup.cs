@@ -19,7 +19,10 @@ public class OneToManyLookup<TLeft, TRight> : IOneToManyLookup<TLeft, TRight>
     /// </summary>
     /// <param name="leftComparer">Comparer for left-hand elements.</param>
     /// <param name="rightComparer">Comparer for right-hand elements.</param>
-    public OneToManyLookup(IEqualityComparer<TLeft>? leftComparer = null, IEqualityComparer<TRight>? rightComparer = null)
+    public OneToManyLookup(
+        IEqualityComparer<TLeft>? leftComparer = null,
+        IEqualityComparer<TRight>? rightComparer = null
+    )
     {
         _leftToRights = new Dictionary<TLeft, HashSet<TRight>>(leftComparer);
         _rightToLeft = new Dictionary<TRight, TLeft>(rightComparer);
@@ -54,13 +57,16 @@ public class OneToManyLookup<TLeft, TRight> : IOneToManyLookup<TLeft, TRight>
 
         foreach (var right in rights)
         {
-            if (_rightToLeft.TryGetValue(right, out var existingLeft) && !EqualityComparer<TLeft>.Default.Equals(existingLeft, left))
+            if (
+                _rightToLeft.TryGetValue(right, out var existingLeft)
+                && !EqualityComparer<TLeft>.Default.Equals(existingLeft, left)
+            )
             {
                 _leftToRights[existingLeft].Remove(right);
             }
             _rightToLeft[right] = left;
         }
-        _leftToRights[left] = [..rights];
+        _leftToRights[left] = [.. rights];
     }
 
     /// <inheritdoc />
@@ -68,7 +74,8 @@ public class OneToManyLookup<TLeft, TRight> : IOneToManyLookup<TLeft, TRight>
     {
         if (value)
         {
-            if (Contains(left, right)) return false;
+            if (Contains(left, right))
+                return false;
             if (_rightToLeft.TryGetValue(right, out var existingLeft))
             {
                 _leftToRights[existingLeft].Remove(right);
@@ -88,7 +95,8 @@ public class OneToManyLookup<TLeft, TRight> : IOneToManyLookup<TLeft, TRight>
     /// <inheritdoc />
     public bool Remove(TLeft left)
     {
-        if (!_leftToRights.TryGetValue(left, out var rights)) return false;
+        if (!_leftToRights.TryGetValue(left, out var rights))
+            return false;
         foreach (var right in rights)
         {
             _rightToLeft.Remove(right);
@@ -100,7 +108,8 @@ public class OneToManyLookup<TLeft, TRight> : IOneToManyLookup<TLeft, TRight>
     /// <inheritdoc />
     public bool Remove(TRight right)
     {
-        if (!_rightToLeft.Remove(right, out var left)) return false;
+        if (!_rightToLeft.Remove(right, out var left))
+            return false;
 
         _leftToRights[left].Remove(right);
 
@@ -115,9 +124,11 @@ public class OneToManyLookup<TLeft, TRight> : IOneToManyLookup<TLeft, TRight>
     /// <inheritdoc />
     public bool Remove(TLeft left, TRight right)
     {
-        if (!_leftToRights.TryGetValue(left, out var rights) || !rights.Remove(right)) return false;
+        if (!_leftToRights.TryGetValue(left, out var rights) || !rights.Remove(right))
+            return false;
         _rightToLeft.Remove(right);
-        if (rights.Count == 0) _leftToRights.Remove(left);
+        if (rights.Count == 0)
+            _leftToRights.Remove(left);
         return true;
     }
 
@@ -129,7 +140,10 @@ public class OneToManyLookup<TLeft, TRight> : IOneToManyLookup<TLeft, TRight>
     }
 
     /// <inheritdoc />
-    public IEnumerator<KeyValuePair<TLeft, IReadOnlySet<TRight>>> GetEnumerator() => _leftToRights.Select(pair => new KeyValuePair<TLeft, IReadOnlySet<TRight>>(pair.Key, pair.Value)).GetEnumerator();
+    public IEnumerator<KeyValuePair<TLeft, IReadOnlySet<TRight>>> GetEnumerator() =>
+        _leftToRights
+            .Select(pair => new KeyValuePair<TLeft, IReadOnlySet<TRight>>(pair.Key, pair.Value))
+            .GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

@@ -25,11 +25,22 @@ public static class DictionaryExtensions
     /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
     /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
     /// <returns>The value associated with the specified key or the newly added value.</returns>
-    [SuppressMessage("Design", "MA0016:Prefer using collection abstraction instead of implementation")]
-    public static TValue GetOrAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, Func<TValue> valueFactory)
+    [SuppressMessage(
+        "Design",
+        "MA0016:Prefer using collection abstraction instead of implementation"
+    )]
+    public static TValue GetOrAdd<TKey, TValue>(
+        this Dictionary<TKey, TValue> dictionary,
+        TKey key,
+        Func<TValue> valueFactory
+    )
         where TKey : notnull
     {
-        ref var value = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out var exists);
+        ref var value = ref CollectionsMarshal.GetValueRefOrAddDefault(
+            dictionary,
+            key,
+            out var exists
+        );
         if (exists)
         {
             return value!;
@@ -51,11 +62,22 @@ public static class DictionaryExtensions
     /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
     /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
     /// <returns>The value associated with the specified key or the newly added value.</returns>
-    [SuppressMessage("Design", "MA0016:Prefer using collection abstraction instead of implementation")]
-    public static TValue GetOrAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value)
+    [SuppressMessage(
+        "Design",
+        "MA0016:Prefer using collection abstraction instead of implementation"
+    )]
+    public static TValue GetOrAdd<TKey, TValue>(
+        this Dictionary<TKey, TValue> dictionary,
+        TKey key,
+        TValue value
+    )
         where TKey : notnull
     {
-        ref var val = ref CollectionsMarshal.GetValueRefOrAddDefault(dictionary, key, out var exists);
+        ref var val = ref CollectionsMarshal.GetValueRefOrAddDefault(
+            dictionary,
+            key,
+            out var exists
+        );
         if (exists)
         {
             return val!;
@@ -77,8 +99,15 @@ public static class DictionaryExtensions
     /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
     /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
     /// <returns><see langword="true"/> if the value was updated; otherwise, <see langword="false"/>.</returns>
-    [SuppressMessage("Design", "MA0016:Prefer using collection abstraction instead of implementation")]
-    public static bool TryUpdate<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, TValue value)
+    [SuppressMessage(
+        "Design",
+        "MA0016:Prefer using collection abstraction instead of implementation"
+    )]
+    public static bool TryUpdate<TKey, TValue>(
+        this Dictionary<TKey, TValue> dictionary,
+        TKey key,
+        TValue value
+    )
         where TKey : notnull
     {
         ref var val = ref CollectionsMarshal.GetValueRefOrNullRef(dictionary, key);
@@ -103,8 +132,15 @@ public static class DictionaryExtensions
     /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
     /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
     /// <returns><see langword="true"/> if the value was updated; otherwise, <see langword="false"/>.</returns>
-    [SuppressMessage("Design", "MA0016:Prefer using collection abstraction instead of implementation")]
-    public static bool TryUpdate<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, Func<TValue, TValue> update)
+    [SuppressMessage(
+        "Design",
+        "MA0016:Prefer using collection abstraction instead of implementation"
+    )]
+    public static bool TryUpdate<TKey, TValue>(
+        this Dictionary<TKey, TValue> dictionary,
+        TKey key,
+        Func<TValue, TValue> update
+    )
         where TKey : notnull
     {
         ref var val = ref CollectionsMarshal.GetValueRefOrNullRef(dictionary, key);

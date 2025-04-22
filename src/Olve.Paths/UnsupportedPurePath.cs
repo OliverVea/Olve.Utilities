@@ -4,11 +4,13 @@ namespace Olve.Paths;
 
 internal class UnsupportedPurePath : IPurePath
 {
-    private static PlatformNotSupportedException PlatformNotSupportedException => new("Unsupported platform");
-    
+    private static PlatformNotSupportedException PlatformNotSupportedException =>
+        new("Unsupported platform");
+
     public string Path => throw PlatformNotSupportedException;
     public PathPlatform Platform => throw PlatformNotSupportedException;
     public PathType Type => throw PlatformNotSupportedException;
+
     public bool TryGetParentPure([NotNullWhen(true)] out IPurePath? parent)
     {
         throw PlatformNotSupportedException;

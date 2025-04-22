@@ -33,7 +33,10 @@ public interface IPurePath
     /// Gets the parent path.
     /// </summary>
     /// <exception cref="InvalidOperationException">Thrown when the path has no parent.</exception>
-    IPurePath ParentPure => TryGetParentPure(out var parent) ? parent : throw new InvalidOperationException("Element does not have a parent");
+    IPurePath ParentPure =>
+        TryGetParentPure(out var parent)
+            ? parent
+            : throw new InvalidOperationException("Element does not have a parent");
 
     /// <summary>
     /// Attempts to retrieve the name of the path component (e.g., filename or directory name).

@@ -5,9 +5,11 @@ public class ReadmeDemo
     [Test]
     public Task Snippet1()
     {
-        if (OperatingSystem.IsWindows()) return WindowsSnippet1();
-        if (OperatingSystem.IsLinux()) return UnixSnippet1();
-        
+        if (OperatingSystem.IsWindows())
+            return WindowsSnippet1();
+        if (OperatingSystem.IsLinux())
+            return UnixSnippet1();
+
         Assert.Fail("Platform not supported");
         return Task.CompletedTask;
     }
@@ -49,6 +51,5 @@ public class ReadmeDemo
 
         var actuallyExists = File.Exists(newPath.Path);
         await Assert.That(exists).IsEqualTo(actuallyExists);
-        
     }
 }

@@ -6,18 +6,29 @@ public class GlobTests
 {
     private const string EverythingPattern = "**/*";
 
-    private static string GetPlatformString(string path)
-        => OperatingSystem.IsWindows()
-            ? path.Replace("/", "\\")
-            : path;
+    private static string GetPlatformString(string path) =>
+        OperatingSystem.IsWindows() ? path.Replace("/", "\\") : path;
 
     [Test]
-    [Arguments("**/*", new[] {"text-file.txt", "text-file-2.txt", "video-file.avi", "image-file.png", "dir/nested-file.txt"})]
-    [Arguments("**/*.txt", new[] {"text-file.txt", "text-file-2.txt", "dir/nested-file.txt"})]
-    [Arguments("*.txt", new[] {"text-file.txt", "text-file-2.txt"})]
-    [Arguments("*.png", new[] {"image-file.png"})]
-    [Arguments("*.avi", new[] {"video-file.avi"})]
-    public async Task TryGlob_WithVariousGlobPatterns_ReturnsExpectedResults(string pattern, string[] expectedFiles)
+    [Arguments(
+        "**/*",
+        new[]
+        {
+            "text-file.txt",
+            "text-file-2.txt",
+            "video-file.avi",
+            "image-file.png",
+            "dir/nested-file.txt",
+        }
+    )]
+    [Arguments("**/*.txt", new[] { "text-file.txt", "text-file-2.txt", "dir/nested-file.txt" })]
+    [Arguments("*.txt", new[] { "text-file.txt", "text-file-2.txt" })]
+    [Arguments("*.png", new[] { "image-file.png" })]
+    [Arguments("*.avi", new[] { "video-file.avi" })]
+    public async Task TryGlob_WithVariousGlobPatterns_ReturnsExpectedResults(
+        string pattern,
+        string[] expectedFiles
+    )
     {
         // Act
         var gotGlob = TryGlobTestData(pattern, out var matches);
@@ -31,7 +42,7 @@ public class GlobTests
         foreach (var (actual, expectedRaw) in matchPaths!.Order().Zip(expectedFiles.Order()))
         {
             var expected = GetPlatformString(expectedRaw);
-            
+
             await Assert.That(actual).EndsWith(expected);
         }
     }
@@ -41,7 +52,7 @@ public class GlobTests
     {
         // Arrange
         const int elementCount = 5;
-        
+
         // Act
         var gotGlob = TryGlobTestData(EverythingPattern, out var matches);
         matches = matches?.ToList();
@@ -95,7 +106,10 @@ public class GlobTests
     [Test]
     [Arguments(true, 1)]
     [Arguments(false, 0)]
-    public async Task TryGlob_WithIgnoreAndDoNotIgnoreCase_ReturnsExpectedResults(bool ignoreCase, int expected)
+    public async Task TryGlob_WithIgnoreAndDoNotIgnoreCase_ReturnsExpectedResults(
+        bool ignoreCase,
+        int expected
+    )
     {
         // Arrange
         const string patternWithIncorrectCasing = "**/Text-file.txt";
@@ -107,7 +121,11 @@ public class GlobTests
         await Assert.That(ignoreCaseMatches).HasCount().EqualTo(expected);
     }
 
-    private static bool TryGlobTestData(string pattern, out IEnumerable<IPath>? matches, bool ignoreCase = false)
+    private static bool TryGlobTestData(
+        string pattern,
+        out IEnumerable<IPath>? matches,
+        bool ignoreCase = false
+    )
     {
         if (!Path.TryGetAssemblyExecutable(out var assemblyPath))
         {

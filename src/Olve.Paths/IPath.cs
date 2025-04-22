@@ -18,7 +18,10 @@ public interface IPath : IPurePath
     /// Gets the type of the element represented by the path.
     /// </summary>
     /// <exception cref="InvalidOperationException">Thrown when the element type cannot be determined.</exception>
-    ElementType ElementType => TryGetElementType(out var type) ? type : throw new InvalidOperationException("Element does not have a type");
+    ElementType ElementType =>
+        TryGetElementType(out var type)
+            ? type
+            : throw new InvalidOperationException("Element does not have a type");
 
     /// <summary>
     /// Attempts to retrieve the absolute version of the current path.
@@ -31,7 +34,10 @@ public interface IPath : IPurePath
     /// Gets the absolute version of the current path.
     /// </summary>
     /// <exception cref="InvalidOperationException">Thrown when the absolute path is not available.</exception>
-    IPath Absolute => TryGetAbsolute(out var absolute) ? absolute : throw new InvalidOperationException("Element does not have an absolute path");
+    IPath Absolute =>
+        TryGetAbsolute(out var absolute)
+            ? absolute
+            : throw new InvalidOperationException("Element does not have an absolute path");
 
     /// <summary>
     /// Attempts to retrieve the parent path.
@@ -44,7 +50,10 @@ public interface IPath : IPurePath
     /// Gets the parent path.
     /// </summary>
     /// <exception cref="InvalidOperationException">Thrown when the path has no parent.</exception>
-    IPath Parent => TryGetParent(out var parent) ? parent : throw new InvalidOperationException("Element does not have a parent");
+    IPath Parent =>
+        TryGetParent(out var parent)
+            ? parent
+            : throw new InvalidOperationException("Element does not have a parent");
 
     /// <summary>
     /// Attempts to retrieve the child elements of the current path.
@@ -57,7 +66,10 @@ public interface IPath : IPurePath
     /// Gets the child elements of the current path.
     /// </summary>
     /// <exception cref="InvalidOperationException">Thrown when the path has no children.</exception>
-    IEnumerable<IPath> Children => TryGetChildren(out var children) ? children : throw new InvalidOperationException("Element does not have children");
+    IEnumerable<IPath> Children =>
+        TryGetChildren(out var children)
+            ? children
+            : throw new InvalidOperationException("Element does not have children");
 
     /// <summary>
     /// Appends the specified path to the current path.

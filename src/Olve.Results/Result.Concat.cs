@@ -2,7 +2,6 @@ namespace Olve.Results;
 
 public readonly partial struct Result
 {
-
     /// <summary>
     /// Concatenates two result-producing functions, returning a combined result if both succeed.
     /// </summary>
@@ -44,7 +43,11 @@ public readonly partial struct Result
     /// A <see cref="Result{T}"/> containing a tuple of the three values if all succeed;
     /// otherwise, the first encountered problem.
     /// </returns>
-    public static Result<(T1, T2, T3)> Concat<T1, T2, T3>(Func<Result<T1>> a, Func<Result<T2>> b, Func<Result<T3>> c)
+    public static Result<(T1, T2, T3)> Concat<T1, T2, T3>(
+        Func<Result<T1>> a,
+        Func<Result<T2>> b,
+        Func<Result<T3>> c
+    )
     {
         var resultA = a();
         if (!resultA.Succeeded)
@@ -82,7 +85,12 @@ public readonly partial struct Result
     /// A <see cref="Result{T}"/> containing a tuple of the four values if all succeed;
     /// otherwise, the first encountered problem.
     /// </returns>
-    public static Result<(T1, T2, T3, T4)> Concat<T1, T2, T3, T4>(Func<Result<T1>> a, Func<Result<T2>> b, Func<Result<T3>> c, Func<Result<T4>> d)
+    public static Result<(T1, T2, T3, T4)> Concat<T1, T2, T3, T4>(
+        Func<Result<T1>> a,
+        Func<Result<T2>> b,
+        Func<Result<T3>> c,
+        Func<Result<T4>> d
+    )
     {
         var resultA = a();
         if (!resultA.Succeeded)
@@ -128,7 +136,13 @@ public readonly partial struct Result
     /// A <see cref="Result{T}"/> containing a tuple of the five values if all succeed;
     /// otherwise, the first encountered problem.
     /// </returns>
-    public static Result<(T1, T2, T3, T4, T5)> Concat<T1, T2, T3, T4, T5>(Func<Result<T1>> a, Func<Result<T2>> b, Func<Result<T3>> c, Func<Result<T4>> d, Func<Result<T5>> e)
+    public static Result<(T1, T2, T3, T4, T5)> Concat<T1, T2, T3, T4, T5>(
+        Func<Result<T1>> a,
+        Func<Result<T2>> b,
+        Func<Result<T3>> c,
+        Func<Result<T4>> d,
+        Func<Result<T5>> e
+    )
     {
         var resultA = a();
         if (!resultA.Succeeded)
@@ -182,7 +196,14 @@ public readonly partial struct Result
     /// A <see cref="Result{T}"/> containing a tuple of the six values if all succeed;
     /// otherwise, the first encountered problem.
     /// </returns>
-    public static Result<(T1, T2, T3, T4, T5, T6)> Concat<T1, T2, T3, T4, T5, T6>(Func<Result<T1>> a, Func<Result<T2>> b, Func<Result<T3>> c, Func<Result<T4>> d, Func<Result<T5>> e, Func<Result<T6>> f)
+    public static Result<(T1, T2, T3, T4, T5, T6)> Concat<T1, T2, T3, T4, T5, T6>(
+        Func<Result<T1>> a,
+        Func<Result<T2>> b,
+        Func<Result<T3>> c,
+        Func<Result<T4>> d,
+        Func<Result<T5>> e,
+        Func<Result<T6>> f
+    )
     {
         var resultA = a();
         if (!resultA.Succeeded)
@@ -220,6 +241,13 @@ public readonly partial struct Result
             return resultF.Problems!;
         }
 
-        return (resultA.Value!, resultB.Value!, resultC.Value!, resultD.Value!, resultE.Value!, resultF.Value!);
+        return (
+            resultA.Value!,
+            resultB.Value!,
+            resultC.Value!,
+            resultD.Value!,
+            resultE.Value!,
+            resultF.Value!
+        );
     }
 }

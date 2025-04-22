@@ -5,7 +5,8 @@ namespace Olve.Utilities.Tests.Collections;
 public class ManyToManyLookupTests
 {
     private static IManyToManyLookup<T1, T2> GetNewBidirectionalDictionary<T1, T2>()
-        where T1 : notnull where T2 : notnull => new ManyToManyLookup<T1, T2>();
+        where T1 : notnull
+        where T2 : notnull => new ManyToManyLookup<T1, T2>();
 
     [Test]
     public async Task Set_AddsNewPair_ReturnsTrue()
@@ -17,12 +18,8 @@ public class ManyToManyLookupTests
         var result = lookup.Set(1, "one", true);
 
         // Assert
-        await Assert
-            .That(result)
-            .IsTrue();
-        await Assert
-            .That(lookup.Contains(1, "one"))
-            .IsTrue();
+        await Assert.That(result).IsTrue();
+        await Assert.That(lookup.Contains(1, "one")).IsTrue();
     }
 
     [Test]
@@ -36,9 +33,7 @@ public class ManyToManyLookupTests
         var result = lookup.Set(1, "one", true);
 
         // Assert
-        await Assert
-            .That(result)
-            .IsFalse();
+        await Assert.That(result).IsFalse();
     }
 
     [Test]
@@ -52,12 +47,8 @@ public class ManyToManyLookupTests
         var result = lookup.Set(1, "one", false);
 
         // Assert
-        await Assert
-            .That(result)
-            .IsTrue();
-        await Assert
-            .That(lookup.Contains(1, "one"))
-            .IsFalse();
+        await Assert.That(result).IsTrue();
+        await Assert.That(lookup.Contains(1, "one")).IsFalse();
     }
 
     [Test]
@@ -71,15 +62,9 @@ public class ManyToManyLookupTests
         var result = lookup.Get(1);
 
         // Assert
-        await Assert
-            .That(result.IsT0)
-            .IsTrue();
-        await Assert
-            .That(result.AsT0)
-            .Contains("one");
-        await Assert
-            .That(result.AsT0)
-            .Contains("uno");
+        await Assert.That(result.IsT0).IsTrue();
+        await Assert.That(result.AsT0).Contains("one");
+        await Assert.That(result.AsT0).Contains("uno");
     }
 
     [Test]
@@ -92,9 +77,7 @@ public class ManyToManyLookupTests
         var result = lookup.Get(1);
 
         // Assert
-        await Assert
-            .That(result.IsT1)
-            .IsTrue();
+        await Assert.That(result.IsT1).IsTrue();
     }
 
     [Test]
@@ -108,12 +91,8 @@ public class ManyToManyLookupTests
         var result = lookup.Remove(1);
 
         // Assert
-        await Assert
-            .That(result)
-            .IsTrue();
-        await Assert
-            .That(lookup.Contains(1, "one"))
-            .IsFalse();
+        await Assert.That(result).IsTrue();
+        await Assert.That(lookup.Contains(1, "one")).IsFalse();
     }
 
     [Test]
@@ -128,12 +107,8 @@ public class ManyToManyLookupTests
         lookup.Clear();
 
         // Assert
-        await Assert
-            .That(lookup.Contains(1, "one"))
-            .IsFalse();
-        await Assert
-            .That(lookup.Contains(2, "two"))
-            .IsFalse();
+        await Assert.That(lookup.Contains(1, "one")).IsFalse();
+        await Assert.That(lookup.Contains(2, "two")).IsFalse();
     }
 
     [Test]
@@ -148,15 +123,9 @@ public class ManyToManyLookupTests
 
         // Assert
         var result = lookup.Get(1);
-        await Assert
-            .That(result.IsT0)
-            .IsTrue();
-        await Assert
-            .That(result.AsT0)
-            .Contains("two");
-        await Assert
-            .That(result.AsT0)
-            .DoesNotContain("one");
+        await Assert.That(result.IsT0).IsTrue();
+        await Assert.That(result.AsT0).Contains("two");
+        await Assert.That(result.AsT0).DoesNotContain("one");
     }
 
     [Test]
@@ -171,15 +140,9 @@ public class ManyToManyLookupTests
 
         // Assert
         var result = lookup.Get("one");
-        await Assert
-            .That(result.IsT0)
-            .IsTrue();
-        await Assert
-            .That(result.AsT0)
-            .Contains(3);
-        await Assert
-            .That(result.AsT0)
-            .DoesNotContain(1);
+        await Assert.That(result.IsT0).IsTrue();
+        await Assert.That(result.AsT0).Contains(3);
+        await Assert.That(result.AsT0).DoesNotContain(1);
     }
 
     [Test]
@@ -192,9 +155,7 @@ public class ManyToManyLookupTests
         var result = lookup.Set(1, "one", false);
 
         // Assert
-        await Assert
-            .That(result)
-            .IsFalse();
+        await Assert.That(result).IsFalse();
     }
 
     [Test]
@@ -208,12 +169,8 @@ public class ManyToManyLookupTests
         var result = lookup.Remove("one");
 
         // Assert
-        await Assert
-            .That(result)
-            .IsTrue();
-        await Assert
-            .That(lookup.Contains(1, "one"))
-            .IsFalse();
+        await Assert.That(result).IsTrue();
+        await Assert.That(lookup.Contains(1, "one")).IsFalse();
     }
 
     [Test]
@@ -226,9 +183,7 @@ public class ManyToManyLookupTests
         var result = lookup.Contains(1, "one");
 
         // Assert
-        await Assert
-            .That(result)
-            .IsFalse();
+        await Assert.That(result).IsFalse();
     }
 
     [Test]
@@ -243,15 +198,9 @@ public class ManyToManyLookupTests
         var result = lookup.Get("one");
 
         // Assert
-        await Assert
-            .That(result.IsT0)
-            .IsTrue();
-        await Assert
-            .That(result.AsT0)
-            .Contains(1);
-        await Assert
-            .That(result.AsT0)
-            .Contains(2);
+        await Assert.That(result.IsT0).IsTrue();
+        await Assert.That(result.AsT0).Contains(1);
+        await Assert.That(result.AsT0).Contains(2);
     }
 
     [Test]
@@ -264,9 +213,7 @@ public class ManyToManyLookupTests
         var result = lookup.Get("one");
 
         // Assert
-        await Assert
-            .That(result.IsT1)
-            .IsTrue();
+        await Assert.That(result.IsT1).IsTrue();
     }
 
     [Test]
@@ -292,9 +239,7 @@ public class ManyToManyLookupTests
         var result = lookup.Remove(1);
 
         // Assert
-        await Assert
-            .That(result)
-            .IsFalse();
+        await Assert.That(result).IsFalse();
     }
 
     [Test]
@@ -307,9 +252,7 @@ public class ManyToManyLookupTests
         var result = lookup.Remove("one");
 
         // Assert
-        await Assert
-            .That(result)
-            .IsFalse();
+        await Assert.That(result).IsFalse();
     }
 
     [Test]
@@ -323,9 +266,7 @@ public class ManyToManyLookupTests
         var result = lookup.Set(1, "one", true);
 
         // Assert
-        await Assert
-            .That(result)
-            .IsFalse();
+        await Assert.That(result).IsFalse();
     }
 
     [Test]
@@ -339,9 +280,7 @@ public class ManyToManyLookupTests
         var result = lookup.Set("one", 1, true);
 
         // Assert
-        await Assert
-            .That(result)
-            .IsFalse();
+        await Assert.That(result).IsFalse();
     }
 
     [Test]
@@ -356,9 +295,7 @@ public class ManyToManyLookupTests
 
         // Assert
         var result = lookup.Get(1);
-        await Assert
-            .That(result.IsT1)
-            .IsTrue();
+        await Assert.That(result.IsT1).IsTrue();
     }
 
     [Test]
@@ -373,9 +310,7 @@ public class ManyToManyLookupTests
 
         // Assert
         var result = lookup.Get("one");
-        await Assert
-            .That(result.IsT1)
-            .IsTrue();
+        await Assert.That(result.IsT1).IsTrue();
     }
 
     [Test]
@@ -388,9 +323,7 @@ public class ManyToManyLookupTests
         var result = lookup.ToList();
 
         // Assert
-        await Assert
-            .That(result)
-            .IsEmpty();
+        await Assert.That(result).IsEmpty();
     }
 
     [Test]
@@ -404,15 +337,9 @@ public class ManyToManyLookupTests
         var result = lookup.ToList();
 
         // Assert
-        await Assert
-            .That(result.Count)
-            .IsEqualTo(1);
-        await Assert
-            .That(result[0].Key)
-            .IsEqualTo(1);
-        await Assert
-            .That(result[0].Value)
-            .IsEqualTo("one");
+        await Assert.That(result.Count).IsEqualTo(1);
+        await Assert.That(result[0].Key).IsEqualTo(1);
+        await Assert.That(result[0].Value).IsEqualTo("one");
     }
 
     [Test]
@@ -428,18 +355,10 @@ public class ManyToManyLookupTests
         var result = lookup.ToList();
 
         // Assert
-        await Assert
-            .That(result.Count)
-            .IsEqualTo(3);
-        await Assert
-            .That(result)
-            .Contains(new KeyValuePair<int, string>(1, "one"));
-        await Assert
-            .That(result)
-            .Contains(new KeyValuePair<int, string>(2, "two"));
-        await Assert
-            .That(result)
-            .Contains(new KeyValuePair<int, string>(3, "three"));
+        await Assert.That(result.Count).IsEqualTo(3);
+        await Assert.That(result).Contains(new KeyValuePair<int, string>(1, "one"));
+        await Assert.That(result).Contains(new KeyValuePair<int, string>(2, "two"));
+        await Assert.That(result).Contains(new KeyValuePair<int, string>(3, "three"));
     }
 
     [Test]
@@ -455,14 +374,8 @@ public class ManyToManyLookupTests
         var result = lookup.ToList();
 
         // Assert
-        await Assert
-            .That(result.Count)
-            .IsEqualTo(1);
-        await Assert
-            .That(result)
-            .Contains(new KeyValuePair<int, string>(2, "two"));
-        await Assert
-            .That(result)
-            .DoesNotContain(new KeyValuePair<int, string>(1, "one"));
+        await Assert.That(result.Count).IsEqualTo(1);
+        await Assert.That(result).Contains(new KeyValuePair<int, string>(2, "two"));
+        await Assert.That(result).DoesNotContain(new KeyValuePair<int, string>(1, "one"));
     }
 }

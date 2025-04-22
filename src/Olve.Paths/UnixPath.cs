@@ -8,7 +8,7 @@ namespace Olve.Paths;
 internal class UnixPath : IPath
 {
     private const string LinkStringPrefix = "file://";
-    
+
     private readonly UnixPurePath _unixPurePath;
     private readonly IPathEnvironment _pathEnvironment;
 
@@ -17,7 +17,7 @@ internal class UnixPath : IPath
         _unixPurePath = path;
         _pathEnvironment = pathEnvironment ?? DefaultUnixPathEnvironment.Shared;
     }
-    
+
     internal UnixPath(string path, IPathEnvironment? pathEnvironment = null)
     {
         _unixPurePath = UnixPurePath.FromPath(path);
@@ -28,8 +28,8 @@ internal class UnixPath : IPath
     public PathPlatform Platform => _unixPurePath.Platform;
     public PathType Type => _unixPurePath.Type;
 
-    public bool TryGetParentPure([NotNullWhen(true)] out IPurePath? parent)
-        => _unixPurePath.TryGetParentPure(out parent);
+    public bool TryGetParentPure([NotNullWhen(true)] out IPurePath? parent) =>
+        _unixPurePath.TryGetParentPure(out parent);
 
     public bool TryGetElementType([NotNullWhen(true)] out ElementType type)
     {
@@ -57,18 +57,20 @@ internal class UnixPath : IPath
             return true;
         }
 
-        if (Type is not PathType.Relative and not PathType.Stub
-            || !_pathEnvironment.TryGetCurrentDirectory(out var cwd))
+        if (
+            Type is not PathType.Relative and not PathType.Stub
+            || !_pathEnvironment.TryGetCurrentDirectory(out var cwd)
+        )
         {
             absolute = null;
             return false;
         }
 
         absolute = Olve.Paths.Path.Create(cwd) / _unixPurePath;
-        
+
         return true;
     }
-    
+
     public bool TryGetParent([NotNullWhen(true)] out IPath? parent)
     {
         if (TryGetParentPure(out var parentPure))
@@ -83,7 +85,8 @@ internal class UnixPath : IPath
 
     public bool TryGetChildren([NotNullWhen(true)] out IEnumerable<IPath>? children)
     {
-        var canGetChildren = TryGetElementType(out var type)
+        var canGetChildren =
+            TryGetElementType(out var type)
             && type == ElementType.Directory
             && Directory.Exists(Path);
 
@@ -114,8 +117,8 @@ internal class UnixPath : IPath
         }
     }
 
-    public bool TryGetName([NotNullWhen(true)] out string? fileName) 
-        => _unixPurePath.TryGetName(out fileName);
+    public bool TryGetName([NotNullWhen(true)] out string? fileName) =>
+        _unixPurePath.TryGetName(out fileName);
 
     public IPurePath Append(IPurePath right)
     {
@@ -193,7 +196,7 @@ internal class UnixPath : IPath
                 sb.Append(c);
             }
         }
-        
+
         var linkText = sb.ToString();
 
         return linkText;
