@@ -1,3 +1,14 @@
+## v0.20.1 (2025-04-22)
+
+### Fix
+
+- improving support on unsupported platforms
+
+### Refactor
+
+- PureUnixPath -> UnixPurePath
+- making internal PureUnixPath ctor into a static method to fit PureWindowsPath
+
 ## v0.20.0 (2025-04-22)
 
 ### Feat
