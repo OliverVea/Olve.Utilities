@@ -6,6 +6,11 @@ public class GlobTests
 {
     private const string EverythingPattern = "**/*";
 
+    private static string GetPlatformString(string path)
+        => OperatingSystem.IsWindows()
+            ? path.Replace("/", "\\")
+            : path;
+
     [Test]
     [Arguments("**/*", new[] {"text-file.txt", "text-file-2.txt", "video-file.avi", "image-file.png", "dir/nested-file.txt"})]
     [Arguments("**/*.txt", new[] {"text-file.txt", "text-file-2.txt", "dir/nested-file.txt"})]
@@ -23,8 +28,10 @@ public class GlobTests
         await Assert.That(matchPaths).IsNotNull();
         await Assert.That(matchPaths).HasCount().EqualTo(expectedFiles.Length);
 
-        foreach (var (actual, expected) in matchPaths!.Order().Zip(expectedFiles.Order()))
+        foreach (var (actual, expectedRaw) in matchPaths!.Order().Zip(expectedFiles.Order()))
         {
+            var expected = GetPlatformString(expectedRaw);
+            
             await Assert.That(actual).EndsWith(expected);
         }
     }

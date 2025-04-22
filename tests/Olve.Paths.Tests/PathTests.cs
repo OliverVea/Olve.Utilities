@@ -1,18 +1,55 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 
 namespace Olve.Paths.Tests;
 
+public class WindowsOnlyAttribute() : SkipAttribute("This test is only supported on Windows")
+{
+    public override Task<bool> ShouldSkip(BeforeTestContext context)
+    {
+        return Task.FromResult(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
+    }
+}
+
+public class LinuxOnlyAttribute() : SkipAttribute("This test is only supported on Windows")
+{
+    public override Task<bool> ShouldSkip(BeforeTestContext context)
+    {
+        return Task.FromResult(!RuntimeInformation.IsOSPlatform(OSPlatform.Linux));
+    }
+}
+
 public class PathTests
 {
-    [Test]
+    [Test, LinuxOnly]
     [Arguments("file.txt", "/home/user/file.txt")]
     [Arguments("file", "/home/user/file")]
     [Arguments("dir/", "/home/user/dir")]
     [Arguments("../", "/home")]
-    public async Task TryGetAbsolute_WithVariousPathsFromHomeDirectory_AreEvaluatedCorrectly(string target, string? expected)
+    public async Task TryGetAbsoluteLinux_WithVariousPathsFromHomeDirectory_AreEvaluatedCorrectly(string target, string? expected)
     {
         // Arrange
         ConstantPathEnvironment pathEnvironment = new("/home/user/");
+        var path = Path.Create(target, pathEnvironment);
+
+        // Act
+        var gotAbsolute = path.TryGetAbsolute(out var absolutePath);
+        var absolute = absolutePath?.Path;
+
+        // Assert
+        await Assert.That(gotAbsolute).IsEqualTo(expected != null);
+        await Assert.That(absolute).IsEqualTo(expected);
+    }
+    
+    [Test, WindowsOnly]
+    [Arguments("file.txt", @"C:\users\user\file.txt")]
+    [Arguments("file", @"C:\users\user\file")]
+    [Arguments("dir/", @"C:\users\user\dir")]
+    [Arguments("../", @"C:\users")]
+    public async Task TryGetAbsoluteWindows_WithVariousPathsFromHomeDirectory_AreEvaluatedCorrectly(string target, string? expected)
+    {
+        // Arrange
+        ConstantPathEnvironment pathEnvironment = new(@"C:\users\user\");
         var path = Path.Create(target, pathEnvironment);
 
         // Act
@@ -40,14 +77,31 @@ public class PathTests
         // Assert
     }
 
-    [Test]
-    public async Task GetLinkString_OnValidPath_ReturnsCorrectLinkString()
+    [Test, LinuxOnly]
+    public async Task GetLinkStringLinux_OnValidPath_ReturnsCorrectLinkString()
     {
         // Arrange
         const string pathString = "/home/oliver/file.txt";
         const int line = 17;
         const int column = 6;
         const string expected = "file:///home/oliver/file.txt:17:6";
+        var path = Path.Create(pathString);
+
+        // Act
+        var linkString = path.GetLinkString(line, column);
+
+        // Assert
+        await Assert.That(linkString).IsEqualTo(expected);
+    }
+
+    [Test, WindowsOnly]
+    public async Task GetLinkStringWindows_OnValidPath_ReturnsCorrectLinkString()
+    {
+        // Arrange
+        const string pathString = @"C:\users\user\file.txt";
+        const int line = 17;
+        const int column = 6;
+        const string expected = @"C:\users\user\file.txt:17:6";
         var path = Path.Create(pathString);
 
         // Act

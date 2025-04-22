@@ -6,6 +6,10 @@ public class ResultTests
 {
     private const string Message = "some problem occurred";
 
+    private static string GetPlatformString(string path)
+        => OperatingSystem.IsWindows()
+            ? path.Replace("/", "\\")
+            : path;
     private void SyntaxTesting()
     {
         const string message = "Hi!";
@@ -37,7 +41,7 @@ public class ResultTests
 
         // Assert
         await Assert.That(problem.OriginInformation.FilePath.Path).EndsWith("ResultTests.cs");
-        await Assert.That(problem.OriginInformation.LineNumber).IsEqualTo(36);
+        await Assert.That(problem.OriginInformation.LineNumber).IsEqualTo(40);
     }
 
     [Test]
@@ -50,7 +54,7 @@ public class ResultTests
 
         // Assert
         await Assert.That(problem.OriginInformation.FilePath.Path).EndsWith("ResultTests.cs");
-        await Assert.That(problem.OriginInformation.LineNumber).IsEqualTo(58);
+        await Assert.That(problem.OriginInformation.LineNumber).IsEqualTo(62);
     }
 
     private static ResultProblem GetResultProblem()
@@ -71,7 +75,9 @@ public class ResultTests
         Console.WriteLine(debugString);
 
         // Assert
-        await Assert.That(debugString).EndsWith("Olve.Utilities/tests/Olve.Results.Tests/ResultTests.cs:58] some problem occurred");
+        var expected =
+            GetPlatformString("Olve.Utilities/tests/Olve.Results.Tests/ResultTests.cs:62] some problem occurred");
+        await Assert.That(debugString).EndsWith(expected);
     }
 
     [Test]

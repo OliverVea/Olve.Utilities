@@ -10,15 +10,15 @@ public interface IPath : IPurePath
     /// <summary>
     /// Attempts to retrieve the type of the element represented by the path.
     /// </summary>
-    /// <param name="type">When this method returns, contains the type of the element if available; otherwise, <c>null</c>.</param>
+    /// <param name="type">When this method returns, contains the type of the element if available; otherwise, <c>ElementType.None</c>.</param>
     /// <returns><c>true</c> if the element type was successfully retrieved; otherwise, <c>false</c>.</returns>
-    bool TryGetElementType([NotNullWhen(true)] out ElementType? type);
+    bool TryGetElementType(out ElementType type);
 
     /// <summary>
     /// Gets the type of the element represented by the path.
     /// </summary>
     /// <exception cref="InvalidOperationException">Thrown when the element type cannot be determined.</exception>
-    ElementType ElementType => TryGetElementType(out var type) ? type.Value : throw new InvalidOperationException("Element does not have a type");
+    ElementType ElementType => TryGetElementType(out var type) ? type : throw new InvalidOperationException("Element does not have a type");
 
     /// <summary>
     /// Attempts to retrieve the absolute version of the current path.

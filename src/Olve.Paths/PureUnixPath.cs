@@ -9,14 +9,14 @@ internal class PureUnixPath : IPurePath
 {
     internal IReadOnlyList<string> Segments { get; }
 
-    internal PureUnixPath(string[] segments, PathType pathType)
+    internal PureUnixPath(IReadOnlyList<string> segments, PathType pathType)
     {
         Segments = segments;
         Type = pathType;
 
         Path = pathType == PathType.Absolute
             ? $"/{string.Join('/', Segments)}"
-            : string.Join("/", Segments);
+            : string.Join('/', Segments);
     }
 
     internal PureUnixPath(string path) : this(path.Split('/', StringSplitOptions.RemoveEmptyEntries), GetPathType(path))
@@ -73,31 +73,8 @@ internal class PureUnixPath : IPurePath
         {
             throw new NotSupportedException("Absolute paths cannot be on the right hand side of a path concatenation");
         }
-        
-        var segments = Segments.ToList();
 
-        foreach (var segment in right.Segments)
-        {
-            if (segment.All(x => x == '.'))
-            {
-                var stepUpCount = segment.Length - 1;
-
-                for (var i = 0; i < stepUpCount; i++)
-                {
-                    if (segments.Count == 0)
-                    {
-                        throw new ArgumentException("Relative path tried to step out of the path root");
-                    }
-                    
-                    segments.RemoveAt(segments.Count - 1);
-                }
-            }
-
-            else
-            {
-                segments.Add(segment);
-            }
-        }
+        var segments = SegmentsHelper.EvaluateAndConcatenateSegments(Segments, right.Segments);
         
         return new PureUnixPath(segments.ToArray(), Type);
     }
@@ -107,7 +84,9 @@ internal class PureUnixPath : IPurePath
         var rightPath = new PureUnixPath(right);
 
         if (rightPath.Type != PathType.Stub)
+        {
             throw new ArgumentException("Can only append stub strings (not absolute or relative paths).", nameof(right));
+        }
 
         var combinedSegments = Segments.Concat(rightPath.Segments).ToArray();
         return new PureUnixPath(combinedSegments, Type);

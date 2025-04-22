@@ -1,45 +1,66 @@
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Olve.Paths;
 
-[DebuggerDisplay("{Path}")]
-internal class UnixPath : IPath
+internal class WindowsPath : IPath
 {
     private const string LinkStringPrefix = "file://";
     
-    private readonly PureUnixPath _pureUnixPath;
+    private readonly PureWindowsPath _pureWindowsPath;
     private readonly IPathEnvironment _pathEnvironment;
 
-    private UnixPath(PureUnixPath path, IPathEnvironment? pathEnvironment = null)
+    private WindowsPath(PureWindowsPath path, IPathEnvironment? pathEnvironment = null)
     {
-        _pureUnixPath = path;
+        _pureWindowsPath = path;
         _pathEnvironment = pathEnvironment ?? DefaultUnixPathEnvironment.Shared;
     }
     
-    internal UnixPath(string path, IPathEnvironment? pathEnvironment = null)
+    internal WindowsPath(string path, IPathEnvironment? pathEnvironment = null)
     {
-        _pureUnixPath = new PureUnixPath(path);
+        _pureWindowsPath = PureWindowsPath.FromPath(path);
         _pathEnvironment = pathEnvironment ?? DefaultUnixPathEnvironment.Shared;
     }
 
-    public string Path => _pureUnixPath.Path;
-    public PathPlatform Platform => _pureUnixPath.Platform;
-    public PathType Type => _pureUnixPath.Type;
-
+    public string Path => _pureWindowsPath.Path;
+    public PathPlatform Platform => PathPlatform.Windows;
+    public PathType Type => _pureWindowsPath.Type;
+    
     public bool TryGetParentPure([NotNullWhen(true)] out IPurePath? parent)
-        => _pureUnixPath.TryGetParentPure(out parent);
+        => _pureWindowsPath.TryGetParentPure(out parent);
 
-    public bool TryGetElementType([NotNullWhen(true)] out ElementType type)
+    public bool TryGetName([NotNullWhen(true)] out string? fileName)
+        => _pureWindowsPath.TryGetName(out fileName);
+
+    public IPurePath Append(IPurePath right)
     {
-        if (File.Exists(Path))
+        if (_pureWindowsPath / right is not PureWindowsPath pureWindowsPath)
+        {
+            throw new InvalidOperationException("Path segments could not be combined.");
+        }
+
+        return new WindowsPath(pureWindowsPath, _pathEnvironment);
+    }
+
+    public IPurePath Append(string right)
+    {
+        if ((IPurePath)_pureWindowsPath / right is not PureWindowsPath pureWindowsPath)
+        {
+            throw new InvalidOperationException("Path segments could not be combined.");
+        }
+        
+        return new WindowsPath(pureWindowsPath, _pathEnvironment);
+    }
+
+    public bool TryGetElementType(out ElementType type)
+    {
+        if (File.Exists(_pureWindowsPath.Path))
         {
             type = ElementType.File;
             return true;
         }
 
-        if (Directory.Exists(Path))
+        if (Directory.Exists(_pureWindowsPath.Path))
         {
             type = ElementType.Directory;
             return true;
@@ -64,16 +85,16 @@ internal class UnixPath : IPath
             return false;
         }
 
-        absolute = Olve.Paths.Path.Create(cwd) / _pureUnixPath;
+        absolute = Olve.Paths.Path.Create(cwd) / _pureWindowsPath;
         
         return true;
     }
-    
+
     public bool TryGetParent([NotNullWhen(true)] out IPath? parent)
     {
         if (TryGetParentPure(out var parentPure))
         {
-            parent = new UnixPath((PureUnixPath)parentPure, _pathEnvironment);
+            parent = new WindowsPath((PureWindowsPath)parentPure, _pathEnvironment);
             return true;
         }
 
@@ -84,8 +105,8 @@ internal class UnixPath : IPath
     public bool TryGetChildren([NotNullWhen(true)] out IEnumerable<IPath>? children)
     {
         var canGetChildren = TryGetElementType(out var type)
-            && type == ElementType.Directory
-            && Directory.Exists(Path);
+                             && type == ElementType.Directory
+                             && Directory.Exists(Path);
 
         if (!canGetChildren)
         {
@@ -96,65 +117,41 @@ internal class UnixPath : IPath
         children = GetChildren(Path);
         return true;
     }
-
-    // Todo: document exceptions
-    private IEnumerable<UnixPath> GetChildren(string path)
+    
+    private IEnumerable<WindowsPath> GetChildren(string path)
     {
         var directories = Directory.EnumerateDirectories(path);
         var files = Directory.EnumerateFiles(path);
 
         foreach (var directory in directories)
         {
-            yield return new UnixPath(directory, _pathEnvironment);
+            yield return new WindowsPath(directory, _pathEnvironment);
         }
 
         foreach (var file in files)
         {
-            yield return new UnixPath(file, _pathEnvironment);
+            yield return new WindowsPath(file, _pathEnvironment);
         }
-    }
-
-    public bool TryGetName([NotNullWhen(true)] out string? fileName) 
-        => _pureUnixPath.TryGetName(out fileName);
-
-    public IPurePath Append(IPurePath right)
-    {
-        if (_pureUnixPath / right is not PureUnixPath pureUnixPath)
-        {
-            throw new InvalidOperationException("Path segments could not be combined.");
-        }
-
-        return new UnixPath(pureUnixPath, _pathEnvironment);
-    }
-
-    public IPurePath Append(string right)
-    {
-        if ((IPurePath)_pureUnixPath / right is not PureUnixPath pureUnixPath)
-        {
-            throw new InvalidOperationException("Path segments could not be combined.");
-        }
-
-        return new UnixPath(pureUnixPath, _pathEnvironment);
     }
 
     public IPath AppendPath(IPurePath right)
     {
-        if (_pureUnixPath / right is not PureUnixPath pureUnixPath)
+        if (_pureWindowsPath / right is not PureWindowsPath pureWindowsPath)
         {
             throw new InvalidOperationException("Path segments could not be combined.");
         }
 
-        return new UnixPath(pureUnixPath, _pathEnvironment);
+        return new WindowsPath(pureWindowsPath, _pathEnvironment);
     }
 
     public IPath AppendPath(string right)
     {
-        if ((IPurePath)_pureUnixPath / right is not PureUnixPath pureUnixPath)
+        if ((IPurePath)_pureWindowsPath / right is not PureWindowsPath pureWindowsPath)
         {
             throw new InvalidOperationException("Path segments could not be combined.");
         }
 
-        return new UnixPath(pureUnixPath, _pathEnvironment);
+        return new WindowsPath(pureWindowsPath, _pathEnvironment);
     }
 
     public bool Exists()
@@ -179,7 +176,6 @@ internal class UnixPath : IPath
     {
         StringBuilder sb = new();
 
-        sb.Append(LinkStringPrefix);
         sb.Append(Path);
 
         if (lineNumber is { } l)
