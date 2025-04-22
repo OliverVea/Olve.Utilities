@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Olve.Paths.Tests;
 
-public class WindowsOnlyAttribute() : SkipAttribute("This test is only supported on Windows")
+public class WindowsOnlyAttribute() : SkipAttribute("This test is only run on Windows")
 {
     public override Task<bool> ShouldSkip(BeforeTestContext context)
     {
@@ -11,7 +11,7 @@ public class WindowsOnlyAttribute() : SkipAttribute("This test is only supported
     }
 }
 
-public class LinuxOnlyAttribute() : SkipAttribute("This test is only supported on Windows")
+public class LinuxOnlyAttribute() : SkipAttribute("This test is only run on Linux")
 {
     public override Task<bool> ShouldSkip(BeforeTestContext context)
     {

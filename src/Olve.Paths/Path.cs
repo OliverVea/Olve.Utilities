@@ -12,15 +12,19 @@ public static class Path
     /// </summary>
     /// <param name="path">The string path to convert.</param>
     /// <returns>An instance of <see cref="IPurePath"/> representing the input path.</returns>
-    /// <exception cref="PlatformNotSupportedException">Thrown if the current platform is not Unix-based.</exception>
     public static IPurePath CreatePure(string path)
     {
-        if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
+        if (OperatingSystem.IsLinux())
         {
             return CreatePureUnixPath(path);
         }
 
-        return CreatePureWindowsPath(path);
+        if (OperatingSystem.IsWindows())
+        {
+            return CreatePureWindowsPath(path);
+        }
+        
+        return new UnsupportedPurePath();
     }
 
     /// <summary>
@@ -30,7 +34,6 @@ public static class Path
     /// <param name="platform">The platform type to use for path interpretation.</param>
     /// <returns>An instance of <see cref="IPurePath"/>.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the platform is <see cref="PathPlatform.None"/>.</exception>
-    /// <exception cref="PlatformNotSupportedException">Thrown if the platform is not supported.</exception>
     public static IPurePath CreatePure(string path, PathPlatform platform)
     {
         path = path.Trim();
@@ -39,8 +42,7 @@ public static class Path
         {
             PathPlatform.Unix => CreatePureUnixPath(path),
             PathPlatform.Windows => CreatePureWindowsPath(path),
-            PathPlatform.None => throw new ArgumentNullException(nameof(path)),
-            _ => throw new PlatformNotSupportedException("Only Unix paths are currently supported.")
+            _ => new UnsupportedPurePath()
         };
     }
 
@@ -50,15 +52,19 @@ public static class Path
     /// <param name="path">The string path to convert.</param>
     /// <param name="pathEnvironment">Optional environment to use for path resolution.</param>
     /// <returns>An instance of <see cref="IPath"/>.</returns>
-    /// <exception cref="PlatformNotSupportedException">Thrown if the platform is not supported.</exception>
     public static IPath Create(string path, IPathEnvironment? pathEnvironment = null)
     {
-        if (OperatingSystem.IsLinux() || OperatingSystem.IsMacOS())
+        if (OperatingSystem.IsLinux())
         {
             return CreateUnixPath(path, pathEnvironment);
         }
+
+        if (OperatingSystem.IsWindows())
+        {
+            return CreateWindowsPath(path, pathEnvironment);
+        }
         
-        return CreateWindowsPath(path, pathEnvironment);
+        return new UnsupportedPath();
     }
 
     /// <summary>
@@ -69,15 +75,13 @@ public static class Path
     /// <param name="pathEnvironment">Optional environment to use for path resolution.</param>
     /// <returns>An instance of <see cref="IPath"/>.</returns>
     /// <exception cref="ArgumentNullException">Thrown when the platform is <see cref="PathPlatform.None"/>.</exception>
-    /// <exception cref="PlatformNotSupportedException">Thrown if the platform is not supported.</exception>
     public static IPath Create(string path, PathPlatform platform, IPathEnvironment? pathEnvironment = null)
     {
         return platform switch
         {
             PathPlatform.Unix => CreateUnixPath(path, pathEnvironment),
             PathPlatform.Windows => CreateWindowsPath(path, pathEnvironment),
-            PathPlatform.None => throw new ArgumentNullException(nameof(path)),
-            _ => throw new PlatformNotSupportedException("Only Unix paths are currently supported.")
+            _ => new UnsupportedPath()
         };
     }
 
@@ -132,7 +136,6 @@ public static class Path
     /// Gets the current user's home directory as a pure path.
     /// </summary>
     /// <returns>An instance of <see cref="IPurePath"/> representing the home directory.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if the HOME environment variable is not set.</exception>
     public static IPurePath GetHomeDirectory()
     {
         var home = Environment.GetEnvironmentVariable("HOME");
