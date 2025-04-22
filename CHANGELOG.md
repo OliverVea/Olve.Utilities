@@ -1,3 +1,9 @@
+## v0.20.0 (2025-04-22)
+
+### Feat
+
+- adding support for windows in Olve.Paths
+
 ## v0.19.3 (2025-04-12)
 
 ### Fix
