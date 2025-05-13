@@ -68,6 +68,8 @@ public class PurePathTests
     [Arguments("file.txt", PathType.Stub)]
     [Arguments("folder/file.txt", PathType.Stub)]
     [Arguments("", PathType.Stub)]
+    [Arguments(".aws", PathType.Stub)]
+    [Arguments(".aws/s3/credentials.json", PathType.Stub)]
     public async Task PathType_IsEvaluatedCorrectly(string input, PathType expectedType)
     {
         // Arrange

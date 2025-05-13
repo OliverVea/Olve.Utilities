@@ -7,6 +7,8 @@ namespace Olve.Paths;
 [DebuggerDisplay("{Path}")]
 internal class UnixPurePath : IPurePath
 {
+    private const char Divider = '/';
+    
     private IReadOnlyList<string> Segments { get; }
 
     private UnixPurePath(IReadOnlyList<string> segments, PathType pathType)
@@ -14,14 +16,12 @@ internal class UnixPurePath : IPurePath
         Segments = segments;
         Type = pathType;
 
-        Path = pathType == PathType.Absolute
-            ? $"/{string.Join('/', Segments)}"
-            : string.Join('/', Segments);
+        Path = PathJoin(Segments, pathType == PathType.Absolute);
     }
 
     public static UnixPurePath FromPath(string path)
     {
-        var segments = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        var segments = path.Split(Divider, StringSplitOptions.RemoveEmptyEntries);
         var pathType = GetPathType(path);
 
         return new UnixPurePath(segments, pathType);
@@ -97,18 +97,27 @@ internal class UnixPurePath : IPurePath
     }
 
 
-    private const char AbsoluteStart = '/';
+    private const char AbsoluteStart = Divider;
     private const char RelativeStart = '.';
     
     private static PathType GetPathType(string path)
     {
         if (path.Length == 0) return PathType.Stub;
 
-        return path[0] switch
-        {
-            AbsoluteStart => PathType.Absolute,
-            RelativeStart => PathType.Relative,
-            _ => PathType.Stub
-        };
+        var firstDivider = path.IndexOf(Divider);
+        if (firstDivider == 0) return PathType.Absolute;
+        
+        if (firstDivider < 0) firstDivider = path.Length;
+
+        var pathIsRelative = path.Take(firstDivider).All(ch => ch == '.');
+        if (pathIsRelative) return PathType.Relative;
+
+        return PathType.Stub;
+    }
+
+    private static string PathJoin(IEnumerable<string> pathSegments, bool startWithDivider = false)
+    {
+        var joinedPath = string.Join(Divider, pathSegments);
+        return startWithDivider ? Divider + joinedPath : joinedPath;
     }
 }
