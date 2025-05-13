@@ -126,17 +126,27 @@ public static class Path
     /// Gets the current working directory as a pure path.
     /// </summary>
     /// <returns>An instance of <see cref="IPurePath"/> representing the current directory.</returns>
-    public static IPurePath GetCurrentDirectory()
+    public static IPurePath GetCurrentDirectoryPure()
     {
         var cwd = Directory.GetCurrentDirectory();
         return CreatePure(cwd);
     }
 
     /// <summary>
+    /// Gets the current working directory as a pure path.
+    /// </summary>
+    /// <returns>An instance of <see cref="IPath"/> representing the current directory.</returns>
+    public static IPath GetCurrentDirectory()
+    {
+        var cwd = Directory.GetCurrentDirectory();
+        return Create(cwd);
+    }
+
+    /// <summary>
     /// Gets the current user's home directory as a pure path.
     /// </summary>
     /// <returns>An instance of <see cref="IPurePath"/> representing the home directory.</returns>
-    public static IPurePath GetHomeDirectory()
+    public static IPurePath GetHomeDirectoryPure()
     {
         var home = Environment.GetEnvironmentVariable("HOME");
         if (string.IsNullOrEmpty(home))
@@ -145,6 +155,21 @@ public static class Path
         }
 
         return CreatePure(home);
+    }
+
+    /// <summary>
+    /// Gets the current user's home directory as a pure path.
+    /// </summary>
+    /// <returns>An instance of <see cref="IPath"/> representing the home directory.</returns>
+    public static IPath GetHomeDirectory()
+    {
+        var home = Environment.GetEnvironmentVariable("HOME");
+        if (string.IsNullOrEmpty(home))
+        {
+            throw new InvalidOperationException("Could not determine the HOME environment variable.");
+        }
+
+        return Create(home);
     }
 
     private static UnixPath CreateUnixPath(string path, IPathEnvironment? pathEnvironment)
