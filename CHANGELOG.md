@@ -1,3 +1,10 @@
+## v0.20.2 (2025-05-13)
+
+### Fix
+
+- `GetCurrentDirectory` and `GetHomeDirectory` now return `IPath` as expected. Added `IPurePath` variants.
+- path segments starting with '.' are no longer seen as relative paths automatically
+
 ## v0.20.1 (2025-04-22)
 
 ### Fix
