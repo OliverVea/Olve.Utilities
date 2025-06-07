@@ -1,3 +1,9 @@
+## v0.22.0 (2025-06-07)
+
+### Feat
+
+- add Result.Failed utility property
+
 ## v0.21.0 (2025-06-07)
 
 ### Feat
