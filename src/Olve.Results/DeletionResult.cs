@@ -21,6 +21,11 @@ public readonly struct DeletionResult
     public bool Succeeded { get; }
 
     /// <summary>
+    ///     Gets a value indicating whether the deletion failed.
+    /// </summary>
+    public bool Failed => !Succeeded;
+
+    /// <summary>
     ///     Gets a value indicating whether the deletion failed due to the entity not being found.
     /// </summary>
     public bool WasNotFound { get; }
