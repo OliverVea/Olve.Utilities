@@ -122,7 +122,7 @@ jobs:
         #if: steps.changed.outputs.any_changed == 'true'
         uses: ./.github/actions/dotnet-publish
         with:
-          project: ${{ matrix.project }}
+          project: ./src/${{ matrix.id }}
           package-name: ${{ matrix.id }}
           version: ${{ needs.bump-version.outputs.version }}
           nuget-api-key: ${{ secrets.NUGET_API_KEY }}

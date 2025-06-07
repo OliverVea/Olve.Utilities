@@ -10,7 +10,11 @@
         },
         {
           "src": "../src/Olve.Results",
-            "files": ["**/Olve.Results.csproj"]
+          "files": ["**/Olve.Results.csproj"]
+        },
+        {
+          "src": "../src/Olve.Results.TUnit",
+          "files": ["**/Olve.Results.TUnit.csproj"]
         },
         {
           "src": "../src/Olve.Operations",
