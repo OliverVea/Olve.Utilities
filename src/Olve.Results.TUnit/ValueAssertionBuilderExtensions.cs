@@ -52,7 +52,7 @@ public static class ValueAssertionBuilderExtensions
     /// </code>
     /// </example>
     public static InvokableValueAssertionBuilder<Result<T>> Failed<T>(this ValueAssertionBuilder<Result<T>> builder) =>
-        builder.HasMember(x => x.Succeeded).EqualTo(false);
+        builder.HasMember(x => x.Failed).EqualTo(true);
 
     /// <summary>
     /// Asserts that the result failed (<c>Succeeded == false</c>).
@@ -65,7 +65,7 @@ public static class ValueAssertionBuilderExtensions
     /// </code>
     /// </example>
     public static InvokableValueAssertionBuilder<Result> Failed(this ValueAssertionBuilder<Result> builder) =>
-        builder.HasMember(x => x.Succeeded).EqualTo(false);
+        builder.HasMember(x => x.Failed).EqualTo(true);
 
     /// <summary>
     /// Asserts that the result is successful, and unwraps its value for further assertions.

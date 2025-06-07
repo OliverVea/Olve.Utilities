@@ -20,6 +20,11 @@ public readonly partial struct Result
     public bool Succeeded { get; private init; }
 
     /// <summary>
+    ///     Gets a value indicating whether the operation failed.
+    /// </summary>
+    public bool Failed => !Succeeded;
+
+    /// <summary>
     ///     Gets the collection of problems associated with the result, if any.
     /// </summary>
     public ResultProblemCollection? Problems { get; }
