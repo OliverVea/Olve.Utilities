@@ -1,3 +1,13 @@
+## v0.21.0 (2025-06-07)
+
+### Feat
+
+- Add support for TUnit assertions for Result and Result<T> from Olve.Results
+
+### Fix
+
+- Olve.Results.TUnit is no longer seen as a test project
+
 ## v0.20.2 (2025-05-13)
 
 ### Fix
