@@ -121,6 +121,7 @@ public class PathTests
         if (!Path.TryGetAssemblyExecutable(out var assemblyPath))
         {
             Assert.Fail("Assembly executable path not found.");
+            return;
         }
 
         var path = assemblyPath.Parent / pathString;
@@ -142,6 +143,7 @@ public class PathTests
         if (!Path.TryGetAssemblyExecutable(out var assemblyPath))
         {
             Assert.Fail("Assembly executable path not found.");
+            return;
         }
 
         var path = assemblyPath.Parent / "testdata";

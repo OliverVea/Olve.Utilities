@@ -112,6 +112,8 @@ public class GlobTests
         if (!Path.TryGetAssemblyExecutable(out var assemblyPath))
         {
             Assert.Fail("Assembly executable path not found.");
+            matches = null;
+            return false;
         }
 
         var path = assemblyPath.Parent / "testdata";
