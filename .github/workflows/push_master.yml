@@ -103,15 +103,11 @@ jobs:
       matrix:
         include:
           - id: Olve.Utilities
-            project: ./src/Olve.Utilities
           - id: Olve.Results
-            project: ./src/Olve.Results
+          - id: Olve.Results.TUnit
           - id: Olve.Operations
-            project: ./src/Olve.Operations
           - id: Olve.Paths
-            project: ./src/Olve.Paths
           - id: Olve.Paths.Glob
-            project: ./src/Olve.Paths.Glob
 
     steps:
       - uses: actions/checkout@v4
@@ -120,7 +116,7 @@ jobs:
         id: changed
         uses: tj-actions/changed-files@v46  
         with:
-          files_from_source_file: ${{ matrix.project }}/workflow-triggers.txt
+          files_from_source_file: ./src/${{ matrix.id }}/workflow-triggers.txt
 
       - name: Publish ${{ matrix.id }} to NuGet
         #if: steps.changed.outputs.any_changed == 'true'
