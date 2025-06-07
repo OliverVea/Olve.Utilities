@@ -10,5 +10,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\Olve.Results\Olve.Results.csproj" />
+        <ProjectReference Include="..\..\src\Olve.Results.TUnit\Olve.Results.TUnit.csproj" />
     </ItemGroup>
 </Project>
