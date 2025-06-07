@@ -1,3 +1,9 @@
+## v0.22.2 (2025-06-07)
+
+### Fix
+
+- fixing broken nuget upload
+
 ## v0.22.1 (2025-06-07)
 
 ### Fix
