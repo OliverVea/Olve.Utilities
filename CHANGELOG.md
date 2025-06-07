@@ -1,3 +1,9 @@
+## v0.22.1 (2025-06-07)
+
+### Fix
+
+- Add DeletionResult.Failed utility method
+
 ## v0.22.0 (2025-06-07)
 
 ### Feat
