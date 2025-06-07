@@ -11,5 +11,6 @@
     <PackageVersion Include="Olve.SG.CopyProperties" Version="0.0.13-20241219.317a544" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
     <PackageVersion Include="TUnit" Version="0.19.64" />
+    <PackageVersion Include="TUnit.Assertions" Version="0.19.64" />
   </ItemGroup>
 </Project>

@@ -14,6 +14,7 @@
         <IsTrimmable>true</IsTrimmable>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <OutputType>Library</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -25,7 +26,7 @@
     </ItemGroup>
     
     <ItemGroup>
-        <PackageReference Include="TUnit" />
+        <PackageReference Include="TUnit.Assertions" />
     </ItemGroup>
 
 </Project>
