@@ -1,0 +1,14 @@
+provider: openai
+openai:
+  model: gpt-4o
+  temperature: 0.2
+review:
+  paths:
+    include:
+      - "src/**/*.cs"
+      - "src/**/*.ts"
+    exclude:
+      - "**/*.md"
+  prompt: >
+    You are a diligent code reviewer. Highlight bugs, suggest style improvements,
+    and note missing tests.
