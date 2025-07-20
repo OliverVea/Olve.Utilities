@@ -104,6 +104,7 @@ jobs:
         include:
           - id: Olve.Utilities
           - id: Olve.Results
+          - id: Olve.Results.Validation
           - id: Olve.Results.TUnit
           - id: Olve.Operations
           - id: Olve.Paths

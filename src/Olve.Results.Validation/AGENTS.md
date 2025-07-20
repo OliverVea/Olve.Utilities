@@ -1,7 +1,10 @@
 # Guidelines for Olve.Results.Validation
 
-This library contains small validator helpers built on top of **Olve.Results**.
-They provide fluent checks that return `Result` or can be implicitly converted to one.
+This library provides small validator helpers built on top of **Olve.Results**. Validators return `Result` and can be implicitly converted.
 
-Keep this document up to date when adding new validators or API changes.
-`workflow-triggers.txt` lists files that trigger NuGet publishing when modified.
+Current validators:
+- `StringValidator`
+- `NumericValidator<T>` with `IntValidator`, `FloatValidator`, `DoubleValidator` and `DecimalValidator`
+- `Validate` static class creates validators from values.
+
+Keep this document updated on API changes. `workflow-triggers.txt` lists files that trigger NuGet publishing when modified.

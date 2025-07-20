@@ -3,3 +3,7 @@ Olve.Results.Validation.BaseValidator<TValue, TValidator>
 Olve.Results.Validation.StringValidator
 Olve.Results.Validation.NumericValidator<T>
 Olve.Results.Validation.IntValidator
+Olve.Results.Validation.FloatValidator
+Olve.Results.Validation.DoubleValidator
+Olve.Results.Validation.DecimalValidator
+Olve.Results.Validation.Validate

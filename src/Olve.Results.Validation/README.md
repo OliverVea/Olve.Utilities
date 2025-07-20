@@ -2,4 +2,10 @@
 
 Lightweight validation helpers returning `Result` instances.
 
-These validators allow fluent checks and integrate with other `Olve.Results` APIs.
+Use `Validate` to create validators:
+
+```csharp
+var result = Validate.String(userName)
+    .IsNotNullOrWhiteSpace()
+    .MinLength(3);
+```

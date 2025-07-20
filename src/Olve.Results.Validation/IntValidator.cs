@@ -10,4 +10,18 @@ public class IntValidator(int value) : NumericValidator<int>(value)
     /// Gets the validator instance for chaining.
     /// </summary>
     protected override IntValidator Validator => this;
+
+    /// <summary>
+    /// Fails when the value is not even.
+    /// </summary>
+    /// <returns>The current validator.</returns>
+    public IntValidator IsEven() =>
+        FailIf(v => v % 2 != 0, () => new ResultProblem("Value must be even"));
+
+    /// <summary>
+    /// Fails when the value is not odd.
+    /// </summary>
+    /// <returns>The current validator.</returns>
+    public IntValidator IsOdd() =>
+        FailIf(v => v % 2 == 0, () => new ResultProblem("Value must be odd"));
 }
