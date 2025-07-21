@@ -17,6 +17,10 @@
           "files": ["**/Olve.Results.TUnit.csproj"]
         },
         {
+          "src": "../src/Olve.Results.Validation",
+          "files": ["**/Olve.Results.Validation.csproj"]
+        },
+        {
           "src": "../src/Olve.Operations",
           "files": ["**/Olve.Operations.csproj"]
         },

@@ -6,6 +6,8 @@
 - Analyzer packages (`Microsoft.CodeAnalysis.*Analyzers`) use version `4.14.0`.
 - The compiler version is locked by `Microsoft.Net.Compilers.Toolset` `4.13.0`.
 - README files from `src/**/README.md` are included in the documentation via DocFX `build.content`.
+- `Olve.Results.Validation` is part of the DocFX metadata `src` list. Add new projects there when needed.
+- Run `dotnet docfx metadata docs/docfx.json` when source projects change to keep YAML up to date.
 - Keep this file updated as packages or build tooling change.
 - To run tests: `dotnet test --verbosity normal --logger "console;verbosity=minimal"`
 
