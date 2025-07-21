@@ -1,3 +1,9 @@
+## v0.25.0 (2025-07-21)
+
+### Feat
+
+- **docs**: add project READMEs to site
+
 ## v0.24.1 (2025-07-21)
 
 ### Fix
