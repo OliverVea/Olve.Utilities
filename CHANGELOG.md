@@ -1,3 +1,10 @@
+## v0.24.0 (2025-07-21)
+
+### Feat
+
+- add Olve.Results.Validation
+- add BuilderGenerator package
+
 ## v0.23.0 (2025-07-05)
 
 ### Feat
