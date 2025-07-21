@@ -1,3 +1,43 @@
 items:
-- name: api
-  href: api/Olve.Utilities.Assertions.yml
+- name: Olve.Utilities
+  items:
+    - name: Overview
+      href: ../src/Olve.Utilities/README.md
+    - name: API
+      href: api/Olve.Utilities.Assertions.yml
+- name: Olve.Operations
+  items:
+    - name: Overview
+      href: ../src/Olve.Operations/README.md
+    - name: API
+      href: api/Olve.Operations.yml
+- name: Olve.Results
+  items:
+    - name: Overview
+      href: ../src/Olve.Results/README.md
+    - name: API
+      href: api/Olve.Results.yml
+- name: Olve.Results.TUnit
+  items:
+    - name: Overview
+      href: ../src/Olve.Results.TUnit/README.md
+    - name: API
+      href: api/Olve.Results.TUnit.yml
+- name: Olve.Paths
+  items:
+    - name: Overview
+      href: ../src/Olve.Paths/README.md
+    - name: API
+      href: api/Olve.Paths.yml
+- name: Olve.Paths.Glob
+  items:
+    - name: Overview
+      href: ../src/Olve.Paths.Glob/README.md
+    - name: API
+      href: api/Olve.Paths.Glob.yml
+- name: Olve.SG.CopyProperties
+  items:
+    - name: Overview
+      href: ../src/source-generators/Olve.SG.CopyProperties/README.md
+    - name: API
+      href: api/Olve.SG.CopyProperties.yml
