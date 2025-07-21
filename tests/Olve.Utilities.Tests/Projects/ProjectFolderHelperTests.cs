@@ -19,15 +19,9 @@ public class ProjectFolderHelperTests
         // Assert
         if (Environment.OSVersion.Platform == PlatformID.Unix)
         {
-            await Assert.That(rootFolder).StartsWith("/home/");
-            var elements = rootFolder.Split("/").Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
-            await Assert.That(elements.Length).IsEqualTo(6);
-            await Assert.That(elements[0]).IsEqualTo("home");
-            await Assert.That(elements[1]).IsEqualTo(Environment.UserName);
-            await Assert.That(elements[2]).IsEqualTo(".local");
-            await Assert.That(elements[3]).IsEqualTo("share");
-            await Assert.That(elements[4]).IsEqualTo(organization);
-            await Assert.That(elements[5]).IsEqualTo(projectName);
+            var userHome = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            var expected = System.IO.Path.Combine(userHome, ".local", "share", organization, projectName);
+            await Assert.That(rootFolder).IsEqualTo(expected);
         }
     }
 }
