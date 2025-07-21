@@ -6,3 +6,4 @@
 - Analyzer packages (`Microsoft.CodeAnalysis.*Analyzers`) use version `4.14.0`.
 - The compiler version is locked by `Microsoft.Net.Compilers.Toolset` `4.13.0`.
 - Keep this file updated as packages or build tooling change.
+- To run tests: `dotnet test --verbosity normal --logger "console;verbosity=minimal"`
