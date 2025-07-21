@@ -1,3 +1,9 @@
+## v0.24.1 (2025-07-21)
+
+### Fix
+
+- align Roslyn packages with SDK
+
 ## v0.24.0 (2025-07-21)
 
 ### Feat
