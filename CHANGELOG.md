@@ -1,3 +1,252 @@
+## v0.26.0 (2025-07-21)
+
+### Feat
+
+- **docs**: add project READMEs to site
+
+## v0.24.1 (2025-07-21)
+
+### Fix
+
+- align Roslyn packages with SDK
+
+## v0.24.0 (2025-07-21)
+
+### Feat
+
+- add Olve.Results.Validation
+- add BuilderGenerator package
+
+## v0.23.0 (2025-07-05)
+
+### Feat
+
+- add FixedSizeQueue
+
+## v0.22.2 (2025-06-07)
+
+### Fix
+
+- fixing broken nuget upload
+
+## v0.22.1 (2025-06-07)
+
+### Fix
+
+- Add DeletionResult.Failed utility method
+
+## v0.22.0 (2025-06-07)
+
+### Feat
+
+- add Result.Failed utility property
+
+## v0.21.0 (2025-06-07)
+
+### Feat
+
+- Add support for TUnit assertions for Result and Result<T> from Olve.Results
+
+### Fix
+
+- Olve.Results.TUnit is no longer seen as a test project
+
+## v0.20.2 (2025-05-13)
+
+### Fix
+
+- `GetCurrentDirectory` and `GetHomeDirectory` now return `IPath` as expected. Added `IPurePath` variants.
+- path segments starting with '.' are no longer seen as relative paths automatically
+
+## v0.20.1 (2025-04-22)
+
+### Refactor
+
+- PureUnixPath -> UnixPurePath
+- making internal PureUnixPath ctor into a static method to fit PureWindowsPath
+
+## v0.20.0 (2025-04-22)
+
+### Feat
+
+- adding support for windows in Olve.Paths
+
+### Fix
+
+- improving support on unsupported platforms
+
+## v0.19.3 (2025-04-12)
+
+### Fix
+
+- force redeploy
+
+## v0.19.2 (2025-04-12)
+
+### Fix
+
+- force redeploy
+
+## v0.19.1 (2025-04-12)
+
+### Fix
+
+- bumped dependencies
+
+## v0.19.0 (2025-04-12)
+
+### Feat
+
+- added directed graph and typed id classes
+
+## v0.18.0 (2025-04-11)
+
+### Feat
+
+- using `Olve.Paths` in `Olve.Utilities`
+- using `Olve.Paths` for `ProblemOriginInformation`
+
+## v0.17.2 (2025-04-08)
+
+### Fix
+
+- setting workflow triggers
+
+## v0.17.1 (2025-04-08)
+
+### Fix
+
+- bump
+
+## v0.17.0 (2025-04-08)
+
+### Feat
+
+- globbing
+- refactored purepath and path to be interfaces
+
+### Fix
+
+- actually builds
+
+## v0.16.0 (2025-04-06)
+
+### Feat
+
+- adding Olve.Paths
+
+## v0.15.0 (2025-03-27)
+
+### Feat
+
+- **Olve.Results**: added `Result.IfProblem`
+- adding static configurable default values to `ResultProblem.Tags`, `ResultProblem.Severity` and `ResultProblem.Source`
+
+## v0.14.0 (2025-03-19)
+
+### Feat
+
+- adding `Result.Chain` to `Result<T>` and renaming the previous operation `Result.Concat` for clarity
+
+### Refactor
+
+- fixing file name
+
+## v0.13.0 (2025-03-18)
+
+### Feat
+
+- **Olve.Result**: allow chaining `Result` using the static `Result.Chain` method
+
+## v0.12.1 (2025-03-18)
+
+### Fix
+
+- removing `RequiresPreviewFeature` attributes
+
+## v0.12.0 (2025-03-18)
+
+### Feat
+
+- adding `Result.Try<TException>` and `Result.Try<TValue, TException>`
+
+## v0.11.0 (2025-03-18)
+
+### Feat
+
+- added more brief `ResultProblemCollection.Prepend` shorthand
+
+### Fix
+
+- fixed broken ci/cp pipeline
+
+## v0.10.1 (2025-03-14)
+
+### Fix
+
+- fixing incorrect `NotNullWhen` boolean value for `TryPickProblems`
+
+## v0.10.0 (2025-03-14)
+
+### Feat
+
+- adding missing `IEnumerable<Result>.TryPickProblems` for non-generic `Result`
+
+### Perf
+
+- added `[NotNullWhen]`, lazy initialization and allowed nullable results to `problems` and `values` in `TryPickProblems`
+
+## v0.9.0 (2025-03-08)
+
+### Feat
+
+- adding `DeletionResult` for deletion operations
+- adding `Success` class
+
+### Fix
+
+- specifying `problems` parameter in `Result.Success` static methods
+
+## v0.8.0 (2025-03-05)
+
+### Feat
+
+- adding `ResultProblem.ToDebugString` with tests
+- adding stacktrace information in `ResultProblem.OriginInformation`
+
+### Fix
+
+- setting .net version in CI to equal 9.0.100
+- setting .net version in CI to equal 9.0.100
+
+## v0.7.1 (2025-02-03)
+
+### Fix
+
+- improving support for linux in `ProjectFolderHelper.cs`
+
+## v0.7.0 (2025-02-01)
+
+### Feat
+
+- adding `PickRandom`  and `PickRandomOrDefault` extension methods to `IEnumerable<T>`
+
+### Refactor
+
+- renamed unused lambda argument to `_`
+
+## v0.6.0 (2025-01-31)
+
+### Feat
+
+- adding `GetOrAdd` and `TryUpdate` `Dictionary` extension methods
+
+## v0.5.1 (2025-01-30)
+
+### Fix
+
+- tagging `TryAsSet` and `TryAsReadOnlySet` output with `NotNullWhen(true)`
+
 ## v0.25.0 (2025-07-21)
 
 ### Feat
