@@ -4,17 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Utilities", "src\Olve.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "repo", "repo", "{853B9358-CBF7-4B29-8824-9169C5D640AC}"
 	ProjectSection(SolutionItems) = preProject
-		LICENSE = LICENSE
-		README.md = README.md
-		Directory.Build.props = Directory.Build.props
-		Directory.Packages.props = Directory.Packages.props
 		.gitignore = .gitignore
-		CONTRIBUTING.md = CONTRIBUTING.md
-		.github\workflows\push_master.yml = .github\workflows\push_master.yml
-		.config\dotnet-tools.json = .config\dotnet-tools.json
 		.cz.yaml = .cz.yaml
-		CHANGELOG.md = CHANGELOG.md
-		docs\docfx.json = docs\docfx.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6AE53E7D-3FEB-459A-B821-AD2F5D52DBE4}"
@@ -49,6 +40,27 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Paths.Tests", "tests\Olve.Paths.Tests\Olve.Paths.Tests.csproj", "{A8185FAF-61A2-4729-826D-0E59F736E30D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Results.TUnit", "src\Olve.Results.TUnit\Olve.Results.TUnit.csproj", "{E080C81A-A1A1-4B9E-A695-DB66D005D5E4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github-actions", "github-actions", "{BE150CE0-284D-4B85-86B0-EFF7AD6957B6}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\push_master.yml = .github\workflows\push_master.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dotnet", "dotnet", "{0E1E16B8-F222-4708-994E-D6114C6F1241}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		.config\dotnet-tools.json = .config\dotnet-tools.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{89F968A6-701C-43B2-82D6-D57D649AB5D7}"
+	ProjectSection(SolutionItems) = preProject
+		docs\docfx.json = docs\docfx.json
+		CHANGELOG.md = CHANGELOG.md
+		CONTRIBUTING.md = CONTRIBUTING.md
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -124,5 +136,8 @@ Global
 		{A8185FAF-61A2-4729-826D-0E59F736E30D} = {70431A57-4F24-4AF1-9EB9-85B5D9840E9B}
 		{E2ACCD87-535B-42E7-8878-FC28DD02C94E} = {6AE53E7D-3FEB-459A-B821-AD2F5D52DBE4}
 		{E080C81A-A1A1-4B9E-A695-DB66D005D5E4} = {6AE53E7D-3FEB-459A-B821-AD2F5D52DBE4}
+		{BE150CE0-284D-4B85-86B0-EFF7AD6957B6} = {853B9358-CBF7-4B29-8824-9169C5D640AC}
+		{0E1E16B8-F222-4708-994E-D6114C6F1241} = {853B9358-CBF7-4B29-8824-9169C5D640AC}
+		{89F968A6-701C-43B2-82D6-D57D649AB5D7} = {853B9358-CBF7-4B29-8824-9169C5D640AC}
 	EndGlobalSection
 EndGlobal
