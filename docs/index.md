@@ -15,7 +15,5 @@ Please go to the [shipped](https://github.com/OliverVea/Olve.Utilities/blob/mast
 ## Projects
 
 - **[Olve.Utilities](https://github.com/OliverVea/Olve.Utilities/tree/master/src/Olve.Utilities):** The main package containing various utilities. Please see the [API documentation](api/Olve.Utilities.Assertions.Assert.yml) for more details.
-- **[Olve.SG.CopyProperties](https://github.com/OliverVea/Olve.Utilities/tree/master/src/source-generators/Olve.SG.CopyProperties):** A source generator that can be used to copy properties from one type to another.
 - **[Olve.Utilities.Tests](https://github.com/OliverVea/Olve.Utilities/tree/master/tests/Olve.Utilities.Tests):** Tests for the `Olve.Utilities` package.
 - **[Olve.Utilities.Trimming](https://github.com/OliverVea/Olve.Utilities/tree/master/tests/Olve.Utilities.Trimming):** Project verifying that trimming of `Olve.Utilities` was successful.
-- **[Olve.SG.CopyProperties.Test](https://github.com/OliverVea/Olve.Utilities/tree/master/tests/Olve.SG.CopyProperties.Test):** Tests for the `Olve.SG.CopyProperties` package.

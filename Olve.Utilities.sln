@@ -16,15 +16,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Utilities.Tests", "tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Utilities.Trimming", "tests\Olve.Utilities.Trimming\Olve.Utilities.Trimming.csproj", "{7BBDB4BF-3D24-4DF5-BE1B-AF86731E2845}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "source-generators", "source-generators", "{35348DB8-8CDD-4F53-950B-D01EFCA42023}"
-	ProjectSection(SolutionItems) = preProject
-		src\source-generators\Directory.Build.props = src\source-generators\Directory.Build.props
-	EndProjectSection
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.SG.CopyProperties", "src\source-generators\Olve.SG.CopyProperties\Olve.SG.CopyProperties.csproj", "{EAA0C1B8-AB17-4CF6-9687-9D1C1F74FBE7}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.SG.CopyProperties.Test", "tests\Olve.SG.CopyProperties.Test\Olve.SG.CopyProperties.Test.csproj", "{E5F16317-1D2F-4C9A-A8DF-4D3C0269F0C2}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Results", "src\Olve.Results\Olve.Results.csproj", "{225581DA-1773-4457-BE85-6A34A3B54DBF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Operations", "src\Olve.Operations\Olve.Operations.csproj", "{93A7D4B5-B068-4BCE-88A5-8029F103B7A6}"
@@ -48,7 +39,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github-actions", "github-ac
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dotnet", "dotnet", "{0E1E16B8-F222-4708-994E-D6114C6F1241}"
 	ProjectSection(SolutionItems) = preProject
-		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 		.config\dotnet-tools.json = .config\dotnet-tools.json
 	EndProjectSection
@@ -81,14 +71,6 @@ Global
 		{7BBDB4BF-3D24-4DF5-BE1B-AF86731E2845}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7BBDB4BF-3D24-4DF5-BE1B-AF86731E2845}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7BBDB4BF-3D24-4DF5-BE1B-AF86731E2845}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EAA0C1B8-AB17-4CF6-9687-9D1C1F74FBE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EAA0C1B8-AB17-4CF6-9687-9D1C1F74FBE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EAA0C1B8-AB17-4CF6-9687-9D1C1F74FBE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EAA0C1B8-AB17-4CF6-9687-9D1C1F74FBE7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E5F16317-1D2F-4C9A-A8DF-4D3C0269F0C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E5F16317-1D2F-4C9A-A8DF-4D3C0269F0C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E5F16317-1D2F-4C9A-A8DF-4D3C0269F0C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E5F16317-1D2F-4C9A-A8DF-4D3C0269F0C2}.Release|Any CPU.Build.0 = Release|Any CPU
 		{225581DA-1773-4457-BE85-6A34A3B54DBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{225581DA-1773-4457-BE85-6A34A3B54DBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{225581DA-1773-4457-BE85-6A34A3B54DBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -126,9 +108,6 @@ Global
 		{28330216-7401-427E-B8BA-8D1466DA6F9F} = {6AE53E7D-3FEB-459A-B821-AD2F5D52DBE4}
 		{B516E9B3-6410-4EFA-8238-2521C94808B9} = {70431A57-4F24-4AF1-9EB9-85B5D9840E9B}
 		{7BBDB4BF-3D24-4DF5-BE1B-AF86731E2845} = {70431A57-4F24-4AF1-9EB9-85B5D9840E9B}
-		{35348DB8-8CDD-4F53-950B-D01EFCA42023} = {6AE53E7D-3FEB-459A-B821-AD2F5D52DBE4}
-		{EAA0C1B8-AB17-4CF6-9687-9D1C1F74FBE7} = {35348DB8-8CDD-4F53-950B-D01EFCA42023}
-		{E5F16317-1D2F-4C9A-A8DF-4D3C0269F0C2} = {70431A57-4F24-4AF1-9EB9-85B5D9840E9B}
 		{225581DA-1773-4457-BE85-6A34A3B54DBF} = {6AE53E7D-3FEB-459A-B821-AD2F5D52DBE4}
 		{93A7D4B5-B068-4BCE-88A5-8029F103B7A6} = {6AE53E7D-3FEB-459A-B821-AD2F5D52DBE4}
 		{C3A4411A-4C68-4729-B062-A74C0431B693} = {70431A57-4F24-4AF1-9EB9-85B5D9840E9B}

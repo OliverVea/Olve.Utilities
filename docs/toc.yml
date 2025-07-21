@@ -35,9 +35,3 @@ items:
       href: ../src/Olve.Paths.Glob/README.md
     - name: API
       href: api/Olve.Paths.Glob.yml
-- name: Olve.SG.CopyProperties
-  items:
-    - name: Overview
-      href: ../src/source-generators/Olve.SG.CopyProperties/README.md
-    - name: API
-      href: api/Olve.SG.CopyProperties.yml
