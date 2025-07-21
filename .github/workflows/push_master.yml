@@ -131,7 +131,6 @@ jobs:
     name: Publish DocFX to GitHub Pages
     needs:
       - bump-version
-    if: "${{ needs.bump-version.outputs.changed == 'true' }}"
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
