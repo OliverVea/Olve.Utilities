@@ -5,6 +5,8 @@ on:
     branches:
       - master
 
+env:
+  DOTNET_VERSION: 9.0.300
 permissions:
   actions: read
   pages: write
@@ -25,7 +27,7 @@ jobs:
       - name: Install .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.300
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - run: dotnet restore
       - run: dotnet tool restore
@@ -42,7 +44,7 @@ jobs:
       - name: Install .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.300
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - run: dotnet restore
       - run: dotnet tool restore
@@ -142,7 +144,7 @@ jobs:
       - name: Install .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 9.0.100
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: .NET restore
         shell: bash
