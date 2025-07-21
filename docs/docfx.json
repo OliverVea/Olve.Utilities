@@ -27,6 +27,10 @@
         {
           "src": "../src/Olve.Paths.Glob",
             "files": ["**/Olve.Paths.Glob.csproj"]
+        },
+        {
+          "src": "../src/source-generators/Olve.SG.CopyProperties",
+            "files": ["**/Olve.SG.CopyProperties.csproj"]
         }
       ],
       "dest": "api"
