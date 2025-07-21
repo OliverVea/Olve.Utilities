@@ -9,7 +9,7 @@
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.5" />
     <PackageVersion Include="Microsoft.Extensions.FileSystemGlobbing"  Version="9.0.5" />
     <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="17.13.1" />
-    <PackageVersion Include="BuilderGenerator" Version="3.0.0" />
+    <PackageVersion Include="BuilderGenerator" Version="3.0.5" />
     <PackageVersion Include="OneOf" Version="3.0.271" />
     <PackageVersion Include="TUnit" Version="0.25.6" />
     <PackageVersion Include="TUnit.Assertions" Version="0.25.6" />
