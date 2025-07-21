@@ -24,3 +24,5 @@ var path = Path.Create("/home/user/documents");
 var glob = path.Glob("*.txt"); // Matches all .txt files in the directory
 var allFiles = path.Glob("**/*"); // Matches all files in the directory and subdirectories
 ```
+
+See the [API documentation](https://olivervea.github.io/Olve.Utilities/api/) for more details.
