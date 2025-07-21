@@ -34,3 +34,5 @@ var folderName = path.Name; // documents
 var newPath = path / "newfile.txt"; // /home/user/documents/newfile.txt
 var exists = newPath.Exists(); // Check if the file exists
 ```
+
+See the [API documentation](https://olivervea.github.io/Olve.Utilities/api/) for more details.
