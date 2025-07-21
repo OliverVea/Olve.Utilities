@@ -1,0 +1,3 @@
+/.github/**
+src/Olve.Results.Validation/**
+src/Olve.Results/**
