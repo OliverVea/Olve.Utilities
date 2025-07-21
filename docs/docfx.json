@@ -45,6 +45,12 @@
         "exclude": [
           "_site/**"
         ]
+      },
+      {
+        "src": "../",
+        "files": [
+          "src/**/README.md"
+        ]
       }
     ],
     "resource": [
