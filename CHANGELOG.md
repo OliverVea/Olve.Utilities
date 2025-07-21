@@ -1,3 +1,10 @@
+## v0.26.1 (2025-07-21)
+
+### Fix
+
+- use BuilderGenerator 3.0.5
+- downgrade ask version requirement
+
 ## v0.26.0 (2025-07-21)
 
 ### Feat
