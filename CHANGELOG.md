@@ -1,3 +1,9 @@
+## v0.26.2 (2025-07-21)
+
+### Refactor
+
+- remove copy properties generator
+
 ## v0.26.1 (2025-07-21)
 
 ### Fix
