@@ -6,7 +6,7 @@
     <PackageReference Include="TUnit" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Olve.Results.Validation\Olve.Results.Validation.csproj" />
+    <ProjectReference Include="..\..\src\Olve.Validation\Olve.Validation.csproj" />
     <ProjectReference Include="..\..\src\Olve.Results\Olve.Results.csproj" />
     <ProjectReference Include="..\..\src\Olve.Results.TUnit\Olve.Results.TUnit.csproj" />
   </ItemGroup>

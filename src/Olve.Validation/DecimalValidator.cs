@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace Olve.Results.Validation;
+namespace Olve.Validation;
 
 /// <summary>
 /// Validator for <see cref="decimal"/> values.
