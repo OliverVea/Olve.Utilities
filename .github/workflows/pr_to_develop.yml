@@ -1,0 +1,46 @@
+name: PR to develop
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+env:
+  DOTNET_VERSION: 9.0.300
+
+jobs:
+  test-ubuntu:
+    name: Run tests (Ubuntu)
+    if: github.head_ref != 'master'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - run: dotnet restore
+      - run: dotnet tool restore
+      - run: dotnet build --no-restore -c Release /p:Version="1.0.0"
+      - run: dotnet test --no-restore --no-build -c Release
+
+  test-windows:
+    name: Run tests (Windows)
+    if: github.head_ref != 'master'
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - run: dotnet restore
+      - run: dotnet tool restore
+      - run: dotnet build --no-restore -c Release /p:Version="1.0.0"
+      - run: dotnet test --no-restore --no-build -c Release
