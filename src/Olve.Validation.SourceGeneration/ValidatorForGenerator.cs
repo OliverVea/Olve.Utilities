@@ -2,12 +2,12 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Olve.Validation.SourceGenerators;
+namespace Olve.Validation.SourceGeneration;
 
 [Generator]
 public sealed class ValidatorForGenerator : IIncrementalGenerator
 {
-    private const string AttributeName = "Olve.Validation.SourceGeneration.ValidatorForAttribute";
+    private const string AttributeName = "Olve.Validation.ValidatorForAttribute";
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -84,7 +84,6 @@ public sealed class ValidatorForGenerator : IIncrementalGenerator
         var ns = symbol.ContainingNamespace.IsGlobalNamespace ? null : symbol.ContainingNamespace.ToDisplayString();
         var sb = new StringBuilder();
         sb.AppendLine("using Olve.Validation;");
-        sb.AppendLine("using Olve.Validation.SourceGeneration;");
         if (ns is not null)
         {
             sb.Append("namespace ").Append(ns).AppendLine();

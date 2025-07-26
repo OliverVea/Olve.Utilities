@@ -10,8 +10,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\Olve.Utilities\Olve.Utilities.csproj"/>
-        <ProjectReference Include="..\..\src\Olve.Validation.SourceGeneration\Olve.Validation.SourceGeneration.csproj" />
-        <ProjectReference Include="..\..\src\Olve.Validation.SourceGenerators\Olve.Validation.SourceGenerators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+        <ProjectReference Include="..\..\src\Olve.Validation.SourceGeneration\Olve.Validation.SourceGeneration.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     </ItemGroup>
 
 </Project>

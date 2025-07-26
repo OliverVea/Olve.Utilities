@@ -1,6 +1,6 @@
 using Olve.Results;
 
-namespace Olve.Validation.SourceGeneration;
+namespace Olve.Validation;
 
 /// <summary>
 /// Describes validation rules for a type.
