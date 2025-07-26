@@ -11,7 +11,8 @@ public class MyDto
 [ValidatorFor(typeof(MyDto))]
 public partial class MyDtoValidator
 {
-    private static IValidator<string> GetNameValidator() => new StringValidator();
+    private static IValidator<string> GetNameValidator() => new StringValidator()
+        .IsNotNullOrWhiteSpace();
     
     private static IValidator<int> GetAgeValidator() => new IntValidator()
         .IsPositive()
