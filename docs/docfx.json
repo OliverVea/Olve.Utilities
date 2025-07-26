@@ -29,6 +29,12 @@
           ]
         },
         {
+          "src": "../src/Olve.Validation.SourceGeneration",
+          "files": [
+            "**/Olve.Validation.SourceGeneration.csproj"
+          ]
+        },
+        {
           "src": "../src/Olve.Operations",
           "files": [
             "**/Olve.Operations.csproj"
