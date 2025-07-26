@@ -1,0 +1,49 @@
+using Olve.Results.TUnit;
+
+namespace Olve.Validation.Tests;
+
+public class NumericStructValidatorTests
+{
+    [Test]
+    [Arguments(5, 2, true)]
+    [Arguments(1, 2, false)]
+    public async Task IsGreaterThan_Various(int value, int limit, bool expected)
+    {
+        var result = new IntValidator()
+            .IsGreaterThan(limit)
+            .Validate(value);
+
+        await (expected
+            ? Assert.That(result).Succeeded()
+            : Assert.That(result).Failed());
+    }
+
+    [Test]
+    [Arguments(0, 0, true)]
+    [Arguments(1, 0, false)]
+    public async Task IsLessThanOrEqualTo_Various(int value, int limit, bool expected)
+    {
+        var result = new IntValidator()
+            .IsLessThanOrEqualTo(limit)
+            .Validate(value);
+
+        await (expected
+            ? Assert.That(result).Succeeded()
+            : Assert.That(result).Failed());
+    }
+
+    [Test]
+    [Arguments(5, 1, 10, true)]
+    [Arguments(0, 1, 10, false)]
+    [Arguments(11, 1, 10, false)]
+    public async Task IsBetween_Various(int value, int min, int max, bool expected)
+    {
+        var result = new IntValidator()
+            .IsBetween(min, max)
+            .Validate(value);
+
+        await (expected
+            ? Assert.That(result).Succeeded()
+            : Assert.That(result).Failed());
+    }
+}
