@@ -1,0 +1,42 @@
+using BuilderGenerator;
+using Olve.Results;
+using Olve.Utilities.Builders;
+using Olve.Validation;
+using Olve.Validation.SourceGeneration;
+
+namespace Olve.Utilities.Tests.Builders;
+
+public class Dto
+{
+    public string Name { get; init; } = string.Empty;
+    public int Age { get; init; }
+}
+
+[BuilderFor(typeof(Dto))]
+public partial class DtoBuilder : IBuilder<Dto>;
+
+[ValidatorFor(typeof(Dto))]
+public partial class DtoValidator
+{
+    private static IValidator<string> GetNameValidator() => new StringValidator();
+    
+    private static IValidator<int> GetAgeValidator() => new IntValidator()
+        .IsPositive()
+        .IsGreaterThanOrEqualTo(18)
+        .WithProblem(_ => new ResultProblem("Age must be at least 18."));
+}
+
+public class BuilderExtensionsTest
+{
+    [Test]
+    public async Task Test()
+    {
+        DtoBuilder builder = new();
+        DtoValidator validator = new();
+        
+        var result = builder.ValidateAndBuild(validator);
+
+        await Assert.That(result.Failed).IsTrue();
+    }
+
+}

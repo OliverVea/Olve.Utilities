@@ -33,5 +33,6 @@
     <ItemGroup>
         <ProjectReference Include="..\Olve.Paths\Olve.Paths.csproj" />
         <ProjectReference Include="..\Olve.Results\Olve.Results.csproj" />
+        <ProjectReference Include="..\Olve.Validation\Olve.Validation.csproj" />
     </ItemGroup>
 </Project>
