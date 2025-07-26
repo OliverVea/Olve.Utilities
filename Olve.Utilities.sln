@@ -53,9 +53,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{89F968A6-7
 		AGENTS.md = AGENTS.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Results.Validation", "src\Olve.Results.Validation\Olve.Results.Validation.csproj", "{9ACA80B2-58CB-437B-B31B-E31FA4685FD0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Validation", "src\Olve.Validation\Olve.Validation.csproj", "{9ACA80B2-58CB-437B-B31B-E31FA4685FD0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Results.Validation.Tests", "tests\Olve.Results.Validation.Tests\Olve.Results.Validation.Tests.csproj", "{8AAFF085-81DF-4653-98F3-CC356B442D50}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Validation.Tests", "tests\Olve.Validation.Tests\Olve.Validation.Tests.csproj", "{8AAFF085-81DF-4653-98F3-CC356B442D50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

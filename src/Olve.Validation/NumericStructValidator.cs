@@ -1,6 +1,7 @@
 using System.Numerics;
+using Olve.Results;
 
-namespace Olve.Results.Validation;
+namespace Olve.Validation;
 
 /// <summary>
 /// Validator for numeric values implementing <see cref="INumber{TSelf}"/>.

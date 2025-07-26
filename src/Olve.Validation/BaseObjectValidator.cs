@@ -1,4 +1,6 @@
-namespace Olve.Results.Validation;
+using Olve.Results;
+
+namespace Olve.Validation;
 
     /// <summary>
     /// Provides validation methods for reference types.
@@ -14,7 +16,7 @@ namespace Olve.Results.Validation;
     /// </summary>
     /// <returns>The current validator instance.</returns>
     public TValidator IsNotNull() => FailIf(
-        value => value != null, 
+        value => value == null, 
         _ => new ResultProblem("Value was null"));
 
     /// <summary>

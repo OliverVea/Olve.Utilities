@@ -1,6 +1,7 @@
+using Olve.Results;
 using Olve.Results.TUnit;
 
-namespace Olve.Results.Validation.Tests;
+namespace Olve.Validation.Tests;
 
 public class StringValidatorTests
 {
@@ -163,7 +164,7 @@ public class StringValidatorTests
         await Assert.That(failure)
             .FailedAndProblemCollection()
             .HasSingleItem()
-            .HasMember(x => x.Single().Message)
+            .HasMember(x => x.Single().ToBriefString())
             .EqualTo("Value was not one of the allowed values: [a, b]");
     }
 
@@ -191,7 +192,7 @@ public class StringValidatorTests
         await Assert.That(result)
             .FailedAndProblemCollection()
             .HasSingleItem()
-            .HasMember(x => x.Single().Message)
+            .HasMember(x => x.Single().ToBriefString())
             .EqualTo("Custom max");
     }
 
@@ -209,18 +210,18 @@ public class StringValidatorTests
     }
 
     [Test]
-    public void MinLength_Negative_ThrowsArgumentException()
+    public async Task MinLength_Negative_ThrowsArgumentException()
     {
         var ex = Assert.Throws<ArgumentException>(() => new StringValidator().MinLength(-1));
-        Assert.That(ex.ParamName).EqualTo("minLength");
-        Assert.That(ex.Message).StartsWith("minLength must be non-negative");
+        await Assert.That(ex.ParamName).IsEqualTo("minLength");
+        await Assert.That(ex.Message).StartsWith("minLength must be non-negative");
     }
 
     [Test]
-    public void MaxLength_Negative_ThrowsArgumentException()
+    public async Task MaxLength_Negative_ThrowsArgumentException()
     {
         var ex = Assert.Throws<ArgumentException>(() => new StringValidator().MaxLength(-1));
-        Assert.That(ex.ParamName).EqualTo("maxLength");
-        Assert.That(ex.Message).StartsWith("maxLength must be non-negative");
+        await Assert.That(ex.ParamName).IsEqualTo("maxLength");
+        await Assert.That(ex.Message).StartsWith("maxLength must be non-negative");
     }
 }
