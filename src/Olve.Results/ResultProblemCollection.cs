@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.Versioning;
 
 namespace Olve.Results;
 

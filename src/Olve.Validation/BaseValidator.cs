@@ -7,7 +7,7 @@ namespace Olve.Validation;
 /// </summary>
 /// <typeparam name="TValidator">Concrete validator type.</typeparam>
 /// <typeparam name="TValue"></typeparam>
-public abstract class BaseValidator<TValue, TValidator>
+public abstract class BaseValidator<TValue, TValidator> : IValidator<TValue>
     where TValidator : BaseValidator<TValue, TValidator>
 {
     private record ValidationRule(Func<TValue, bool> Condition, Func<TValue, ResultProblem> ProblemFactory)
