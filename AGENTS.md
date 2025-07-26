@@ -11,6 +11,7 @@
 - Run `dotnet docfx metadata docs/docfx.json` when source projects change to keep YAML up to date.
 - Keep this file updated as packages or build tooling change.
 - To run tests: `dotnet test --verbosity normal --logger "console;verbosity=minimal"`
+- `push_master.yml` pushes version bumps from `master` to `develop`.
 
 ## Examples of XML Documentation in Source Code
 
