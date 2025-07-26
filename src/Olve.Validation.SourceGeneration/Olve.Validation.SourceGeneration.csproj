@@ -1,12 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <Title>Olve.Validation.SourceGeneration</Title>
+    <Authors>Oliver Vea</Authors>
+    <Description>Utilities that expose Olve.Validation.SourceGenerators transitively.</Description>
+    <Copyright>Oliver Vea</Copyright>
+    <PackageProjectUrl>https://github.com/OliverVea/Olve.Utilities/src/Olve.Validation.SourceGeneration</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/OliverVea/Olve.Utilities</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <IsTrimmable>true</IsTrimmable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TargetFramework>net9.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Olve.Validation\Olve.Validation.csproj" />
-    <ProjectReference Include="..\Olve.Validation.SourceGenerators\Olve.Validation.SourceGenerators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\Olve.Validation.SourceGenerators\Olve.Validation.SourceGenerators.csproj"
+                      ReferenceOutputAssembly="false"
+                      OutputItemType="Analyzer"
+                      PrivateAssets="all"
+                      IncludeAssets="analyzers;build;buildtransitive" />
   </ItemGroup>
 </Project>
