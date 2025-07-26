@@ -2,13 +2,13 @@ using Olve.Results;
 
 namespace Olve.Validation;
 
-    /// <summary>
-    /// Provides validation methods for reference types.
-    /// </summary>
-    /// <typeparam name="TValue">The reference type being validated.</typeparam>
-    /// <typeparam name="TValidator">The type of the validator implementing this class.</typeparam>
-    public abstract class BaseObjectValidator<TValue, TValidator> : BaseValidator<TValue?, TValidator>
-    where TValue :  class
+/// <summary>
+/// Provides validation methods for reference types.
+/// </summary>
+/// <typeparam name="TValue">The reference type being validated.</typeparam>
+/// <typeparam name="TValidator">The type of the validator implementing this class.</typeparam>
+public abstract class BaseObjectValidator<TValue, TValidator> : BaseValidator<TValue?, TValidator>
+    where TValue : class
     where TValidator : BaseObjectValidator<TValue, TValidator>
 {
     /// <summary>
