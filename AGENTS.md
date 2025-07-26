@@ -13,6 +13,7 @@
 - Keep this file updated as packages or build tooling change.
 - Version bump commits on `master` are automatically pushed to `develop` via the workflow.
 - To run tests: `dotnet test --verbosity normal --logger "console;verbosity=minimal"`
+- Source generator tests compile in-memory using `Microsoft.CodeAnalysis.CSharp`.
 
 ## Examples of XML Documentation in Source Code
 
