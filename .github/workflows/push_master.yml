@@ -11,6 +11,7 @@ permissions:
   actions: read
   pages: write
   id-token: write
+  contents: write
 
 concurrency:
   group: "deploy"
@@ -95,17 +96,16 @@ jobs:
         run: echo "::notice::id=${{ steps.release.outputs.id }}"
 
   push-to-develop:
-    name: Copy bump commit to develop
+    name: Sync develop branch
     needs:
       - bump-version
     if: "${{ needs.bump-version.outputs.changed == 'true' }}"
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Push to develop
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ github.token }}
+      - name: Push bump commit to develop
         run: git push origin HEAD:develop
 
   publish-packages:
