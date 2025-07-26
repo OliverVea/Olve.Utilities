@@ -57,9 +57,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Validation", "src\Olve
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Validation.Tests", "tests\Olve.Validation.Tests\Olve.Validation.Tests.csproj", "{8AAFF085-81DF-4653-98F3-CC356B442D50}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Validation.SourceGenerators", "src\Olve.Validation.SourceGenerators\Olve.Validation.SourceGenerators.csproj", "{D4C6C15F-F5A9-40BE-8676-5451C33C5ED9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Validation.SourceGeneration", "src\Olve.Validation.SourceGeneration\Olve.Validation.SourceGeneration.csproj", "{C5AB4149-8C77-4D86-BFED-133019EC139C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Validation.SourceGeneration", "src\Olve.Validation.SourceGeneration\Olve.Validation.SourceGeneration.csproj", "{D4C6C15F-F5A9-40BE-8676-5451C33C5ED9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Olve.Validation.SourceGeneration.Tests", "tests\Olve.Validation.SourceGeneration.Tests\Olve.Validation.SourceGeneration.Tests.csproj", "{D07B88BA-EFFB-4870-A8FC-ED0237CDF0E3}"
 EndProject
@@ -241,18 +239,6 @@ Global
 		{D4C6C15F-F5A9-40BE-8676-5451C33C5ED9}.Release|x64.Build.0 = Release|Any CPU
 		{D4C6C15F-F5A9-40BE-8676-5451C33C5ED9}.Release|x86.ActiveCfg = Release|Any CPU
 		{D4C6C15F-F5A9-40BE-8676-5451C33C5ED9}.Release|x86.Build.0 = Release|Any CPU
-		{C5AB4149-8C77-4D86-BFED-133019EC139C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C5AB4149-8C77-4D86-BFED-133019EC139C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C5AB4149-8C77-4D86-BFED-133019EC139C}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{C5AB4149-8C77-4D86-BFED-133019EC139C}.Debug|x64.Build.0 = Debug|Any CPU
-		{C5AB4149-8C77-4D86-BFED-133019EC139C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{C5AB4149-8C77-4D86-BFED-133019EC139C}.Debug|x86.Build.0 = Debug|Any CPU
-		{C5AB4149-8C77-4D86-BFED-133019EC139C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C5AB4149-8C77-4D86-BFED-133019EC139C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C5AB4149-8C77-4D86-BFED-133019EC139C}.Release|x64.ActiveCfg = Release|Any CPU
-		{C5AB4149-8C77-4D86-BFED-133019EC139C}.Release|x64.Build.0 = Release|Any CPU
-		{C5AB4149-8C77-4D86-BFED-133019EC139C}.Release|x86.ActiveCfg = Release|Any CPU
-		{C5AB4149-8C77-4D86-BFED-133019EC139C}.Release|x86.Build.0 = Release|Any CPU
 		{D07B88BA-EFFB-4870-A8FC-ED0237CDF0E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D07B88BA-EFFB-4870-A8FC-ED0237CDF0E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D07B88BA-EFFB-4870-A8FC-ED0237CDF0E3}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -287,7 +273,6 @@ Global
 		{9ACA80B2-58CB-437B-B31B-E31FA4685FD0} = {6AE53E7D-3FEB-459A-B821-AD2F5D52DBE4}
 		{8AAFF085-81DF-4653-98F3-CC356B442D50} = {70431A57-4F24-4AF1-9EB9-85B5D9840E9B}
 		{D4C6C15F-F5A9-40BE-8676-5451C33C5ED9} = {6AE53E7D-3FEB-459A-B821-AD2F5D52DBE4}
-		{C5AB4149-8C77-4D86-BFED-133019EC139C} = {6AE53E7D-3FEB-459A-B821-AD2F5D52DBE4}
 		{D07B88BA-EFFB-4870-A8FC-ED0237CDF0E3} = {70431A57-4F24-4AF1-9EB9-85B5D9840E9B}
 	EndGlobalSection
 EndGlobal

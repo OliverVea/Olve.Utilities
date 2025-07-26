@@ -6,8 +6,7 @@
     <PackageReference Include="TUnit" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Olve.Validation.SourceGeneration\Olve.Validation.SourceGeneration.csproj" />
-    <ProjectReference Include="..\..\src\Olve.Validation.SourceGenerators\Olve.Validation.SourceGenerators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+    <ProjectReference Include="..\..\src\Olve.Validation.SourceGeneration\Olve.Validation.SourceGeneration.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
     <ProjectReference Include="..\..\src\Olve.Validation\Olve.Validation.csproj" />
     <ProjectReference Include="..\..\src\Olve.Results.TUnit\Olve.Results.TUnit.csproj" />
   </ItemGroup>
