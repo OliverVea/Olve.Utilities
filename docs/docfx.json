@@ -45,6 +45,12 @@
           "files": [
             "**/Olve.Paths.Glob.csproj"
           ]
+        },
+        {
+          "src": "../src/Olve.Validation.SourceGeneration",
+          "files": [
+            "**/Olve.Validation.SourceGeneration.csproj"
+          ]
         }
       ],
       "dest": "api"

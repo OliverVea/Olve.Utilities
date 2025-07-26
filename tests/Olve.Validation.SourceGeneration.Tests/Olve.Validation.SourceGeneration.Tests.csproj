@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Olve.Validation.SourceGeneration\Olve.Validation.SourceGeneration.csproj" />
+    <ProjectReference Include="..\..\src\Olve.Validation.SourceGenerators\Olve.Validation.SourceGenerators.csproj" ReferenceOutputAssembly="false" OutputItemType="Analyzer" PrivateAssets="all" />
+    <ProjectReference Include="..\..\src\Olve.Results\Olve.Results.csproj" />
+    <ProjectReference Include="..\..\src\Olve.Validation\Olve.Validation.csproj" />
+    <ProjectReference Include="..\..\src\Olve.Results.TUnit\Olve.Results.TUnit.csproj" />
+  </ItemGroup>
+</Project>
