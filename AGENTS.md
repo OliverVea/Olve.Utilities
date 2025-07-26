@@ -14,6 +14,7 @@
 - Version bump commits on `master` are automatically pushed to `develop` via the workflow.
 - To run tests: `dotnet test --verbosity normal --logger "console;verbosity=minimal"`
 - Pull requests to `develop` run Ubuntu and Windows tests. Failures are informational only.
+- Pull requests to `master` build and run tests on Ubuntu and Windows. Merging is blocked if any job fails.
 - Source generator tests compile in-memory using `Microsoft.CodeAnalysis.CSharp`.
 
 ## Examples of XML Documentation in Source Code
