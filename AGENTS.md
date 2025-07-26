@@ -10,6 +10,7 @@
 - `Olve.Validation.SourceGeneration` includes `Olve.Validation.SourceGenerators` as a transitive analyzer so consumers get the generator automatically.
 - Run `dotnet docfx metadata docs/docfx.json` when source projects change to keep YAML up to date.
 - Keep this file updated as packages or build tooling change.
+- Version bump commits on `master` are automatically pushed to `develop` via the workflow.
 - To run tests: `dotnet test --verbosity normal --logger "console;verbosity=minimal"`
 
 ## Examples of XML Documentation in Source Code
