@@ -94,6 +94,20 @@ jobs:
         if: "${{ steps.version-changed.outputs.changed == 'true' }}"
         run: echo "::notice::id=${{ steps.release.outputs.id }}"
 
+  push-to-develop:
+    name: Copy bump commit to develop
+    needs:
+      - bump-version
+    if: "${{ needs.bump-version.outputs.changed == 'true' }}"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Push to develop
+        run: git push origin HEAD:develop
+
   publish-packages:
     name: Publish NuGet Packages in Parallel
     needs:
