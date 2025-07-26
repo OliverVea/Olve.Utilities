@@ -14,8 +14,8 @@ public sealed class ValidatorForGenerator : IIncrementalGenerator
         var symbols = context.SyntaxProvider
             .ForAttributeWithMetadataName(
                 AttributeName,
-                static (n, _) => true,
-                static (ctx, _) => ctx.TargetSymbol is INamedTypeSymbol t ? t : null);
+                static (_, _) => true,
+                static (ctx, _) => ctx.TargetSymbol as INamedTypeSymbol);
 
         var combined = symbols.Combine(context.CompilationProvider);
 
@@ -61,6 +61,22 @@ public sealed class ValidatorForGenerator : IIncrementalGenerator
 
             mappings.Add((propertyName, method.Name));
         }
+        
+        foreach (var prop in props)
+        {
+            if (mappings.Any(m => m.Property == prop.Key))
+                continue;
+
+            context.ReportDiagnostic(Diagnostic.Create(
+                new DiagnosticDescriptor(
+                    "OVSG001",
+                    "Missing Validator Method",
+                    $"Expected method name: 'Get{prop.Key}Validator' in '{symbol.Name}' for property '{prop.Key}'.",
+                    "Usage",
+                    DiagnosticSeverity.Error,
+                    isEnabledByDefault: true),
+                symbol.Locations.FirstOrDefault() ?? Location.None));
+        }
 
         if (mappings.Count == 0)
             return;
@@ -68,6 +84,7 @@ public sealed class ValidatorForGenerator : IIncrementalGenerator
         var ns = symbol.ContainingNamespace.IsGlobalNamespace ? null : symbol.ContainingNamespace.ToDisplayString();
         var sb = new StringBuilder();
         sb.AppendLine("using Olve.Validation;");
+        sb.AppendLine("using Olve.Validation.SourceGeneration;");
         if (ns is not null)
         {
             sb.Append("namespace ").Append(ns).AppendLine();
@@ -75,7 +92,8 @@ public sealed class ValidatorForGenerator : IIncrementalGenerator
         }
 
         var indent = ns is null ? string.Empty : "    ";
-        sb.Append(indent).Append("partial class ").Append(symbol.Name).AppendLine();
+        sb.Append(indent).Append("partial class ").Append(symbol.Name).Append(" : ValidatorFor<").Append(targetType.ToDisplayString()).Append(">");
+        sb.AppendLine();
         sb.Append(indent).AppendLine("{");
         sb.Append(indent).Append("    protected override void Configure(ValidationDescriptor<")
           .Append(targetType.ToDisplayString()).AppendLine("> descriptor)");
