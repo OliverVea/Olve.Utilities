@@ -1,0 +1,34 @@
+using Olve.Results.TUnit;
+
+namespace Olve.Validation.Tests;
+
+public class DecimalValidatorTests
+{
+    [Test]
+    [Arguments(1.0, true)]
+    [Arguments(-1.0, false)]
+    public async Task IsPositive_Various(double value, bool expected)
+    {
+        var validator = new DecimalValidator<double>()
+            .IsPositive();
+        var result = validator.Validate(value);
+
+        await (expected
+            ? Assert.That(result).Succeeded()
+            : Assert.That(result).Failed());
+    }
+
+    [Test]
+    [Arguments(0.0, true)]
+    [Arguments(1.0, false)]
+    public async Task IsZero_Various(double value, bool expected)
+    {
+        var validator = new DecimalValidator<double>()
+            .IsZero();
+        var result = validator.Validate(value);
+
+        await (expected
+            ? Assert.That(result).Succeeded()
+            : Assert.That(result).Failed());
+    }
+}
