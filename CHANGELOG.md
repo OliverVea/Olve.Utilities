@@ -1,3 +1,16 @@
+## v0.27.0 (2025-07-27)
+
+### Feat
+
+- publish source generation analyzer
+- add ValidatorFor source generator
+
+### Fix
+
+- correct default value validation
+- improving ValidatorFor ergonomics
+- renaming Olve.Results.Validation to Olve.Validation
+
 ## v0.26.2 (2025-07-21)
 
 ### Refactor
