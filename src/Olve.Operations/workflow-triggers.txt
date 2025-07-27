@@ -1,3 +1,0 @@
-/.github/**
-src/Olve.Operations/**
-src/Olve.Results/**
