@@ -16,6 +16,8 @@
 - Pull requests to `develop` run Ubuntu and Windows tests. Failures are informational only.
 - Pull requests to `master` build and run tests on Ubuntu and Windows. Merging is blocked if any job fails.
 - Source generator tests compile in-memory using `Microsoft.CodeAnalysis.CSharp`.
+- `build/main.py` defines a Dagger pipeline that restores, builds, tests, packs
+  and generates DocFX using the `.NET` version from `DOTNET_VERSION`.
 
 ## Examples of XML Documentation in Source Code
 
