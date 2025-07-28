@@ -1,3 +1,9 @@
+## v0.28.0 (2025-07-28)
+
+### Feat
+
+- add dagger build pipeline
+
 ## v0.27.0 (2025-07-27)
 
 ### Feat
