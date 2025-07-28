@@ -10,6 +10,8 @@
 - `Olve.Validation.SourceGeneration` is documented via DocFX to cover the generator.
 - `Olve.Validation.SourceGeneration` includes `Olve.Validation.SourceGenerators` as a transitive analyzer so consumers get the generator automatically.
 - Run `dotnet docfx metadata docs/docfx.json` when source projects change to keep YAML up to date.
+- `Olve.Tools.ProjectDependencyGraph` is a global CLI tool found under `src/tools`.
+- Its package references `Spectre.Console.Cli`, `Microsoft.Build` and `Microsoft.Build.Graph` via centralized versions.
 - Keep this file updated as packages or build tooling change.
 - Version bump commits on `master` are automatically pushed to `develop` via the workflow.
 - To run tests: `dotnet test --verbosity normal --logger "console;verbosity=minimal"`
