@@ -57,3 +57,29 @@ jobs:
             dotnet pack --no-build -c Release $proj
           }
         shell: pwsh
+
+  dry-run-publish-packages:
+    name: Dry Run Publish NuGet Packages in Parallel
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - id: Olve.Utilities
+          - id: Olve.Results
+          - id: Olve.Results.TUnit
+          - id: Olve.Operations
+          - id: Olve.Validation
+          - id: Olve.Validation.SourceGeneration
+          - id: Olve.Paths
+          - id: Olve.Paths.Glob
+    steps:
+      - uses: actions/checkout@v4
+      - name: Dry run publish ${{ matrix.id }} to NuGet
+        uses: ./.github/actions/dotnet-publish
+        with:
+          project: ./src/${{ matrix.id }}
+          package-name: ${{ matrix.id }}
+          version: "1.0.0"
+          nuget-api-key: ""
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dry-run: "true"
