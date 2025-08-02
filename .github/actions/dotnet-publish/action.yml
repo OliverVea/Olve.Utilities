@@ -53,4 +53,5 @@ runs:
       shell: bash
       run: |
         echo "::notice::Dry run"
-        ls -l nupkgs/${{ inputs.package-name }} | echo "::notice::nupkgs/${{ inputs.package-name }}"
+        ls -l nupkgs/${{ inputs.package-name }}
+        echo "::notice::nupkgs/${{ inputs.package-name }}"
