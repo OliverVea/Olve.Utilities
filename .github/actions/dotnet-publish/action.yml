@@ -18,13 +18,16 @@ inputs:
   nuget-api-key:
     description: 'The NuGet API key'
     required: true
+  dotnet-version:
+    description: 'The dotnet version to use'
+    required: true
 runs:
   using: "composite"
   steps:
     - name: Install .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.0.100
+        dotnet-version: ${{ inputs.dotnet-version }}
 
     - name: .NET restore
       shell: bash
