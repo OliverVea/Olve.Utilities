@@ -143,6 +143,7 @@ jobs:
           package-name: ${{ matrix.id }}
           version: ${{ needs.bump-version.outputs.version }}
           nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+          dotnet-version: ${{ env.DOTNET_VERSION }}
 
   publish-docs:
     name: Publish DocFX to GitHub Pages
