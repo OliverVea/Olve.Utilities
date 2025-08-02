@@ -27,8 +27,11 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
+      - name: Clean bin/ and obj/ folders
+        run: find . -type d \( -name bin -o -name obj \) -exec rm -rf {} +
       - run: dotnet restore
       - run: dotnet tool restore
+      - run: dotnet clean -c Release
       - run: dotnet build --no-restore -c Release /p:Version="1.0.0"
       - run: dotnet test --no-restore --no-build -c Release
       - name: Dry run NuGet pack (all src projects)
@@ -48,6 +51,10 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       - run: dotnet restore
       - run: dotnet tool restore
+      - name: Clean bin/ and obj/ folders
+        run: Get-ChildItem -Path . -Include bin,obj -Recurse | Remove-Item -Recurse -Force
+        shell: pwsh
+      - run: dotnet clean -c Release
       - run: dotnet build --no-restore -c Release /p:Version="1.0.0"
       - run: dotnet test --no-restore --no-build -c Release
       - name: Dry run NuGet pack (all src projects)
