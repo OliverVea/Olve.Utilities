@@ -1,3 +1,9 @@
+## v0.28.1 (2025-08-02)
+
+### Fix
+
+- reverting package versions
+
 ## v0.28.0 (2025-07-28)
 
 ### Feat
