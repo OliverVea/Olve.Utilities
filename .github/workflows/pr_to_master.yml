@@ -15,6 +15,7 @@ env:
     src/Olve.Results.TUnit/Olve.Results.TUnit.csproj
     src/Olve.Utilities/Olve.Utilities.csproj
     src/Olve.Validation/Olve.Validation.csproj
+    src/Olve.MinimalApi/Olve.MinimalApi.csproj
 
 jobs:
   test-ubuntu:
@@ -68,6 +69,7 @@ jobs:
           - id: Olve.Results.TUnit
           - id: Olve.Operations
           - id: Olve.Validation
+          - id: Olve.MinimalApi
           - id: Olve.Paths
           - id: Olve.Paths.Glob
     steps:

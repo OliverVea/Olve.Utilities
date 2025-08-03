@@ -110,6 +110,7 @@ jobs:
           - id: Olve.Results.TUnit
           - id: Olve.Operations
           - id: Olve.Validation
+          - id: Olve.MinimalApi
           - id: Olve.Paths
           - id: Olve.Paths.Glob
 
