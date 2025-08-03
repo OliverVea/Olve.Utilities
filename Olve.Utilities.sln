@@ -36,6 +36,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github-actions", "github-ac
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\push_master.yml = .github\workflows\push_master.yml
 		.github\actions\dotnet-publish\action.yml = .github\actions\dotnet-publish\action.yml
+		.github\workflows\pr_to_master.yml = .github\workflows\pr_to_master.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dotnet", "dotnet", "{0E1E16B8-F222-4708-994E-D6114C6F1241}"
