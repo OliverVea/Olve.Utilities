@@ -15,7 +15,6 @@ env:
     src/Olve.Results.TUnit/Olve.Results.TUnit.csproj
     src/Olve.Utilities/Olve.Utilities.csproj
     src/Olve.Validation/Olve.Validation.csproj
-    src/Olve.Validation.SourceGeneration/Olve.Validation.SourceGeneration.csproj
 
 jobs:
   test-ubuntu:
