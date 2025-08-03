@@ -9,7 +9,7 @@ public class BaseStructValidatorTests
     private class TestIntValidator : BaseStructValidator<int, TestIntValidator>
     {
         protected override TestIntValidator Validator => this;
-        public TestIntValidator NotDefault() => IsNotDefault();
+        public TestIntValidator NotDefault() => CannotBeDefault();
     }
 
     [Test]

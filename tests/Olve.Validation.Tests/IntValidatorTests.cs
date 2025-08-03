@@ -12,7 +12,7 @@ public class IntValidatorTests
     public async Task IsEven_Various(int value, bool expected)
     {
         var result = new IntValidator()
-            .IsEven()
+            .MustBeEven()
             .Validate(value);
 
         await (expected
@@ -35,7 +35,7 @@ public class IntValidatorTests
     public async Task IsOdd_Various(int value, bool expected)
     {
         var result = new IntValidator()
-            .IsOdd()
+            .MustBeOdd()
             .Validate(value);
 
         await (expected

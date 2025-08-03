@@ -14,7 +14,7 @@ public class StringValidatorTests
     public async Task IsNotNullOrEmpty_Tests(string? value, bool expectedSuccess)
     {
         var result = new StringValidator()
-            .IsNotNullOrEmpty()
+            .CannotBeNullOrEmpty()
             .Validate(value);
 
         await (expectedSuccess
@@ -30,7 +30,7 @@ public class StringValidatorTests
     public async Task IsNotNullOrWhiteSpace_Tests(string? value, bool expectedSuccess)
     {
         var result = new StringValidator()
-            .IsNotNullOrWhiteSpace()
+            .CannotBeNullOrWhiteSpace()
             .Validate(value);
 
         await (expectedSuccess
@@ -42,7 +42,7 @@ public class StringValidatorTests
     public async Task WithProblem_ReplacesMessage()
     {
         var result = new StringValidator()
-            .IsNotNullOrWhiteSpace()
+            .CannotBeNullOrWhiteSpace()
             .WithProblem(_ => new ResultProblem("custom message"))
             .Validate(null);
 
@@ -65,7 +65,7 @@ public class StringValidatorTests
     [Arguments(7, "abcdef", false)]
     public async Task MinLength_Various(int minLength, string? value, bool expectedSuccess)
     {
-        var validator = new StringValidator().MinLength(minLength);
+        var validator = new StringValidator().MustHaveMinLength(minLength);
         var result = validator.Validate(value);
 
         await (expectedSuccess
@@ -94,7 +94,7 @@ public class StringValidatorTests
     [Arguments(7, "abcdefgh", false)]
     public async Task MaxLength_Various(int maxLength, string? value, bool expectedSuccess)
     {
-        var validator = new StringValidator().MaxLength(maxLength);
+        var validator = new StringValidator().MustHaveMaxLength(maxLength);
         var result = validator.Validate(value);
 
         await (expectedSuccess
@@ -114,7 +114,7 @@ public class StringValidatorTests
     [Test]
     public async Task IsNotNullOrEmpty_DefaultProblemMessage()
     {
-        var result = new StringValidator().IsNotNullOrEmpty().Validate("");
+        var result = new StringValidator().CannotBeNullOrEmpty().Validate("");
         await Assert.That(result)
             .FailedAndProblemCollection()
             .HasSingleItem()
@@ -125,7 +125,7 @@ public class StringValidatorTests
     [Test]
     public async Task IsNotNullOrWhiteSpace_DefaultProblemMessage()
     {
-        var result = new StringValidator().IsNotNullOrWhiteSpace().Validate(" ");
+        var result = new StringValidator().CannotBeNullOrWhiteSpace().Validate(" ");
         await Assert.That(result)
             .FailedAndProblemCollection()
             .HasSingleItem()
@@ -138,7 +138,7 @@ public class StringValidatorTests
     [Arguments("value", true)]
     public async Task IsNotNull_Various(string? value, bool expectedSuccess)
     {
-        var result = new StringValidator().IsNotNull().Validate(value);
+        var result = new StringValidator().CannotBeNull().Validate(value);
         await (expectedSuccess
             ? Assert.That(result).Succeeded()
             : Assert.That(result).Failed());
@@ -153,10 +153,10 @@ public class StringValidatorTests
     }
 
     [Test]
-    public async Task IsNotOneOf_Various()
+    public async Task MustBeOneOf_Various()
     {
         string[] allowed = ["a", "b"];
-        var validator = new StringValidator().IsNotOneOf(allowed);
+        var validator = new StringValidator().MustBeOneOf(allowed);
 
         var success = validator.Validate("a");
         await Assert.That(success).Succeeded();
@@ -170,10 +170,27 @@ public class StringValidatorTests
     }
 
     [Test]
+    public async Task CannotBeOneOf_Various()
+    {
+        string[] allowed = ["a", "b"];
+        var validator = new StringValidator().CannotBeOneOf(allowed);
+
+        var failure = validator.Validate("a");
+        await Assert.That(failure)
+            .FailedAndProblemCollection()
+            .HasSingleItem()
+            .HasMember(x => x.Single().ToBriefString())
+            .EqualTo("Value was one of the disallowed values: [a, b]");
+
+        var success = validator.Validate("c");
+        await Assert.That(success).Succeeded();
+    }
+
+    [Test]
     public async Task MinLength_WithProblemOverride()
     {
         var result = new StringValidator()
-            .MinLength(3)
+            .MustHaveMinLength(3)
             .WithProblem(_ => new ResultProblem("Custom min"))
             .Validate("a");
         await Assert.That(result)
@@ -187,7 +204,7 @@ public class StringValidatorTests
     public async Task MaxLength_WithProblemOverride()
     {
         var result = new StringValidator()
-            .MaxLength(2)
+            .MustHaveMaxLength(2)
             .WithProblem(_ => new ResultProblem("Custom max"))
             .Validate("abc");
         await Assert.That(result)
@@ -201,8 +218,8 @@ public class StringValidatorTests
     public async Task Chaining_MultipleRules_CollectsAllProblems()
     {
         var result = new StringValidator()
-            .IsNotNullOrWhiteSpace()
-            .MinLength(2)
+            .CannotBeNullOrWhiteSpace()
+            .MustHaveMinLength(2)
             .Validate("");
         await Assert.That(result)
             .FailedAndProblemCollection()
@@ -213,7 +230,7 @@ public class StringValidatorTests
     [Test]
     public async Task MinLength_Negative_ThrowsArgumentException()
     {
-        var ex = Assert.Throws<ArgumentException>(() => new StringValidator().MinLength(-1));
+        var ex = Assert.Throws<ArgumentException>(() => new StringValidator().MustHaveMinLength(-1));
         await Assert.That(ex.ParamName).IsEqualTo("minLength");
         await Assert.That(ex.Message).StartsWith("minLength must be non-negative");
     }
@@ -221,7 +238,7 @@ public class StringValidatorTests
     [Test]
     public async Task MaxLength_Negative_ThrowsArgumentException()
     {
-        var ex = Assert.Throws<ArgumentException>(() => new StringValidator().MaxLength(-1));
+        var ex = Assert.Throws<ArgumentException>(() => new StringValidator().MustHaveMaxLength(-1));
         await Assert.That(ex.ParamName).IsEqualTo("maxLength");
         await Assert.That(ex.Message).StartsWith("maxLength must be non-negative");
     }

@@ -15,7 +15,7 @@ public abstract class BaseObjectValidator<TValue, TValidator> : BaseValidator<TV
     /// Fails validation if the value is null.
     /// </summary>
     /// <returns>The current validator instance.</returns>
-    public TValidator IsNotNull() => FailIf(
+    public TValidator CannotBeNull() => FailIf(
         value => value == null, 
         _ => new ResultProblem("Value was null"));
 
@@ -24,7 +24,17 @@ public abstract class BaseObjectValidator<TValue, TValidator> : BaseValidator<TV
     /// </summary>
     /// <param name="values">The collection of allowed values.</param>
     /// <returns>The current validator instance.</returns>
-    public TValidator IsNotOneOf(ICollection<TValue?> values) => FailIf(
+    public TValidator MustBeOneOf(ICollection<TValue?> values) => FailIf(
         value => !values.Contains(value), 
         _ => new ResultProblem("Value was not one of the allowed values: [{0}]", string.Join(", ", values)));
+    
+
+    /// <summary>
+    /// Fails validation if the value is one of the disallowed values.
+    /// </summary>
+    /// <param name="values">The collection of disallowed values.</param>
+    /// <returns>The current validator instance.</returns>
+    public TValidator CannotBeOneOf(params ICollection<TValue?> values) => FailIf(
+        values.Contains, 
+        _ => new ResultProblem("Value was one of the disallowed values: [{0}]", string.Join(", ", values)));
 }

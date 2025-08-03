@@ -14,7 +14,14 @@ public abstract class BaseStructValidator<TValue, TValidator> : BaseValidator<TV
     /// <summary>
     /// Fails validation if the value is the default for its type.
     /// </summary>
-    protected TValidator IsNotDefault() => FailIf(
+    protected TValidator CannotBeDefault() => FailIf(
         value => value.Equals(default(TValue)),
+        _ => new ResultProblem("Value was default"));
+    
+    /// <summary>
+    /// Fails validation if the value is not the default for its type.
+    /// </summary>
+    protected TValidator MustBeDefault() => FailIf(
+        value => !value.Equals(default(TValue)),
         _ => new ResultProblem("Value was default"));
 }

@@ -23,8 +23,8 @@ public class DtoValidator : IValidator<Dto>
     private static IValidator<string> GetNameValidator() => new StringValidator();
     
     private static IValidator<int> GetAgeValidator() => new IntValidator()
-        .IsPositive()
-        .IsGreaterThanOrEqualTo(18)
+        .MustBePositive()
+        .MustBeGreaterThanOrEqualTo(18)
         .WithProblem(_ => new ResultProblem("Age must be at least 18."));
     
     public Result Validate(Dto value)

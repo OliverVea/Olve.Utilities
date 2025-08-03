@@ -11,7 +11,7 @@ public class DecimalValidatorTests
     public async Task IsPositive_Various(double value, bool expected)
     {
         var validator = new DecimalValidator<double>()
-            .IsPositive();
+            .MustBePositive();
         var result = validator.Validate(value);
 
         await (expected
@@ -25,7 +25,7 @@ public class DecimalValidatorTests
     public async Task IsZero_Various(double value, bool expected)
     {
         var validator = new DecimalValidator<double>()
-            .IsZero();
+            .MustBeZero();
         var result = validator.Validate(value);
 
         await (expected

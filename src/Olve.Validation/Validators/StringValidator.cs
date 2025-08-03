@@ -17,14 +17,14 @@ public class StringValidator : BaseObjectValidator<string, StringValidator>
     /// Fails when the string is null or empty.
     /// </summary>
     /// <returns>The current validator.</returns>
-    public StringValidator IsNotNullOrEmpty() =>
+    public StringValidator CannotBeNullOrEmpty() =>
         FailIf(string.IsNullOrEmpty, _ => new ResultProblem("Value is null or empty"));
 
     /// <summary>
     /// Fails when the string is null or white space.
     /// </summary>
     /// <returns>The current validator.</returns>
-    public StringValidator IsNotNullOrWhiteSpace() =>
+    public StringValidator CannotBeNullOrWhiteSpace() =>
         FailIf(string.IsNullOrWhiteSpace, _ => new ResultProblem("Value is null or white space"));
 
     /// <summary>
@@ -32,7 +32,7 @@ public class StringValidator : BaseObjectValidator<string, StringValidator>
     /// </summary>
     /// <param name="minLength">Minimum length allowed.</param>
     /// <returns>The current validator.</returns>
-    public StringValidator MinLength(int minLength)
+    public StringValidator MustHaveMinLength(int minLength)
     {
         if (minLength < 0) throw new ArgumentException("minLength must be non-negative", nameof(minLength));
         return FailIf(v => v?.Length < minLength, _ => new ResultProblem("Value must be at least '{0}' characters", minLength));
@@ -43,7 +43,7 @@ public class StringValidator : BaseObjectValidator<string, StringValidator>
     /// </summary>
     /// <param name="maxLength">Maximum length allowed.</param>
     /// <returns>The current validator.</returns>
-    public StringValidator MaxLength(int maxLength)
+    public StringValidator MustHaveMaxLength(int maxLength)
     {
         if (maxLength < 0) throw new ArgumentException("maxLength must be non-negative", nameof(maxLength));
         return FailIf(v => v?.Length > maxLength, _ => new ResultProblem("Value must be at most '{0}' characters", maxLength));

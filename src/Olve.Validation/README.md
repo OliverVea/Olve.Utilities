@@ -6,6 +6,6 @@ Use `Validate` to create validators:
 
 ```csharp
 var result = Validate.That(userName)
-    .IsNotNullOrWhiteSpace()
-    .MinLength(3);
+    .CannotBeNullOrWhiteSpace()
+    .MustHaveMinLength(3);
 ```
