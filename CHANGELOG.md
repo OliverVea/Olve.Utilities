@@ -1,3 +1,10 @@
+## v0.29.1 (2025-08-03)
+
+### Fix
+
+- **Olve.Validation**: added `params` to MustBeOneOf
+- **Olve.Validation**: renamed validation methods to be more human readable
+
 ## v0.29.0 (2025-08-03)
 
 ### Feat
