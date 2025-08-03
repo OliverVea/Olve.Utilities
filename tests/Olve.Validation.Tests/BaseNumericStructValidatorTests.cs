@@ -11,7 +11,7 @@ public class BaseNumericStructValidatorTests
     public async Task IsGreaterThan_Various(int value, int limit, bool expected)
     {
         var result = new IntValidator()
-            .IsGreaterThan(limit)
+            .MustBeGreaterThan(limit)
             .Validate(value);
 
         await (expected
@@ -25,7 +25,7 @@ public class BaseNumericStructValidatorTests
     public async Task IsLessThanOrEqualTo_Various(int value, int limit, bool expected)
     {
         var result = new IntValidator()
-            .IsLessThanOrEqualTo(limit)
+            .MustBeLessThanOrEqualTo(limit)
             .Validate(value);
 
         await (expected
@@ -40,7 +40,7 @@ public class BaseNumericStructValidatorTests
     public async Task IsBetween_Various(int value, int min, int max, bool expected)
     {
         var result = new IntValidator()
-            .IsBetween(min, max)
+            .MustBeBetween(min, max)
             .Validate(value);
 
         await (expected

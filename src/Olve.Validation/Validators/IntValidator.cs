@@ -17,7 +17,7 @@ public class IntValidator : BaseNumericStructValidator<int, IntValidator>
     /// Fails when the value is not even.
     /// </summary>
     /// <returns>The current validator.</returns>
-    public IntValidator IsEven() => FailIf(
+    public IntValidator MustBeEven() => FailIf(
         v => v % 2 != 0, 
         _ => new ResultProblem("Value must be even"));
 
@@ -25,7 +25,7 @@ public class IntValidator : BaseNumericStructValidator<int, IntValidator>
     /// Fails when the value is not odd.
     /// </summary>
     /// <returns>The current validator.</returns>
-    public IntValidator IsOdd() => FailIf(
+    public IntValidator MustBeOdd() => FailIf(
         v => v % 2 == 0, 
         _ => new ResultProblem("Value must be odd"));
 }
