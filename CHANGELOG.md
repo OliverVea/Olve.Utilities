@@ -1,3 +1,9 @@
+## v0.29.0 (2025-08-03)
+
+### Feat
+
+- added support for non-Func result chaining
+
 ## v0.28.2 (2025-08-02)
 
 ### Fix
