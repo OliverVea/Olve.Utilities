@@ -155,8 +155,7 @@ public class StringValidatorTests
     [Test]
     public async Task MustBeOneOf_Various()
     {
-        string[] allowed = ["a", "b"];
-        var validator = new StringValidator().MustBeOneOf(allowed);
+        var validator = new StringValidator().MustBeOneOf("a", "b");
 
         var success = validator.Validate("a");
         await Assert.That(success).Succeeded();
@@ -172,8 +171,7 @@ public class StringValidatorTests
     [Test]
     public async Task CannotBeOneOf_Various()
     {
-        string[] allowed = ["a", "b"];
-        var validator = new StringValidator().CannotBeOneOf(allowed);
+        var validator = new StringValidator().CannotBeOneOf("a", "b");
 
         var failure = validator.Validate("a");
         await Assert.That(failure)

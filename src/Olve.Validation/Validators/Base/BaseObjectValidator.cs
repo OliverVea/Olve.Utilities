@@ -24,7 +24,7 @@ public abstract class BaseObjectValidator<TValue, TValidator> : BaseValidator<TV
     /// </summary>
     /// <param name="values">The collection of allowed values.</param>
     /// <returns>The current validator instance.</returns>
-    public TValidator MustBeOneOf(ICollection<TValue?> values) => FailIf(
+    public TValidator MustBeOneOf(params ICollection<TValue?> values) => FailIf(
         value => !values.Contains(value), 
         _ => new ResultProblem("Value was not one of the allowed values: [{0}]", string.Join(", ", values)));
     
