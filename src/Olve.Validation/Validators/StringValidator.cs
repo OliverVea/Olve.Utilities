@@ -1,6 +1,7 @@
 using Olve.Results;
+using Olve.Validation.Validators.Base;
 
-namespace Olve.Validation;
+namespace Olve.Validation.Validators;
 
 /// <summary>
 /// Validator for string values.

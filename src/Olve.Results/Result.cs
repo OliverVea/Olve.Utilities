@@ -139,7 +139,16 @@ public readonly partial struct Result
     public static Result Concat(params IEnumerable<Func<Result>> elements)
     {
         var results = elements.Select(x => x());
+        return Concat(results);
+    }
 
+    /// <summary>
+    ///     Concatenates a sequence of results.
+    /// </summary>
+    /// <param name="results">The results.</param>
+    /// <returns>A successful result if all functions succeed; otherwise, all encountered problems.</returns>
+    public static Result Concat(params IEnumerable<Result> results)
+    {
         if (results.TryPickProblems(out var problems))
         {
             return problems;

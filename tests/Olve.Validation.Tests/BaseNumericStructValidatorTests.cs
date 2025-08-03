@@ -1,8 +1,9 @@
 using Olve.Results.TUnit;
+using Olve.Validation.Validators;
 
 namespace Olve.Validation.Tests;
 
-public class NumericStructValidatorTests
+public class BaseNumericStructValidatorTests
 {
     [Test]
     [Arguments(5, 2, true)]

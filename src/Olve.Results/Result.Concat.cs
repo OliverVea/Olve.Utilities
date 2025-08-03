@@ -2,169 +2,149 @@ namespace Olve.Results;
 
 public readonly partial struct Result
 {
-
     /// <summary>
-    /// Concatenates two result-producing functions, returning a combined result if both succeed.
+    /// Concatenates two <see cref="Result{T}"/> values into a tuple if both succeed,
+    /// or aggregates all problems if one or both fail.
     /// </summary>
     /// <typeparam name="T1">The type of the first result value.</typeparam>
     /// <typeparam name="T2">The type of the second result value.</typeparam>
-    /// <param name="a">A function that produces the first result.</param>
-    /// <param name="b">A function that produces the second result.</param>
+    /// <param name="a">The first <see cref="Result{T1}"/> value.</param>
+    /// <param name="b">The second <see cref="Result{T2}"/> value.</param>
     /// <returns>
-    /// A <see cref="Result{T}"/> containing a tuple of the two values if both succeed;
-    /// otherwise, the first encountered problem.
+    /// A <see cref="Result{T}"/> containing a tuple of the two values if both succeeded;
+    /// otherwise a <see cref="ResultProblemCollection"/> containing all validation problems.
     /// </returns>
-    public static Result<(T1, T2)> Concat<T1, T2>(Func<Result<T1>> a, Func<Result<T2>> b)
+    public static Result<(T1, T2)> Concat<T1, T2>(Result<T1> a, Result<T2> b)
     {
-        var resultA = a();
-        if (!resultA.Succeeded)
-        {
-            return resultA.Problems!;
-        }
+        if (a.Succeeded && b.Succeeded)
+            return (a.Value!, b.Value!);
 
-        var resultB = b();
-        if (!resultB.Succeeded)
-        {
-            return resultB.Problems!;
-        }
+        var problems = new ResultProblemCollection();
+        if (a.TryPickProblems(out var p1))
+            problems.Append(p1);
+        if (b.TryPickProblems(out var p2))
+            problems.Append(p2);
 
-        return (resultA.Value!, resultB.Value!);
+        return problems;
     }
 
     /// <summary>
-    /// Concatenates three result-producing functions, returning a combined result if all succeed.
+    /// Concatenates three <see cref="Result{T}"/> values into a tuple if all succeed,
+    /// or aggregates all problems if any fail.
     /// </summary>
     /// <typeparam name="T1">The type of the first result value.</typeparam>
     /// <typeparam name="T2">The type of the second result value.</typeparam>
     /// <typeparam name="T3">The type of the third result value.</typeparam>
-    /// <param name="a">A function that produces the first result.</param>
-    /// <param name="b">A function that produces the second result.</param>
-    /// <param name="c">A function that produces the third result.</param>
+    /// <param name="a">The first <see cref="Result{T1}"/> value.</param>
+    /// <param name="b">The second <see cref="Result{T2}"/> value.</param>
+    /// <param name="c">The third <see cref="Result{T3}"/> value.</param>
     /// <returns>
-    /// A <see cref="Result{T}"/> containing a tuple of the three values if all succeed;
-    /// otherwise, the first encountered problem.
+    /// A <see cref="Result{T}"/> containing a tuple of the three values if all succeeded;
+    /// otherwise a <see cref="ResultProblemCollection"/> containing all validation problems.
     /// </returns>
-    public static Result<(T1, T2, T3)> Concat<T1, T2, T3>(Func<Result<T1>> a, Func<Result<T2>> b, Func<Result<T3>> c)
+    public static Result<(T1, T2, T3)> Concat<T1, T2, T3>(
+        Result<T1> a,
+        Result<T2> b,
+        Result<T3> c)
     {
-        var resultA = a();
-        if (!resultA.Succeeded)
-        {
-            return resultA.Problems!;
-        }
+        if (a.Succeeded && b.Succeeded && c.Succeeded)
+            return (a.Value!, b.Value!, c.Value!);
 
-        var resultB = b();
-        if (!resultB.Succeeded)
-        {
-            return resultB.Problems!;
-        }
+        var problems = new ResultProblemCollection();
+        if (a.TryPickProblems(out var p1))
+            problems.Append(p1);
+        if (b.TryPickProblems(out var p2))
+            problems.Append(p2);
+        if (c.TryPickProblems(out var p3))
+            problems.Append(p3);
 
-        var resultC = c();
-        if (!resultC.Succeeded)
-        {
-            return resultC.Problems!;
-        }
-
-        return (resultA.Value!, resultB.Value!, resultC.Value!);
+        return problems;
     }
 
     /// <summary>
-    /// Concatenates four result-producing functions, returning a combined result if all succeed.
+    /// Concatenates four <see cref="Result{T}"/> values into a tuple if all succeed,
+    /// or aggregates all problems if any fail.
     /// </summary>
     /// <typeparam name="T1">The type of the first result value.</typeparam>
     /// <typeparam name="T2">The type of the second result value.</typeparam>
     /// <typeparam name="T3">The type of the third result value.</typeparam>
     /// <typeparam name="T4">The type of the fourth result value.</typeparam>
-    /// <param name="a">A function that produces the first result.</param>
-    /// <param name="b">A function that produces the second result.</param>
-    /// <param name="c">A function that produces the third result.</param>
-    /// <param name="d">A function that produces the fourth result.</param>
+    /// <param name="a">The first <see cref="Result{T1}"/> value.</param>
+    /// <param name="b">The second <see cref="Result{T2}"/> value.</param>
+    /// <param name="c">The third <see cref="Result{T3}"/> value.</param>
+    /// <param name="d">The fourth <see cref="Result{T4}"/> value.</param>
     /// <returns>
-    /// A <see cref="Result{T}"/> containing a tuple of the four values if all succeed;
-    /// otherwise, the first encountered problem.
+    /// A <see cref="Result{T}"/> containing a tuple of the four values if all succeeded;
+    /// otherwise a <see cref="ResultProblemCollection"/> containing all validation problems.
     /// </returns>
-    public static Result<(T1, T2, T3, T4)> Concat<T1, T2, T3, T4>(Func<Result<T1>> a, Func<Result<T2>> b, Func<Result<T3>> c, Func<Result<T4>> d)
+    public static Result<(T1, T2, T3, T4)> Concat<T1, T2, T3, T4>(
+        Result<T1> a,
+        Result<T2> b,
+        Result<T3> c,
+        Result<T4> d)
     {
-        var resultA = a();
-        if (!resultA.Succeeded)
-        {
-            return resultA.Problems!;
-        }
+        if (a.Succeeded && b.Succeeded && c.Succeeded && d.Succeeded)
+            return (a.Value!, b.Value!, c.Value!, d.Value!);
 
-        var resultB = b();
-        if (!resultB.Succeeded)
-        {
-            return resultB.Problems!;
-        }
+        var problems = new ResultProblemCollection();
+        if (a.TryPickProblems(out var p1))
+            problems.Append(p1);
+        if (b.TryPickProblems(out var p2))
+            problems.Append(p2);
+        if (c.TryPickProblems(out var p3))
+            problems.Append(p3);
+        if (d.TryPickProblems(out var p4))
+            problems.Append(p4);
 
-        var resultC = c();
-        if (!resultC.Succeeded)
-        {
-            return resultC.Problems!;
-        }
-
-        var resultD = d();
-        if (!resultD.Succeeded)
-        {
-            return resultD.Problems!;
-        }
-
-        return (resultA.Value!, resultB.Value!, resultC.Value!, resultD.Value!);
+        return problems;
     }
 
     /// <summary>
-    /// Concatenates five result-producing functions, returning a combined result if all succeed.
+    /// Concatenates five <see cref="Result{T}"/> values into a tuple if all succeed,
+    /// or aggregates all problems if any fail.
     /// </summary>
     /// <typeparam name="T1">The type of the first result value.</typeparam>
     /// <typeparam name="T2">The type of the second result value.</typeparam>
     /// <typeparam name="T3">The type of the third result value.</typeparam>
     /// <typeparam name="T4">The type of the fourth result value.</typeparam>
     /// <typeparam name="T5">The type of the fifth result value.</typeparam>
-    /// <param name="a">A function that produces the first result.</param>
-    /// <param name="b">A function that produces the second result.</param>
-    /// <param name="c">A function that produces the third result.</param>
-    /// <param name="d">A function that produces the fourth result.</param>
-    /// <param name="e">A function that produces the fifth result.</param>
+    /// <param name="a">The first <see cref="Result{T1}"/> value.</param>
+    /// <param name="b">The second <see cref="Result{T2}"/> value.</param>
+    /// <param name="c">The third <see cref="Result{T3}"/> value.</param>
+    /// <param name="d">The fourth <see cref="Result{T4}"/> value.</param>
+    /// <param name="e">The fifth <see cref="Result{T5}"/> value.</param>
     /// <returns>
-    /// A <see cref="Result{T}"/> containing a tuple of the five values if all succeed;
-    /// otherwise, the first encountered problem.
+    /// A <see cref="Result{T}"/> containing a tuple of the five values if all succeeded;
+    /// otherwise a <see cref="ResultProblemCollection"/> containing all validation problems.
     /// </returns>
-    public static Result<(T1, T2, T3, T4, T5)> Concat<T1, T2, T3, T4, T5>(Func<Result<T1>> a, Func<Result<T2>> b, Func<Result<T3>> c, Func<Result<T4>> d, Func<Result<T5>> e)
+    public static Result<(T1, T2, T3, T4, T5)> Concat<T1, T2, T3, T4, T5>(
+        Result<T1> a,
+        Result<T2> b,
+        Result<T3> c,
+        Result<T4> d,
+        Result<T5> e)
     {
-        var resultA = a();
-        if (!resultA.Succeeded)
-        {
-            return resultA.Problems!;
-        }
+        if (a.Succeeded && b.Succeeded && c.Succeeded && d.Succeeded && e.Succeeded)
+            return (a.Value!, b.Value!, c.Value!, d.Value!, e.Value!);
 
-        var resultB = b();
-        if (!resultB.Succeeded)
-        {
-            return resultB.Problems!;
-        }
+        var problems = new ResultProblemCollection();
+        if (a.TryPickProblems(out var p1))
+            problems.Append(p1);
+        if (b.TryPickProblems(out var p2))
+            problems.Append(p2);
+        if (c.TryPickProblems(out var p3))
+            problems.Append(p3);
+        if (d.TryPickProblems(out var p4))
+            problems.Append(p4);
+        if (e.TryPickProblems(out var p5))
+            problems.Append(p5);
 
-        var resultC = c();
-        if (!resultC.Succeeded)
-        {
-            return resultC.Problems!;
-        }
-
-        var resultD = d();
-        if (!resultD.Succeeded)
-        {
-            return resultD.Problems!;
-        }
-
-        var resultE = e();
-        if (!resultE.Succeeded)
-        {
-            return resultE.Problems!;
-        }
-
-        return (resultA.Value!, resultB.Value!, resultC.Value!, resultD.Value!, resultE.Value!);
+        return problems;
     }
 
     /// <summary>
-    /// Concatenates six result-producing functions, returning a combined result if all succeed.
+    /// Concatenates six <see cref="Result{T}"/> values into a tuple if all succeed,
+    /// or aggregates all problems if any fail.
     /// </summary>
     /// <typeparam name="T1">The type of the first result value.</typeparam>
     /// <typeparam name="T2">The type of the second result value.</typeparam>
@@ -172,54 +152,41 @@ public readonly partial struct Result
     /// <typeparam name="T4">The type of the fourth result value.</typeparam>
     /// <typeparam name="T5">The type of the fifth result value.</typeparam>
     /// <typeparam name="T6">The type of the sixth result value.</typeparam>
-    /// <param name="a">A function that produces the first result.</param>
-    /// <param name="b">A function that produces the second result.</param>
-    /// <param name="c">A function that produces the third result.</param>
-    /// <param name="d">A function that produces the fourth result.</param>
-    /// <param name="e">A function that produces the fifth result.</param>
-    /// <param name="f">A function that produces the sixth result.</param>
+    /// <param name="a">The first <see cref="Result{T1}"/> value.</param>
+    /// <param name="b">The second <see cref="Result{T2}"/> value.</param>
+    /// <param name="c">The third <see cref="Result{T3}"/> value.</param>
+    /// <param name="d">The fourth <see cref="Result{T4}"/> value.</param>
+    /// <param name="e">The fifth <see cref="Result{T5}"/> value.</param>
+    /// <param name="f">The sixth <see cref="Result{T6}"/> value.</param>
     /// <returns>
-    /// A <see cref="Result{T}"/> containing a tuple of the six values if all succeed;
-    /// otherwise, the first encountered problem.
+    /// A <see cref="Result{T}"/> containing a tuple of the six values if all succeeded;
+    /// otherwise a <see cref="ResultProblemCollection"/> containing all validation problems.
     /// </returns>
-    public static Result<(T1, T2, T3, T4, T5, T6)> Concat<T1, T2, T3, T4, T5, T6>(Func<Result<T1>> a, Func<Result<T2>> b, Func<Result<T3>> c, Func<Result<T4>> d, Func<Result<T5>> e, Func<Result<T6>> f)
+    public static Result<(T1, T2, T3, T4, T5, T6)> Concat<T1, T2, T3, T4, T5, T6>(
+        Result<T1> a,
+        Result<T2> b,
+        Result<T3> c,
+        Result<T4> d,
+        Result<T5> e,
+        Result<T6> f)
     {
-        var resultA = a();
-        if (!resultA.Succeeded)
-        {
-            return resultA.Problems!;
-        }
+        if (a.Succeeded && b.Succeeded && c.Succeeded && d.Succeeded && e.Succeeded && f.Succeeded)
+            return (a.Value!, b.Value!, c.Value!, d.Value!, e.Value!, f.Value!);
 
-        var resultB = b();
-        if (!resultB.Succeeded)
-        {
-            return resultB.Problems!;
-        }
+        var problems = new ResultProblemCollection();
+        if (a.TryPickProblems(out var p1))
+            problems.Append(p1);
+        if (b.TryPickProblems(out var p2))
+            problems.Append(p2);
+        if (c.TryPickProblems(out var p3))
+            problems.Append(p3);
+        if (d.TryPickProblems(out var p4))
+            problems.Append(p4);
+        if (e.TryPickProblems(out var p5))
+            problems.Append(p5);
+        if (f.TryPickProblems(out var p6))
+            problems.Append(p6);
 
-        var resultC = c();
-        if (!resultC.Succeeded)
-        {
-            return resultC.Problems!;
-        }
-
-        var resultD = d();
-        if (!resultD.Succeeded)
-        {
-            return resultD.Problems!;
-        }
-
-        var resultE = e();
-        if (!resultE.Succeeded)
-        {
-            return resultE.Problems!;
-        }
-
-        var resultF = f();
-        if (!resultF.Succeeded)
-        {
-            return resultF.Problems!;
-        }
-
-        return (resultA.Value!, resultB.Value!, resultC.Value!, resultD.Value!, resultE.Value!, resultF.Value!);
+        return problems;
     }
 }
