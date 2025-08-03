@@ -1,3 +1,9 @@
+## v0.30.0 (2025-08-03)
+
+### Feat
+
+- added Olve.MinimalApi for minimal api extensions
+
 ## v0.29.1 (2025-08-03)
 
 ### Fix
