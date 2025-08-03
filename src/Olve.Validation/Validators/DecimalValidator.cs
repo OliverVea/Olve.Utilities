@@ -1,11 +1,12 @@
 using System.Numerics;
+using Olve.Validation.Validators.Base;
 
-namespace Olve.Validation;
+namespace Olve.Validation.Validators;
 
 /// <summary>
 /// Validator for <see cref="decimal"/> values.
 /// </summary>
-public class DecimalValidator<TValue> : NumericStructValidator<TValue, DecimalValidator<TValue>>
+public class DecimalValidator<TValue> : BaseNumericStructValidator<TValue, DecimalValidator<TValue>>
     where TValue : struct, INumber<TValue>
 {
     /// <summary>

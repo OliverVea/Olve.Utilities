@@ -1,16 +1,16 @@
 using System.Numerics;
 using Olve.Results;
 
-namespace Olve.Validation;
+namespace Olve.Validation.Validators.Base;
 
 /// <summary>
 /// Validator for numeric values implementing <see cref="INumber{TSelf}"/>.
 /// </summary>
 /// <typeparam name="TValue">Numeric type.</typeparam>
 /// <typeparam name="TValidator">Validator type.</typeparam>
-public abstract class NumericStructValidator<TValue, TValidator> : BaseStructValidator<TValue, TValidator>
+public abstract class BaseNumericStructValidator<TValue, TValidator> : BaseStructValidator<TValue, TValidator>
     where TValue : struct, INumber<TValue>
-    where TValidator : NumericStructValidator<TValue, TValidator>
+    where TValidator : BaseNumericStructValidator<TValue, TValidator>
 {
     /// <summary>
     /// Fails when the value is less than or equal to <paramref name="limit"/>.

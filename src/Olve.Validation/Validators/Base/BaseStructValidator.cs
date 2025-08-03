@@ -1,6 +1,6 @@
 using Olve.Results;
 
-namespace Olve.Validation;
+namespace Olve.Validation.Validators.Base;
 
 /// <summary>
 /// Provides validation methods for struct types.

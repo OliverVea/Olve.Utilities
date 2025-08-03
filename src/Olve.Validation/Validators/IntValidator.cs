@@ -1,11 +1,12 @@
 using Olve.Results;
+using Olve.Validation.Validators.Base;
 
-namespace Olve.Validation;
+namespace Olve.Validation.Validators;
 
 /// <summary>
 /// Validator for <see cref="int"/> values.
 /// </summary>
-public class IntValidator : NumericStructValidator<int, IntValidator>
+public class IntValidator : BaseNumericStructValidator<int, IntValidator>
 {
     /// <summary>
     /// Gets the validator instance for chaining.
