@@ -8,9 +8,7 @@ namespace Olve.Validation.Validators;
 /// </summary>
 public class StringValidator : BaseObjectValidator<string, StringValidator>
 {
-    /// <summary>
-    /// Gets the validator instance for chaining.
-    /// </summary>
+    /// <inheritdoc />
     protected override StringValidator Validator => this;
 
     /// <summary>
