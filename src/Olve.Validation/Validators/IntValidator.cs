@@ -8,9 +8,7 @@ namespace Olve.Validation.Validators;
 /// </summary>
 public class IntValidator : BaseNumericStructValidator<int, IntValidator>
 {
-    /// <summary>
-    /// Gets the validator instance for chaining.
-    /// </summary>
+    /// <inheritdoc />
     protected override IntValidator Validator => this;
 
     /// <summary>

@@ -6,7 +6,7 @@ namespace Olve.Validation.Validators.Base;
 /// Provides common validation functionality.
 /// </summary>
 /// <typeparam name="TValidator">Concrete validator type.</typeparam>
-/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TValue">Type of value being validated.</typeparam>
 public abstract class BaseValidator<TValue, TValidator> : IValidator<TValue>
     where TValidator : BaseValidator<TValue, TValidator>
 {
@@ -33,7 +33,8 @@ public abstract class BaseValidator<TValue, TValidator> : IValidator<TValue>
     /// <summary>
     /// Replaces the last problem when the preceding validation failed.
     /// </summary>
-    /// <returns>The current validator.</returns>
+/// <returns>The current validator.</returns>
+/// <param name="problemFactory">Factory producing a <see cref="ResultProblem"/> to replace the last detected problem.</param>
     public TValidator WithProblem(Func<TValue, ResultProblem> problemFactory)
     {
             _validationRules[^1] = _validationRules[^1] with { ProblemFactory = problemFactory };
@@ -45,7 +46,8 @@ public abstract class BaseValidator<TValue, TValidator> : IValidator<TValue>
     /// <summary>
     /// Runs the validation
     /// </summary>
-    /// <returns>Result depending on the match between the value and the configured validation rules.</returns>
+/// <returns>Result depending on the match between the value and the configured validation rules.</returns>
+/// <param name="value">Value to validate.</param>
     public Result Validate(TValue value)
     {
         var results = _validationRules.Select(x => x.Execute(value));
