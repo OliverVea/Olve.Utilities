@@ -1,3 +1,10 @@
+## v0.31.0 (2025-08-05)
+
+### Feat
+
+- **Olve.Validation**: added new `WithMessage` and `WithProblem` methods for validators
+- **Olve.Validation**: add enumerable validators
+
 ## v0.30.0 (2025-08-03)
 
 ### Feat
