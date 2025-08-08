@@ -1,3 +1,9 @@
+## v0.32.0 (2025-08-08)
+
+### Feat
+
+- **Olve.Logging**: added logging project
+
 ## v0.31.0 (2025-08-05)
 
 ### Feat
