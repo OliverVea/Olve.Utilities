@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="TUnit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Olve.Logging\Olve.Logging.csproj" />
+    <ProjectReference Include="..\..\src\Olve.Results.TUnit\Olve.Results.TUnit.csproj" />
+  </ItemGroup>
+</Project>

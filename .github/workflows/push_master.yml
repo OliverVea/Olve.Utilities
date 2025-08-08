@@ -113,6 +113,7 @@ jobs:
           - id: Olve.MinimalApi
           - id: Olve.Paths
           - id: Olve.Paths.Glob
+          - id: Olve.Logging
 
     steps:
       - uses: actions/checkout@v4

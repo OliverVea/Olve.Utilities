@@ -1,5 +1,8 @@
 ﻿using Olve.Utilities.Projects;
+using TUnit.Assertions;
 using TUnit.Assertions.Enums;
+using TUnit.Assertions.Extensions;
+using TUnit.Core;
 
 namespace Olve.Utilities.Tests.Projects;
 

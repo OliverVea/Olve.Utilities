@@ -1,5 +1,8 @@
     using Olve.Utilities.Graphs;
     using Olve.Utilities.Ids;
+    using TUnit.Assertions;
+    using TUnit.Assertions.Extensions;
+    using TUnit.Core;
 
     namespace Olve.Utilities.Tests.Graphs;
 

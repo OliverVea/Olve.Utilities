@@ -6,6 +6,7 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="4.13.0" />
     <PackageVersion Include="Microsoft.Net.Compilers.Toolset" Version="4.13.0" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.5" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="9.0.8" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.5" />
     <PackageVersion Include="Microsoft.Extensions.FileSystemGlobbing"  Version="9.0.5" />
     <PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="17.13.1" />

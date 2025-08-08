@@ -1,8 +1,12 @@
 using BuilderGenerator;
 using Olve.Results;
+using Olve.Results.TUnit;
 using Olve.Utilities.Builders;
 using Olve.Validation;
 using Olve.Validation.Validators;
+using TUnit.Assertions;
+using TUnit.Assertions.Extensions;
+using TUnit.Core;
 
 namespace Olve.Utilities.Tests.Builders;
 
@@ -45,7 +49,7 @@ public class BuilderExtensionsTest
         
         var result = builder.ValidateAndBuild(validator);
 
-        await Assert.That(result.Failed).IsTrue();
+        await Assert.That(result).Failed();
     }
 
 }

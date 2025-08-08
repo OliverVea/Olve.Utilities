@@ -1,5 +1,8 @@
 ﻿using Olve.Utilities.CollectionExtensions;
 using OneOf;
+using TUnit.Assertions;
+using TUnit.Assertions.Extensions;
+using TUnit.Core;
 
 namespace Olve.Utilities.Tests.CollectionExtensions;
 

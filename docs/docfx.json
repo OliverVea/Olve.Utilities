@@ -51,6 +51,12 @@
           "files": [
             "**/Olve.Paths.Glob.csproj"
           ]
+        },
+        {
+          "src": "../src/Olve.Logging",
+          "files": [
+            "**/Olve.Logging.csproj"
+          ]
         }
       ],
       "dest": "api"
