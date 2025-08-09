@@ -1,3 +1,9 @@
+## v0.32.2 (2025-08-09)
+
+### Fix
+
+- **Olve.Utilities**: Added Parse method to Id<T>
+
 ## v0.32.1 (2025-08-09)
 
 ### Fix
