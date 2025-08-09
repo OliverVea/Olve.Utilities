@@ -172,6 +172,12 @@ public readonly partial struct Result
         return this;
     }
 
+    /// <inheritdoc />>
+    public override string ToString()
+    {
+        return Succeeded ? "Success" : "Failure";
+    }
+
     /// <summary>
     ///     Attempts to retrieve the problems associated with the result.
     /// </summary>

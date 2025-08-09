@@ -145,6 +145,12 @@ public readonly struct Result<T>
         return this;
     }
 
+    /// <inheritdoc />>
+    public override string ToString()
+    {
+        return Succeeded ? $"Success({Value})" : "Failure";
+    }
+
     /// <summary>
     ///     Converts the specified value to a success result.
     /// </summary>
