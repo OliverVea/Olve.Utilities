@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Olve.Results;
 
 namespace Olve.Utilities.Ids;
 
@@ -93,5 +94,21 @@ public readonly record struct Id<T> : IComparable<Id<T>>
     public override string ToString()
     {
         return $"Id<{nameof(T)}>({Value})";
+    }
+
+    /// <summary>
+    /// Attempts to parse an <see cref="Id{T}"/> from the provided span of chars.
+    /// </summary>
+    /// <param name="text">The text to parse into an id.</param>
+    /// <typeparam name="T">The type of the returned id.</typeparam>
+    /// <returns>The parsed Id on a success, a failed result on failure.</returns>
+    public static Result<Id<T>> Parse(string text)
+    {
+        if (uint.TryParse(text, out var parsedId))
+        {
+            return new Id<T>(parsedId);
+        }
+
+        return new ResultProblem("Could not parse '{0}' as id", text);
     }
 }
