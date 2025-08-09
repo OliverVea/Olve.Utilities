@@ -1,3 +1,9 @@
+## v0.32.1 (2025-08-09)
+
+### Fix
+
+- **Olve.Results**: overrode Result.ToString
+
 ## v0.32.0 (2025-08-08)
 
 ### Feat
