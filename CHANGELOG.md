@@ -1,3 +1,9 @@
+## v0.33.0 (2025-09-13)
+
+### Feat
+
+- **Olve.Utilities**: added UnionId<T1, T2>
+
 ## v0.32.2 (2025-08-09)
 
 ### Fix
