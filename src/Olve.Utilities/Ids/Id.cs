@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Olve.Results;
 
 namespace Olve.Utilities.Ids;
 
@@ -14,9 +13,6 @@ namespace Olve.Utilities.Ids;
 [DebuggerDisplay("{ToString()}")]
 public readonly record struct Id<T> : IComparable<Id<T>>
 {
-    // ReSharper disable once StaticMemberInGenericType
-    private static readonly ThreadSafeUintGenerator ThreadSafeUintGenerator = new();
-
     /// <summary>
     /// Gets the underlying <see cref="uint"/> value of the identifier.
     /// </summary>
@@ -39,7 +35,8 @@ public readonly record struct Id<T> : IComparable<Id<T>>
     /// <remarks>
     /// This method uses a thread-safe generator to ensure unique values across threads.
     /// </remarks>
-    public static Id<T> New() => new(ThreadSafeUintGenerator.Next());
+    [Obsolete("Please use Id.New<T>()")]
+    public static Id<T> New() => Id.New<T>();
 
     /// <summary>
     /// Compares the current identifier to another <see cref="Id{T}"/> instance.
@@ -91,23 +88,61 @@ public readonly record struct Id<T> : IComparable<Id<T>>
     /// Returns a string that represents the current identifier.
     /// </summary>
     /// <returns>A string in the format <c>Id&lt;TypeName&gt;(Value)</c>.</returns>
-    public override string ToString()
-    {
-        return $"Id<{nameof(T)}>({Value})";
-    }
+    public override string ToString() => $"Id<{typeof(T).Name}>({Value})";
+
 
     /// <summary>
-    /// Attempts to parse an <see cref="Id{T}"/> from the provided span of chars.
+    /// Attempts to parse the specified text into an <see cref="Id{T}"/>.
     /// </summary>
-    /// <param name="text">The text to parse into an id.</param>
-    /// <returns>The parsed Id on a success, a failed result on failure.</returns>
-    public static Result<Id<T>> Parse(string text)
+    /// <param name="text">The text representation of the identifier value.</param>
+    /// <param name="parsedId">
+    /// When this method returns <c>true</c>, contains the parsed <see cref="Id{T}"/>.
+    /// When it returns <c>false</c>, this parameter is set to the default value.
+    /// </param>
+    /// <returns>
+    /// <c>true</c> if the text was successfully parsed into an <see cref="Id{T}"/>; otherwise, <c>false</c>.
+    /// </returns>
+    [Obsolete("Please use Id.TryParse<T>()")]
+    public static bool TryParse(string text, out Id<T> parsedId) => Id.TryParse(text, out parsedId);
+}
+
+/// <summary>
+/// Class for generalized supporting methods of Id.
+/// </summary>
+public static class Id
+{
+    // ReSharper disable once StaticMemberInGenericType
+    private static readonly ThreadSafeUintGenerator ThreadSafeUintGenerator = new();
+    
+    /// <summary>
+    /// Attempts to parse the specified text into an <see cref="Id{T}"/>.
+    /// </summary>
+    /// <param name="text">The text representation of the identifier value.</param>
+    /// <param name="parsedId">
+    /// When this method returns <c>true</c>, contains the parsed <see cref="Id{T}"/>.
+    /// When it returns <c>false</c>, this parameter is set to the default value.
+    /// </param>
+    /// <returns>
+    /// <c>true</c> if the text was successfully parsed into an <see cref="Id{T}"/>; otherwise, <c>false</c>.
+    /// </returns>
+    public static bool TryParse<T>(string text, out Id<T> parsedId)
     {
-        if (uint.TryParse(text, out var parsedId))
+        if (uint.TryParse(text, out var parsedIdValue))
         {
-            return new Id<T>(parsedId);
+            parsedId = new Id<T>(parsedIdValue);
+            return true;
         }
 
-        return new ResultProblem("Could not parse '{0}' as id", text);
+        parsedId = default;
+        return false;
     }
+    
+    /// <summary>
+    /// Creates a new instance of <see cref="Id{T}"/> with a unique value.
+    /// </summary>
+    /// <returns>A new <see cref="Id{T}"/> whose value is guaranteed to be unique for this type.</returns>
+    /// <remarks>
+    /// This method uses a thread-safe generator to ensure unique values across threads.
+    /// </remarks>
+    public static Id<T> New<T>() => new(ThreadSafeUintGenerator.Next());
 }

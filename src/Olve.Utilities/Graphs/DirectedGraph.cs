@@ -44,7 +44,7 @@ public class DirectedGraph
     /// </returns>
     public Result<Id<Node>> CreateNode()
     {
-        var nodeId = Id<Node>.New();
+        var nodeId = Id.New<Node>();
         Node node = new(nodeId);
         
         _nodes.Add(nodeId, node);
@@ -118,7 +118,7 @@ public class DirectedGraph
     /// </returns>
     public Result<Id<DirectedEdge>> CreateEdge(Id<Node> from, Id<Node> to)
     {
-        var edgeId = Id<DirectedEdge>.New();
+        var edgeId = Id.New<DirectedEdge>();
         DirectedEdge directedEdge = new(edgeId, from, to);
         
         _edges.Add(edgeId, directedEdge);

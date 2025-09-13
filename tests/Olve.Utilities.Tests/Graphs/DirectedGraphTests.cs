@@ -30,7 +30,7 @@
         {
             // Arrange
             var graph = new DirectedGraph();
-            var fakeNodeId = Id<Node>.New();
+            var fakeNodeId = Id.New<Node>();
 
             // Act
             var result = graph.GetNode(fakeNodeId);
@@ -142,7 +142,7 @@
         {
             // Arrange
             var graph = new DirectedGraph();
-            var fakeEdgeId = Id<DirectedEdge>.New();
+            var fakeEdgeId = Id.New<DirectedEdge>();
 
             // Act
             var result = graph.GetEdge(fakeEdgeId);
@@ -176,7 +176,7 @@
         {
             // Arrange
             var graph = new DirectedGraph();
-            var fakeEdgeId = Id<DirectedEdge>.New();
+            var fakeEdgeId = Id.New<DirectedEdge>();
 
             // Act
             var deletionResult = graph.DeleteEdge(fakeEdgeId);
