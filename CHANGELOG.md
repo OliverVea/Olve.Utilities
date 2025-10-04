@@ -1,3 +1,9 @@
+## v0.34.0 (2025-10-04)
+
+### Feat
+
+- **Olve.Results**: moved Result<T>.Failure() to Result.Failure<T>()
+
 ## v0.33.0 (2025-09-13)
 
 ### Feat
