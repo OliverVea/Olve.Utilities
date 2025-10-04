@@ -47,6 +47,15 @@ public readonly partial struct Result
     public static Result Failure(params IEnumerable<ResultProblem> problems) => new(new ResultProblemCollection(problems));
 
     /// <summary>
+    /// Creates a result representing failure with the specified problems.
+    /// </summary>
+    /// <param name="problems">The problems associated with the failure</param>
+    /// <typeparam name="T">The success type of the failed result.</typeparam>
+    /// <returns>A failure result.</returns>
+    public static Result<T> Failure<T>(params IEnumerable<ResultProblem> problems) =>
+        new(default, new ResultProblemCollection(problems));
+
+    /// <summary>
     ///     Attempts to execute the specified action and returns a <see cref="Result"/>.
     ///     If an exception of type <typeparamref name="TException"/> is thrown, it is captured
     ///     as a problem in the result.

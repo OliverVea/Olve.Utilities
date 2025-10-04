@@ -8,7 +8,7 @@ namespace Olve.Results;
 /// <typeparam name="T">The type of the result value.</typeparam>
 public readonly struct Result<T>
 {
-    private Result(T? result, ResultProblemCollection? problems)
+    internal Result(T? result, ResultProblemCollection? problems)
     {
         Succeeded = problems is null;
         Value = result;
@@ -47,6 +47,7 @@ public readonly struct Result<T>
     /// </summary>
     /// <param name="problems">The problems associated with the failure.</param>
     /// <returns>A failure result.</returns>
+    [Obsolete("Use Result.Failure<T> instead")]
     public static Result<T> Failure(params IEnumerable<ResultProblem> problems) =>
         new(default, new ResultProblemCollection(problems));
 
@@ -163,12 +164,12 @@ public readonly struct Result<T>
     /// </summary>
     /// <param name="problem">The problem to convert.</param>
     /// <returns>A failure result.</returns>
-    public static implicit operator Result<T>(ResultProblem problem) => Failure(problem);
+    public static implicit operator Result<T>(ResultProblem problem) => Result.Failure<T>(problem);
 
     /// <summary>
     ///     Converts the specified problems to a failure result.
     /// </summary>
     /// <param name="problems">The problems to convert.</param>
     /// <returns>A failure result.</returns>
-    public static implicit operator Result<T>(ResultProblemCollection problems) => Failure(problems);
+    public static implicit operator Result<T>(ResultProblemCollection problems) => Result.Failure<T>(problems);
 }
