@@ -14,7 +14,7 @@ public readonly record struct UnionId<T1, T2> : IComparable<UnionId<T1, T2>>
 {
     // 0 => T1, 1 => T2
     private readonly byte _tag;
-    private readonly uint _value;
+    private readonly Id _value;
 
     static UnionId()
     {
@@ -24,7 +24,7 @@ public readonly record struct UnionId<T1, T2> : IComparable<UnionId<T1, T2>>
         }
     }
 
-    private UnionId(uint value, byte tag)
+    private UnionId(Id value, byte tag)
     {
         if (tag > 1) throw new ArgumentOutOfRangeException(nameof(tag));
         _value = value;
@@ -71,8 +71,8 @@ public readonly record struct UnionId<T1, T2> : IComparable<UnionId<T1, T2>>
     /// Returns the contained <see cref="Id{T1}"/> without checking the current variant.
     /// </summary>
     /// <remarks>
-    /// This method does not validate whether the union actually holds an <see cref="Id{T1}"/>.  
-    /// If it does not, the result will be <c>default</c>.  
+    /// This method does not validate whether the union actually holds an <see cref="Id{T1}"/>.
+    /// If it does not, the result will be <c>default</c>.
     /// Use <see cref="IsT1"/> or <see cref="TryGetT1"/> for safe access.
     /// </remarks>
     public Id<T1> AsT1() => _tag == 0 ? new Id<T1>(_value) : default;
@@ -81,8 +81,8 @@ public readonly record struct UnionId<T1, T2> : IComparable<UnionId<T1, T2>>
     /// Returns the contained <see cref="Id{T2}"/> without checking the current variant.
     /// </summary>
     /// <remarks>
-    /// This method does not validate whether the union actually holds an <see cref="Id{T2}"/>.  
-    /// If it does not, the result will be <c>default</c>.  
+    /// This method does not validate whether the union actually holds an <see cref="Id{T2}"/>.
+    /// If it does not, the result will be <c>default</c>.
     /// Use <see cref="IsT2"/> or <see cref="TryGetT2"/> for safe access.
     /// </remarks>
     public Id<T2> AsT2() => _tag == 1 ? new Id<T2>(_value) : default;

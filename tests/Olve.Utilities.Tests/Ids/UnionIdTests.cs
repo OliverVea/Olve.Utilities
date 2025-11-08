@@ -1,6 +1,4 @@
 using Olve.Utilities.Ids;
-using TUnit.Assertions.Extensions;
-using TUnit.Core;
 using Assert = TUnit.Assertions.Assert;
 
 namespace Olve.Utilities.Tests.Ids;
@@ -9,9 +7,9 @@ public class UnionIdTests
 {
     private readonly Dictionary<Id<Person>, Person> _people = [];
     private readonly Dictionary<Id<int>, int> _integers = [];
-    
+
     private readonly record struct Person(string Name, string PHoneNumber);
-    
+
     [Test]
     public async Task TestUnionIds()
     {
@@ -29,14 +27,14 @@ public class UnionIdTests
                 personId => output.Add($"person:{personId}:{_people[personId]}"),
                 intId => output.Add($"int:{intId}:{_integers[intId]}"));
         }
-        
-        List<string> expexted = [
+
+        List<string> expected = [
             $"person:{personIdA.ToString()}:{personA.ToString()}",
             $"int:{intIdA.ToString()}:{intA.ToString()}",
             $"person:{personIdB.ToString()}:{personB.ToString()}",
             $"int:{intIdB.ToString()}:{intB.ToString()}"];
 
-        await Assert.That(output).IsEquivalentTo(expexted);
+        await Assert.That(output).IsEquivalentTo(expected);
     }
 
     private (Id<Person>, Person) CreatePerson(string name, string phoneNumber)
