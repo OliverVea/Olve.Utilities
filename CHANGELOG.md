@@ -1,3 +1,9 @@
+## v0.35.0 (2025-11-08)
+
+### Feat
+
+- redoing Ids to now be backed by Guid
+
 ## v0.34.0 (2025-10-04)
 
 ### Feat
