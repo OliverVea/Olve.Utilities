@@ -187,38 +187,6 @@ public readonly record struct Id<T> : IComparable<Id<T>>
     public Id(Id value) => Value = value;
 
     /// <summary>
-    /// Creates a new, randomly generated <see cref="Id{T}"/>.
-    /// </summary>
-    /// <returns>A new <see cref="Id{T}"/> whose underlying identifier is randomly generated.</returns>
-    public static Id<T> New() => new(Id.New());
-
-    /// <summary>
-    /// Creates a deterministic <see cref="Id{T}"/> from a textual name and optional namespace.
-    /// </summary>
-    /// <param name="name">The non-null name used to derive the identifier.</param>
-    /// <param name="namespaceId">An optional namespace <see cref="Id"/> that scopes the result; if <c>null</c> a default/empty namespace is used.</param>
-    /// <returns>A deterministic <see cref="Id{T}"/> that is stable for the same <paramref name="name"/> and <paramref name="namespaceId"/>.</returns>
-    /// <exception cref="ArgumentNullException">If <paramref name="name"/> is <c>null</c>.</exception>
-    public static Id<T> FromName(string name, Id? namespaceId = null) => new(Id.FromName(name, namespaceId));
-
-    /// <summary>
-    /// Attempts to parse a textual representation into a typed <see cref="Id{T}"/>.
-    /// </summary>
-    /// <param name="text">The string to parse (typically a GUID string).</param>
-    /// <param name="id">When the method returns, contains the parsed <see cref="Id{T}"/> if parsing succeeded; otherwise the default value.</param>
-    /// <returns><c>true</c> if parsing succeeded; otherwise <c>false</c>.</returns>
-    public static bool TryParse(string text, out Id<T> id)
-    {
-        id = default;
-        if (Id.TryParse(text, out var raw))
-        {
-            id = new Id<T>(raw);
-            return true;
-        }
-        return false;
-    }
-
-    /// <summary>
     /// Returns a human-readable representation of this typed identifier, including the logical type name and value.
     /// </summary>
     /// <returns>A string such as <c>Id&lt;TName&gt;(value)</c>.</returns>
