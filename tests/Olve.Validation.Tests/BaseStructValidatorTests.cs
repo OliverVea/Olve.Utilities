@@ -1,4 +1,3 @@
-using System;
 using Olve.Results;
 using Olve.Results.TUnit;
 using Olve.Validation.Validators.Base;
@@ -52,10 +51,9 @@ public class BaseStructValidatorTests
             .Validate(0);
 
         await Assert.That(result)
-            .FailedAndProblemCollection()
-            .HasSingleItem()
-            .HasMember(x => x.Single().Message)
-            .EqualTo("custom");
+            .FailedAndProblemCollection(y => y.Satisfies(x =>
+                x?.Count() == 1
+                && x.Single().Message == "custom"));
     }
 
     [Test]
@@ -67,9 +65,8 @@ public class BaseStructValidatorTests
             .Validate(0);
 
         await Assert.That(result)
-            .FailedAndProblemCollection()
-            .HasSingleItem()
-            .HasMember(x => x.Single().Message)
-            .EqualTo("custom msg");
+            .FailedAndProblemCollection(y => y.Satisfies(x =>
+                x?.Count() == 1
+                && x.Single().Message == "custom msg"));
     }
 }

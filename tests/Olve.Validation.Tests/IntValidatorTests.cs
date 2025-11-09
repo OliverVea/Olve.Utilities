@@ -21,10 +21,9 @@ public class IntValidatorTests
         if (!expected)
         {
             await Assert.That(result)
-                .FailedAndProblemCollection()
-                .HasSingleItem()
-                .HasMember(x => x.Single().Message)
-                .EqualTo("Value must be even");
+                .FailedAndProblemCollection(y => y.Satisfies(z =>
+                    z?.Count() == 1
+                    && z.Single().Message == "Value must be even"));
         }
     }
 
@@ -44,10 +43,9 @@ public class IntValidatorTests
         if (!expected)
         {
             await Assert.That(result)
-                .FailedAndProblemCollection()
-                .HasSingleItem()
-                .HasMember(x => x.Single().Message)
-                .EqualTo("Value must be odd");
+                .FailedAndProblemCollection(y => y.Satisfies(z =>
+                    z?.Count() == 1
+                    && z.Single().Message == "Value must be odd"));
         }
     }
 }

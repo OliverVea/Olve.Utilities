@@ -1,188 +1,117 @@
-﻿using TUnit.Assertions.AssertConditions;
-using TUnit.Assertions.AssertConditions.Operators;
-using TUnit.Assertions.AssertionBuilders;
+﻿using TUnit.Assertions.Assertions;
+using TUnit.Assertions.Conditions;
+using TUnit.Assertions.Core;
 
 namespace Olve.Results.TUnit;
 
 /// <summary>
-/// Provides fluent assertion extensions for verifying <see cref="Result{T}"/> values in TUnit tests.
+/// Extension methods that provide fluent TUnit assertions for <see cref="Result{T}"/> and <see cref="Result"/>.
 /// </summary>
-/// <remarks>
-/// These extensions allow asserting whether a <see cref="Result{T}"/> represents success or failure,
-/// and provide convenient access to the unwrapped value or problems for further assertions.
-/// </remarks>
 public static class ValueAssertionBuilderExtensions
 {
     /// <summary>
-    /// Asserts that the result was successful (<c>Succeeded == true</c>).
+    /// Asserts that the result represents success (<c>Succeeded == true</c>).
     /// </summary>
-    /// <typeparam name="T">The result's value type.</typeparam>
-    /// <param name="builder">The assertion builder for the result.</param>
-    /// <returns>A fluent assertion chain for further conditions.</returns>
-    /// <example>
-    /// <code>
-    /// await Assert.That(myResult).Succeeded();
-    /// </code>
-    /// </example>
-    public static InvokableValueAssertionBuilder<Result<T>> Succeeded<T>(this ValueAssertionBuilder<Result<T>> builder) =>
-        builder.HasMember(x => x.Succeeded).EqualTo(true);
-    
-    /// <summary>
-    /// Asserts that the result was successful (<c>Succeeded == true</c>).
-    /// </summary>
-    /// <param name="builder">The assertion builder for the result.</param>
-    /// <returns>A fluent assertion chain for further conditions.</returns>
-    /// <example>
-    /// <code>
-    /// await Assert.That(myResult).Succeeded();
-    /// </code>
-    /// </example>
-    public static InvokableValueAssertionBuilder<Result> Succeeded(this ValueAssertionBuilder<Result> builder) =>
-        builder.HasMember(x => x.Succeeded).EqualTo(true);
+    /// <typeparam name="T">The result value type.</typeparam>
+    /// <param name="source">The assertion source for the <see cref="Result{T}"/> to test.</param>
+    /// <returns>A property assertion result targeting the <c>Succeeded</c> property.</returns>
+    public static PropertyAssertionResult<Result<T>> Succeeded<T>(this IAssertionSource<Result<T>> source) =>
+        source.HasProperty(x => x.Succeeded).IsEqualTo(true);
 
     /// <summary>
-    /// Asserts that the result failed (<c>Succeeded == false</c>).
+    /// Asserts that the result represents success (<c>Succeeded == true</c>).
     /// </summary>
-    /// <typeparam name="T">The result's value type.</typeparam>
-    /// <param name="builder">The assertion builder for the result.</param>
-    /// <returns>A fluent assertion chain for further conditions.</returns>
-    /// <example>
-    /// <code>
-    /// await Assert.That(myResult).Failed();
-    /// </code>
-    /// </example>
-    public static InvokableValueAssertionBuilder<Result<T>> Failed<T>(this ValueAssertionBuilder<Result<T>> builder) =>
-        builder.HasMember(x => x.Failed).EqualTo(true);
+    /// <param name="source">The assertion source for the <see cref="Result"/> to test.</param>
+    /// <returns>A property assertion result targeting the <c>Succeeded</c> property.</returns>
+    public static PropertyAssertionResult<Result> Succeeded(this IAssertionSource<Result> source) =>
+        source.HasProperty(x => x.Succeeded).IsEqualTo(true);
 
     /// <summary>
-    /// Asserts that the result failed (<c>Succeeded == false</c>).
+    /// Asserts that the result represents failure (<c>Failed == true</c>).
     /// </summary>
-    /// <param name="builder">The assertion builder for the result.</param>
-    /// <returns>A fluent assertion chain for further conditions.</returns>
-    /// <example>
-    /// <code>
-    /// await Assert.That(myResult).Failed();
-    /// </code>
-    /// </example>
-    public static InvokableValueAssertionBuilder<Result> Failed(this ValueAssertionBuilder<Result> builder) =>
-        builder.HasMember(x => x.Failed).EqualTo(true);
+    /// <typeparam name="T">The result value type.</typeparam>
+    /// <param name="source">The assertion source for the <see cref="Result{T}"/> to test.</param>
+    /// <returns>A property assertion result targeting the <c>Failed</c> property.</returns>
+    public static PropertyAssertionResult<Result<T>> Failed<T>(this IAssertionSource<Result<T>> source) =>
+        source.HasProperty(x => x.Failed).IsEqualTo(true);
 
     /// <summary>
-    /// Asserts that the result is successful, and unwraps its value for further assertions.
+    /// Asserts that the result represents failure (<c>Failed == true</c>).
     /// </summary>
-    /// <typeparam name="T">The result's value type.</typeparam>
-    /// <param name="builder">The assertion builder for the result.</param>
-    /// <returns>A value assertion builder for the unwrapped value.</returns>
+    /// <param name="source">The assertion source for the <see cref="Result"/> to test.</param>
+    /// <returns>A property assertion result targeting the <c>Failed</c> property.</returns>
+    public static PropertyAssertionResult<Result> Failed(this IAssertionSource<Result> source) =>
+        source.HasProperty(x => x.Failed).IsEqualTo(true);
+
+    /// <summary>
+    /// Asserts the result is successful and runs an assertion against the unwrapped value.
+    /// </summary>
+    /// <typeparam name="T">The result value type.</typeparam>
+    /// <param name="source">The assertion source for the <see cref="Result{T}"/> to test.</param>
+    /// <param name="assertion">
+    /// A function that receives an <see cref="IAssertionSource{T}"/> for the unwrapped value and returns an assertion to apply.
+    /// </param>
+    /// <returns>
+    /// A member assertion result for the original <see cref="Result{T}"/> enabling further chaining.
+    /// </returns>
     /// <example>
     /// <code>
-    /// await Assert.That(myResult).SucceededAndValue().IsEqualTo(expectedValue);
+    /// await Assert.That(result).SucceededAndValue(v => v.IsEqualTo(expected));
     /// </code>
     /// </example>
-    public static ValueAnd<T> SucceededAndValue<T>(this ValueAssertionBuilder<Result<T>> builder)
+    public static MemberAssertionResult<Result<T>> SucceededAndValue<T>(this IAssertionSource<Result<T>> source,
+        Func<IAssertionSource<T>, object> assertion)
     {
-        return builder.RegisterConversionAssertion(new ResultSucceededCondition<T>(), []).And;
+        return source
+            .Satisfies(x => x.Succeeded)
+            .And.Member(x => x.Value!, assertion);
     }
 
     /// <summary>
-    /// Asserts that the result failed and unwraps its <see cref="ResultProblemCollection"/> for further assertions.
+    /// Asserts the result is a failure and runs an assertion against the problem collection.
     /// </summary>
-    /// <typeparam name="T">The result's value type.</typeparam>
-    /// <param name="builder">The assertion builder for the result.</param>
-    /// <returns>A value assertion builder for the problem collection.</returns>
+    /// <typeparam name="T">The result value type.</typeparam>
+    /// <param name="source">The assertion source for the <see cref="Result{T}"/> to test.</param>
+    /// <param name="assertion">
+    /// A function that receives an <see cref="IAssertionSource{ResultProblemCollection}"/> for the problems and returns an assertion to apply.
+    /// </param>
+    /// <returns>
+    /// A member assertion result for the original <see cref="Result{T}"/> enabling further chaining.
+    /// </returns>
     /// <example>
     /// <code>
-    /// await Assert.That(myResult).FailedAndProblemCollection().IsNotEmpty();
+    /// await Assert.That(result).FailedAndProblemCollection(p => p.IsNotEmpty());
     /// </code>
     /// </example>
-    public static ValueAnd<ResultProblemCollection> FailedAndProblemCollection<T>(this ValueAssertionBuilder<Result<T>> builder)
+    public static MemberAssertionResult<Result<T>> FailedAndProblemCollection<T>(this IAssertionSource<Result<T>> source,
+        Func<IAssertionSource<ResultProblemCollection>, object> assertion)
     {
-        return builder.RegisterConversionAssertion(new ResultFailedCondition<T>(), []).And;
+        return source
+            .Satisfies(x => x.Failed)
+            .And.Member(x => x.Problems!, assertion);
     }
 
     /// <summary>
-    /// Asserts that the result failed and unwraps its <see cref="ResultProblemCollection"/> for further assertions.
+    /// Asserts the non-generic result is a failure and runs an assertion against the problem collection.
     /// </summary>
-    /// <param name="builder">The assertion builder for the result.</param>
-    /// <returns>A value assertion builder for the problem collection.</returns>
+    /// <param name="source">The assertion source for the <see cref="Result"/> to test.</param>
+    /// <param name="assertion">
+    /// A function that receives an <see cref="IAssertionSource{ResultProblemCollection}"/> for the problems and returns an assertion to apply.
+    /// </param>
+    /// <returns>
+    /// A member assertion result for the original <see cref="Result"/> enabling further chaining.
+    /// </returns>
     /// <example>
     /// <code>
-    /// await Assert.That(myResult).FailedAndProblemCollection().IsNotEmpty();
+    /// await Assert.That(result).FailedAndProblemCollection(p => p.IsNotEmpty());
     /// </code>
     /// </example>
-    public static ValueAnd<ResultProblemCollection> FailedAndProblemCollection(this ValueAssertionBuilder<Result> builder)
+    public static MemberAssertionResult<Result> FailedAndProblemCollection<TAssertion>(this IAssertionSource<Result> source,
+        Func<IAssertionSource<ResultProblemCollection>, TAssertion> assertion)
+    where TAssertion : Assertion<ResultProblemCollection>
     {
-        return builder.RegisterConversionAssertion(new ResultFailedCondition(), []).And;
-    }
-
-    /// <summary>
-    /// Converts a successful result into its value for assertion purposes.
-    /// </summary>
-    /// <typeparam name="T">The result's value type.</typeparam>
-    private class ResultSucceededCondition<T> : ConvertToAssertCondition<Result<T>, T>
-    {
-        /// <inheritdoc />
-        protected override string GetExpectation() => "to be a success";
-
-        /// <inheritdoc />
-        public override ValueTask<(AssertionResult, T?)> ConvertValue(Result<T> result)
-        {
-            return ValueTask.FromResult(ConvertValueInternal(result));
-        }
-
-        private static (AssertionResult, T?) ConvertValueInternal(Result<T> result)
-        {
-            var failed = result.TryPickProblems(out var problems, out var value);
-            var problemString = string.Join(", ", problems?.Select(x => $"'{x}'") ?? []);
-            var errorString = $"got problem(s): {problemString}";
-
-            return (AssertionResult.FailIf(failed, errorString), value);
-        }
-    }
-
-    /// <summary>
-    /// Converts a failed result into its problem collection for assertion purposes.
-    /// </summary>
-    private class ResultFailedCondition : ConvertToAssertCondition<Result, ResultProblemCollection>
-    {
-        /// <inheritdoc />
-        protected override string GetExpectation() => "to be a failure";
-
-        /// <inheritdoc />
-        public override ValueTask<(AssertionResult, ResultProblemCollection?)> ConvertValue(Result result)
-        {
-            return ValueTask.FromResult(ConvertValueInternal(result));
-        }
-
-        private static (AssertionResult, ResultProblemCollection?) ConvertValueInternal(Result result)
-        {
-            var failed = result.TryPickProblems(out var problems);
-            var succeeded = !failed;
-
-            return (AssertionResult.FailIf(succeeded, "got a success"), problems);
-        }
-    }
-
-    /// <summary>
-    /// Converts a failed result into its problem collection for assertion purposes.
-    /// </summary>
-    /// <typeparam name="T">The result's value type.</typeparam>
-    private class ResultFailedCondition<T> : ConvertToAssertCondition<Result<T>, ResultProblemCollection>
-    {
-        /// <inheritdoc />
-        protected override string GetExpectation() => "to be a failure";
-
-        /// <inheritdoc />
-        public override ValueTask<(AssertionResult, ResultProblemCollection?)> ConvertValue(Result<T> result)
-        {
-            return ValueTask.FromResult(ConvertValueInternal(result));
-        }
-
-        private static (AssertionResult, ResultProblemCollection?) ConvertValueInternal(Result<T> result)
-        {
-            var failed = result.TryPickProblems(out var problems);
-            var succeeded = !failed;
-
-            return (AssertionResult.FailIf(succeeded, "got a success"), problems);
-        }
+        return source
+            .Satisfies(x => x.Failed)
+            .And.Member(x => x.Problems!, assertion);
     }
 }

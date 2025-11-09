@@ -50,7 +50,7 @@ public class Result_Try
         // Assert
         await Assert.That(result.Succeeded).IsFalse();
         var actualProblem = result.Problems?.Single();
-        await Assert.That(actualProblem).IsNotNull().And.HasMember(x => x!.Message).EqualTo("Could not call method '{0}'");
+        await Assert.That(actualProblem).IsNotNull().And.HasProperty(x => x!.Message).IsEqualTo("Could not call method '{0}'");
     }
 
     [Test]

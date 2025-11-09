@@ -31,7 +31,7 @@ public class GlobTests
         foreach (var (actual, expectedRaw) in matchPaths!.Order().Zip(expectedFiles.Order()))
         {
             var expected = GetPlatformString(expectedRaw);
-            
+
             await Assert.That(actual).EndsWith(expected);
         }
     }
@@ -41,7 +41,7 @@ public class GlobTests
     {
         // Arrange
         const int elementCount = 5;
-        
+
         // Act
         var gotGlob = TryGlobTestData(EverythingPattern, out var matches);
         matches = matches?.ToList();

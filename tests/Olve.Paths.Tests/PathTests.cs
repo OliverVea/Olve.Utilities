@@ -5,17 +5,27 @@ namespace Olve.Paths.Tests;
 
 public class WindowsOnlyAttribute() : SkipAttribute("This test is only run on Windows")
 {
-    public override Task<bool> ShouldSkip(BeforeTestContext context)
+    public override Task<bool> ShouldSkip(TestRegisteredContext context)
     {
         return Task.FromResult(!RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
+    }
+
+    protected override string GetSkipReason(TestRegisteredContext context)
+    {
+        return "This test is only run on Windows";
     }
 }
 
 public class LinuxOnlyAttribute() : SkipAttribute("This test is only run on Linux")
 {
-    public override Task<bool> ShouldSkip(BeforeTestContext context)
+    public override Task<bool> ShouldSkip(TestRegisteredContext context)
     {
         return Task.FromResult(!RuntimeInformation.IsOSPlatform(OSPlatform.Linux));
+    }
+
+    protected override string GetSkipReason(TestRegisteredContext context)
+    {
+        return "This test is only run on Linux";
     }
 }
 
@@ -40,7 +50,7 @@ public class PathTests
         await Assert.That(gotAbsolute).IsEqualTo(expected != null);
         await Assert.That(absolute).IsEqualTo(expected);
     }
-    
+
     [Test, WindowsOnly]
     [Arguments("file.txt", @"C:\users\user\file.txt")]
     [Arguments("file", @"C:\users\user\file")]

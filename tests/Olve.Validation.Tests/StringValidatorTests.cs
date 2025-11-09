@@ -47,10 +47,9 @@ public class StringValidatorTests
             .Validate(null);
 
         await Assert.That(result)
-            .FailedAndProblemCollection()
-            .HasSingleItem()
-            .HasMember(x => x.Single().Message)
-            .EqualTo("custom message");
+            .FailedAndProblemCollection(y => y.Satisfies(z =>
+                z?.Count() == 1
+                && z.Single().Message == "custom message"));
     }
 
     [Test]
@@ -75,10 +74,9 @@ public class StringValidatorTests
         if (!expectedSuccess)
         {
             await Assert.That(result)
-                .FailedAndProblemCollection()
-                .HasSingleItem()
-                .HasMember(x => x.Single().ToBriefString())
-                .EqualTo($"Value must be at least '{minLength}' characters");
+                .FailedAndProblemCollection(x => x.Satisfies(y =>
+                    y?.Count() == 1
+                    && y.Single().ToBriefString() == $"Value must be at least '{minLength}' characters"));
         }
     }
 
@@ -104,10 +102,9 @@ public class StringValidatorTests
         if (!expectedSuccess)
         {
             await Assert.That(result)
-                .FailedAndProblemCollection()
-                .HasSingleItem()
-                .HasMember(x => x.Single().ToBriefString())
-                .EqualTo($"Value must be at most '{maxLength}' characters");
+                .FailedAndProblemCollection(y => y.Satisfies(x =>
+                    x?.Count() == 1
+                    && x.Single().ToBriefString() == $"Value must be at most '{maxLength}' characters"));
         }
     }
 
@@ -116,10 +113,9 @@ public class StringValidatorTests
     {
         var result = new StringValidator().CannotBeNullOrEmpty().Validate("");
         await Assert.That(result)
-            .FailedAndProblemCollection()
-            .HasSingleItem()
-            .HasMember(x => x.Single().Message)
-            .EqualTo("Value is null or empty");
+            .FailedAndProblemCollection(y => y.Satisfies(x =>
+                x?.Count() == 1
+                && x.Single().Message == "Value is null or empty"));
     }
 
     [Test]
@@ -127,10 +123,9 @@ public class StringValidatorTests
     {
         var result = new StringValidator().CannotBeNullOrWhiteSpace().Validate(" ");
         await Assert.That(result)
-            .FailedAndProblemCollection()
-            .HasSingleItem()
-            .HasMember(x => x.Single().Message)
-            .EqualTo("Value is null or white space");
+            .FailedAndProblemCollection(y => y.Satisfies(x =>
+                x?.Count() == 1
+                && x.Single().Message == "Value is null or white space"));
     }
 
     [Test]
@@ -145,10 +140,9 @@ public class StringValidatorTests
         if (!expectedSuccess)
         {
             await Assert.That(result)
-                .FailedAndProblemCollection()
-                .HasSingleItem()
-                .HasMember(x => x.Single().Message)
-                .EqualTo("Value was null");
+                .FailedAndProblemCollection(y => y.Satisfies(x =>
+                    x?.Count() == 1
+                    && x.Single().Message == "Value was null"));
         }
     }
 
@@ -162,10 +156,9 @@ public class StringValidatorTests
 
         var failure = validator.Validate("c");
         await Assert.That(failure)
-            .FailedAndProblemCollection()
-            .HasSingleItem()
-            .HasMember(x => x.Single().ToBriefString())
-            .EqualTo("Value was not one of the allowed values: [a, b]");
+            .FailedAndProblemCollection(y => y.Satisfies(x =>
+                x?.Count() == 1
+                && x.Single().ToBriefString() == "Value was not one of the allowed values: [a, b]"));
     }
 
     [Test]
@@ -175,10 +168,9 @@ public class StringValidatorTests
 
         var failure = validator.Validate("a");
         await Assert.That(failure)
-            .FailedAndProblemCollection()
-            .HasSingleItem()
-            .HasMember(x => x.Single().ToBriefString())
-            .EqualTo("Value was one of the disallowed values: [a, b]");
+            .FailedAndProblemCollection(y => y.Satisfies(x =>
+                x?.Count() == 1
+                && x.Single().ToBriefString() == "Value was one of the disallowed values: [a, b]"));
 
         var success = validator.Validate("c");
         await Assert.That(success).Succeeded();
@@ -192,10 +184,9 @@ public class StringValidatorTests
             .WithProblem(_ => new ResultProblem("Custom min"))
             .Validate("a");
         await Assert.That(result)
-            .FailedAndProblemCollection()
-            .HasSingleItem()
-            .HasMember(x => x.Single().Message)
-            .EqualTo("Custom min");
+            .FailedAndProblemCollection(y => y.Satisfies(x =>
+                x?.Count() == 1
+                && x.Single().Message == "Custom min"));
     }
 
     [Test]
@@ -206,10 +197,9 @@ public class StringValidatorTests
             .WithProblem(_ => new ResultProblem("Custom max"))
             .Validate("abc");
         await Assert.That(result)
-            .FailedAndProblemCollection()
-            .HasSingleItem()
-            .HasMember(x => x.Single().ToBriefString())
-            .EqualTo("Custom max");
+            .FailedAndProblemCollection(y => y.Satisfies(x =>
+                x?.Count() == 1
+                && x.Single().ToBriefString() == "Custom max"));
     }
 
     [Test]
@@ -220,9 +210,8 @@ public class StringValidatorTests
             .MustHaveMinLength(2)
             .Validate("");
         await Assert.That(result)
-            .FailedAndProblemCollection()
-            .HasMember(x => x.Count())
-            .EqualTo(2);
+            .FailedAndProblemCollection(y => y.Satisfies(x =>
+                x?.Count() == 2));
     }
 
     [Test]
