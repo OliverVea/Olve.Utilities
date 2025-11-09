@@ -181,7 +181,7 @@ public readonly partial struct Result
         return this;
     }
 
-    /// <inheritdoc />>
+    /// <inheritdoc />
     public override string ToString()
     {
         return Succeeded ? "Success" : "Failure";
