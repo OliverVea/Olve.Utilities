@@ -1,3 +1,9 @@
+## v0.35.2 (2025-11-09)
+
+### Fix
+
+- remove extra '>' from inheritdoc tags in Result ToString methods
+
 ## v0.35.1 (2025-11-08)
 
 ### Fix
