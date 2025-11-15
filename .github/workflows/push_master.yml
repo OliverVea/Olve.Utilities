@@ -6,7 +6,7 @@ on:
       - master
 
 env:
-  DOTNET_VERSION: 9.0.300
+  DOTNET_VERSION: 10.0.100
 permissions:
   actions: read
   pages: write
