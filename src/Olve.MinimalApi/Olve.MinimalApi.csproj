@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-
     <Title>Olve.MinimalApi</Title>
     <Authors>Oliver Vea</Authors>
     <Description>Minimal API extensions for ASP.NET Core including JSON conversion for IPath, result mapping, and validation helpers</Description>
