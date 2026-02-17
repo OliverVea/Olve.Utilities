@@ -82,4 +82,22 @@ public class DeletionResultExtensionsTests
 
         await Assert.That(mapped).Failed();
     }
+
+    [Test]
+    public async Task ImplicitConversion_FromResultProblem_CreatesErrorResult()
+    {
+        DeletionResult result = new ResultProblem("something went wrong");
+
+        await Assert.That(result.Failed).IsTrue();
+        await Assert.That(result.Problems).IsNotNull();
+    }
+
+    [Test]
+    public async Task ImplicitConversion_FromResultProblemCollection_CreatesErrorResult()
+    {
+        DeletionResult result = new ResultProblemCollection(new ResultProblem("error"));
+
+        await Assert.That(result.Failed).IsTrue();
+        await Assert.That(result.Problems).IsNotNull();
+    }
 }

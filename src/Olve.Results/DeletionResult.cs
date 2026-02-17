@@ -65,4 +65,18 @@ public readonly struct DeletionResult
         problems = Problems;
         return problems is not null;
     }
+
+    /// <summary>
+    ///     Converts the specified problem to an error deletion result.
+    /// </summary>
+    /// <param name="problem">The problem to convert.</param>
+    /// <returns>An error deletion result.</returns>
+    public static implicit operator DeletionResult(ResultProblem problem) => Error(problem);
+
+    /// <summary>
+    ///     Converts the specified problems to an error deletion result.
+    /// </summary>
+    /// <param name="problems">The problems to convert.</param>
+    /// <returns>An error deletion result.</returns>
+    public static implicit operator DeletionResult(ResultProblemCollection problems) => Error(problems);
 }
