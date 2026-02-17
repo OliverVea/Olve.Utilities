@@ -23,6 +23,9 @@ This file documents the design and usage of the **Olve.Results** project. Keep i
 - **IfProblem** – run an action when a result has problems.
 - **ResultEnumerableExtensions** – utilities for enumerations of results: `HasProblems`, `TryPickProblems`, `GetValues` and `GetProblems`.
 - **ResultFuncExtensions** – converts `Action<T>` to `Func<T, Result>`.
+- **ResultExtensions** – instance extension methods for `Result` and `Result<T>`: `Map` (functor map), `Bind` (monadic bind), `ToEmptyResult` (discard value), `WithValueOnSuccess` (attach value to bare `Result`).
+- **DictionaryResultExtensions** – `SetWithResult` and `GetWithResult` for dictionary operations that return `Result` instead of throwing.
+- **DeletionResultExtensions** – `Match` (exhaustive pattern match) and `MapToResult` (convert to `Result`) for `DeletionResult`.
 
 ## Testing Utilities
 
