@@ -35,3 +35,27 @@ items:
       href: ../src/Olve.Paths.Glob/README.md
     - name: API
       href: api/Olve.Paths.Glob.yml
+- name: Olve.Validation
+  items:
+    - name: Overview
+      href: ../src/Olve.Validation/README.md
+    - name: API
+      href: api/Olve.Validation.yml
+- name: Olve.MinimalApi
+  items:
+    - name: Overview
+      href: ../src/Olve.MinimalApi/README.md
+    - name: API
+      href: api/Olve.MinimalApi.yml
+- name: Olve.Logging
+  items:
+    - name: Overview
+      href: ../src/Olve.Logging/README.md
+    - name: API
+      href: api/Olve.Logging.yml
+- name: Olve.OpenRaster
+  items:
+    - name: Overview
+      href: ../src/Olve.OpenRaster/README.md
+    - name: API
+      href: api/Olve.OpenRaster.yml

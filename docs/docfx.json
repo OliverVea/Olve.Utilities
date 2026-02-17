@@ -23,15 +23,15 @@
           ]
         },
         {
-          "src": "../src/Olve.Results.Validation",
+          "src": "../src/Olve.Validation",
           "files": [
-            "**/Olve.Results.Validation.csproj"
+            "**/Olve.Validation.csproj"
           ]
         },
         {
-          "src": "../src/Olve.Validation.SourceGeneration",
+          "src": "../src/Olve.MinimalApi",
           "files": [
-            "**/Olve.Validation.SourceGeneration.csproj"
+            "**/Olve.MinimalApi.csproj"
           ]
         },
         {
@@ -56,6 +56,12 @@
           "src": "../src/Olve.Logging",
           "files": [
             "**/Olve.Logging.csproj"
+          ]
+        },
+        {
+          "src": "../src/Olve.OpenRaster",
+          "files": [
+            "**/Olve.OpenRaster.csproj"
           ]
         }
       ],
