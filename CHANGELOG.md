@@ -1,3 +1,10 @@
+## v0.37.0 (2026-02-17)
+
+### Feat
+
+- add implicit conversions from ResultProblem to DeletionResult
+- add extension methods for Result, DeletionResult, Dictionary, and IPath
+
 ## v0.36.1 (2025-11-15)
 
 ### Fix
