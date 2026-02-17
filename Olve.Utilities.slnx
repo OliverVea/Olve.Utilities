@@ -1,0 +1,50 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/repo/">
+    <File Path=".cz.yaml" />
+    <File Path=".gitignore" />
+  </Folder>
+  <Folder Name="/repo/docs/">
+    <File Path="AGENTS.md" />
+    <File Path="CHANGELOG.md" />
+    <File Path="CONTRIBUTING.md" />
+    <File Path="docs/docfx.json" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/repo/dotnet/">
+    <File Path=".config/dotnet-tools.json" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/repo/github-actions/">
+    <File Path=".github/actions/dotnet-publish/action.yml" />
+    <File Path=".github/workflows/pr_to_master.yml" />
+    <File Path=".github/workflows/push_master.yml" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Olve.Logging/Olve.Logging.csproj" />
+    <Project Path="src/Olve.MinimalApi/Olve.MinimalApi.csproj" />
+    <Project Path="src/Olve.OpenRaster/Olve.OpenRaster.csproj" />
+    <Project Path="src/Olve.Operations/Olve.Operations.csproj" />
+    <Project Path="src/Olve.Paths.Glob/Olve.Paths.Glob.csproj" />
+    <Project Path="src/Olve.Paths/Olve.Paths.csproj" />
+    <Project Path="src/Olve.Results.TUnit/Olve.Results.TUnit.csproj" />
+    <Project Path="src/Olve.Results/Olve.Results.csproj" />
+    <Project Path="src/Olve.Utilities/Olve.Utilities.csproj" />
+    <Project Path="src/Olve.Validation/Olve.Validation.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Olve.MinimalApi.Tests/Olve.MinimalApi.Tests.csproj" />
+    <Project Path="tests/Olve.Operations.Tests/Olve.Operations.Tests.csproj" />
+    <Project Path="tests/Olve.Paths.Tests/Olve.Paths.Tests.csproj" />
+    <Project Path="tests/Olve.Results.Tests/Olve.Results.Tests.csproj" />
+    <Project Path="tests/Olve.Utilities.Tests/Olve.Utilities.Tests.csproj" />
+    <Project Path="tests/Olve.Utilities.Trimming/Olve.Utilities.Trimming.csproj" />
+    <Project Path="tests/Olve.Validation.Tests/Olve.Validation.Tests.csproj" />
+  </Folder>
+</Solution>
