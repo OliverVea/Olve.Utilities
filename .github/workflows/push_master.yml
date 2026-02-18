@@ -114,6 +114,7 @@ jobs:
           - id: Olve.Paths
           - id: Olve.Paths.Glob
           - id: Olve.Logging
+          - id: Olve.OpenRaster
 
     steps:
       - uses: actions/checkout@v4
