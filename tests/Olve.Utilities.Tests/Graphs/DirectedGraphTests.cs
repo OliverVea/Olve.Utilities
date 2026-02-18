@@ -48,11 +48,9 @@
             var to = nodeIds[1];
 
             // Act
-            var edgeResult = graph.CreateEdge(from, to);
+            var edgeId = graph.CreateEdge(from, to);
 
             // Assert
-            await Assert.That(edgeResult.Succeeded).IsTrue();
-            var edgeId = edgeResult.Value;
             var edgeGetResult = graph.GetEdge(edgeId);
             await Assert.That(edgeGetResult.Succeeded).IsTrue();
 
@@ -60,7 +58,7 @@
             await Assert.That(edge.From).IsEqualTo(from);
             await Assert.That(edge.To).IsEqualTo(to);
         }
-            
+
         [Test]
         public async Task CreateEdge_SameFromTo_CreatesDistinctEdges()
         {
@@ -70,15 +68,13 @@
             var to = nodeIds[1];
 
             // Act
-            var edgeResult1 = graph.CreateEdge(from, to);
-            var edgeResult2 = graph.CreateEdge(from, to);
+            var edgeId1 = graph.CreateEdge(from, to);
+            var edgeId2 = graph.CreateEdge(from, to);
 
             // Assert
-            await Assert.That(edgeResult1.Succeeded).IsTrue();
-            await Assert.That(edgeResult2.Succeeded).IsTrue();
-            await Assert.That(edgeResult1.Value).IsNotEqualTo(edgeResult2.Value);
+            await Assert.That(edgeId1).IsNotEqualTo(edgeId2);
         }
-            
+
         [Test]
         public async Task CreateEdge_OppositeDirection_Succeeds()
         {
@@ -92,9 +88,7 @@
             var edgeBA = graph.CreateEdge(b, a);
 
             // Assert
-            await Assert.That(edgeAB.Succeeded).IsTrue();
-            await Assert.That(edgeBA.Succeeded).IsTrue();
-            await Assert.That(edgeAB.Value).IsNotEqualTo(edgeBA.Value);
+            await Assert.That(edgeAB).IsNotEqualTo(edgeBA);
         }
 
         [Test]
@@ -105,16 +99,16 @@
             var from = nodeIds[0];
             var others = nodeIds[1..];
 
-            // Act & Assert
+            // Act
             foreach (var to in others)
             {
-                var result = graph.CreateEdge(from, to);
-                await Assert.That(result.Succeeded).IsTrue();
+                graph.CreateEdge(from, to);
             }
 
-            var outgoing = graph.GetOutgoingEdges(from);
-            await Assert.That(outgoing.Succeeded).IsTrue();
-            await Assert.That(outgoing.Value!.Count).IsEqualTo(others.Length);
+            // Assert
+            var found = graph.TryGetOutgoingEdges(from, out var outgoing);
+            await Assert.That(found).IsTrue();
+            await Assert.That(outgoing!.Count).IsEqualTo(others.Length);
         }
 
         [Test]
@@ -124,8 +118,7 @@
             var (graph, nodeIds) = CreateGraphWithNodes(2);
             var from = nodeIds[0];
             var to = nodeIds[1];
-            var edgeResult = graph.CreateEdge(from, to);
-            var edgeId = edgeResult.Value;
+            var edgeId = graph.CreateEdge(from, to);
 
             // Act
             var result = graph.GetEdge(edgeId);
@@ -158,8 +151,7 @@
             var (graph, nodeIds) = CreateGraphWithNodes(2);
             var from = nodeIds[0];
             var to = nodeIds[1];
-            var edgeResult = graph.CreateEdge(from, to);
-            var edgeId = edgeResult.Value;
+            var edgeId = graph.CreateEdge(from, to);
 
             // Act
             var deletionResult = graph.DeleteEdge(edgeId);
@@ -195,10 +187,8 @@
             var nodeC = nodeIds[2];
 
             // Create edges: A->B and B->C
-            var edgeResult1 = graph.CreateEdge(nodeA, nodeB);
-            var edgeResult2 = graph.CreateEdge(nodeB, nodeC);
-            var edgeId1 = edgeResult1.Value;
-            var edgeId2 = edgeResult2.Value;
+            var edgeId1 = graph.CreateEdge(nodeA, nodeB);
+            var edgeId2 = graph.CreateEdge(nodeB, nodeC);
 
             // Pre-assert: edges exist
             await Assert.That(graph.GetEdge(edgeId1).Succeeded).IsTrue();
@@ -221,8 +211,7 @@
             var (graph, nodeIds) = CreateGraphWithNodes(2);
             var from = nodeIds[0];
             var to = nodeIds[1];
-            var edgeResult = graph.CreateEdge(from, to);
-            var edgeId = edgeResult.Value;
+            var edgeId = graph.CreateEdge(from, to);
 
             // Act
             var followResult = graph.FollowEdge(from, edgeId);
@@ -239,8 +228,7 @@
             var (graph, nodeIds) = CreateGraphWithNodes(2);
             var from = nodeIds[0];
             var to = nodeIds[1];
-            var edgeResult = graph.CreateEdge(from, to);
-            var edgeId = edgeResult.Value;
+            var edgeId = graph.CreateEdge(from, to);
 
             // Act
             var followResult = graph.FollowEdge(to, edgeId);
@@ -250,7 +238,7 @@
         }
 
         [Test]
-        public async Task GetIncomingEdges_ReturnsCorrectEdges()
+        public async Task TryGetIncomingEdges_ReturnsCorrectEdges()
         {
             // Arrange
             var (graph, nodeIds) = CreateGraphWithNodes(3);
@@ -259,23 +247,20 @@
             var nodeC = nodeIds[2];
 
             // Create edges: A->C and B->C
-            var edgeResult1 = graph.CreateEdge(nodeA, nodeC);
-            var edgeResult2 = graph.CreateEdge(nodeB, nodeC);
-            var edgeId1 = edgeResult1.Value;
-            var edgeId2 = edgeResult2.Value;
+            var edgeId1 = graph.CreateEdge(nodeA, nodeC);
+            var edgeId2 = graph.CreateEdge(nodeB, nodeC);
 
             // Act
-            var incomingEdgesResult = graph.GetIncomingEdges(nodeC);
+            var found = graph.TryGetIncomingEdges(nodeC, out var incomingEdges);
 
             // Assert
-            await Assert.That(incomingEdgesResult.Succeeded).IsTrue();
-            var incomingEdges = incomingEdgesResult.Value;
+            await Assert.That(found).IsTrue();
             await Assert.That(incomingEdges!.Contains(edgeId1)).IsTrue();
             await Assert.That(incomingEdges.Contains(edgeId2)).IsTrue();
         }
 
         [Test]
-        public async Task GetOutgoingEdges_ReturnsCorrectEdges()
+        public async Task TryGetOutgoingEdges_ReturnsCorrectEdges()
         {
             // Arrange
             var (graph, nodeIds) = CreateGraphWithNodes(3);
@@ -284,21 +269,18 @@
             var nodeC = nodeIds[2];
 
             // Create edges: A->B and A->C
-            var edgeResult1 = graph.CreateEdge(nodeA, nodeB);
-            var edgeResult2 = graph.CreateEdge(nodeA, nodeC);
-            var edgeId1 = edgeResult1.Value;
-            var edgeId2 = edgeResult2.Value;
+            var edgeId1 = graph.CreateEdge(nodeA, nodeB);
+            var edgeId2 = graph.CreateEdge(nodeA, nodeC);
 
             // Act
-            var outgoingEdgesResult = graph.GetOutgoingEdges(nodeA);
+            var found = graph.TryGetOutgoingEdges(nodeA, out var outgoingEdges);
 
             // Assert
-            await Assert.That(outgoingEdgesResult.Succeeded).IsTrue();
-            var outgoingEdges = outgoingEdgesResult.Value;
+            await Assert.That(found).IsTrue();
             await Assert.That(outgoingEdges!.Contains(edgeId1)).IsTrue();
             await Assert.That(outgoingEdges.Contains(edgeId2)).IsTrue();
         }
-        
+
         [Test]
         public async Task CreateFullMesh_AllNodesConnectedToEachOther()
         {
@@ -314,16 +296,15 @@
                 foreach (var to in nodeIds)
                 {
                     if (from.Equals(to)) continue;
-                    var result = graph.CreateEdge(from, to);
-                    await Assert.That(result.Succeeded).IsTrue();
-                    createdEdges.Add(result.Value);
+                    var edgeId = graph.CreateEdge(from, to);
+                    createdEdges.Add(edgeId);
                 }
             }
 
             // Assert: all expected edges are created
             await Assert.That(createdEdges.Count).IsEqualTo(expectedEdgeCount);
         }
-        
+
         [Test]
         public async Task IncomingOutgoing_DoNotOverlap()
         {
@@ -338,11 +319,11 @@
             graph.CreateEdge(c, a);
 
             // Act
-            var incomingA = graph.GetIncomingEdges(a);
-            var outgoingA = graph.GetOutgoingEdges(a);
+            graph.TryGetIncomingEdges(a, out var incomingA);
+            graph.TryGetOutgoingEdges(a, out var outgoingA);
 
             // Assert
-            await Assert.That(incomingA.Value!.All(e => !outgoingA.Value!.Contains(e))).IsTrue();
+            await Assert.That(incomingA!.All(e => !outgoingA!.Contains(e))).IsTrue();
         }
 
         /// <summary>
@@ -355,11 +336,7 @@
 
             for (var i = 0; i < nodeCount; i++)
             {
-                if (graph.CreateNode().TryPickProblems(out var problems, out var nodeId))
-                {
-                    Assert.Fail(string.Join(", ", problems.Select(x => x.ToDebugString())));
-                }
-                nodeIds[i] = nodeId;
+                nodeIds[i] = graph.CreateNode();
             }
 
             return (graph, nodeIds);

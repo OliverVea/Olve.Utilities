@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Olve.Results;
 using Olve.Utilities.CollectionExtensions;
 using Olve.Utilities.Ids;
@@ -38,17 +39,14 @@ public class DirectedGraph
     /// <summary>
     /// Creates a new node and adds it to the graph.
     /// </summary>
-    /// <returns>
-    /// A <see cref="Result{T}"/> containing the ID of the newly created node if successful,
-    /// or a problem description if the update function fails.
-    /// </returns>
-    public Result<Id<Node>> CreateNode()
+    /// <returns>The ID of the newly created node.</returns>
+    public Id<Node> CreateNode()
     {
         var nodeId = Id.New<Node>();
         Node node = new(nodeId);
-        
+
         _nodes.Add(nodeId, node);
-        
+
         return nodeId;
     }
 
@@ -112,20 +110,17 @@ public class DirectedGraph
     /// </summary>
     /// <param name="from">The ID of the source node.</param>
     /// <param name="to">The ID of the target node.</param>
-    /// <returns>
-    /// A <see cref="Result{T}"/> containing the ID of the created edge if successful,
-    /// or a problem result if the operation fails.
-    /// </returns>
-    public Result<Id<DirectedEdge>> CreateEdge(Id<Node> from, Id<Node> to)
+    /// <returns>The ID of the created edge.</returns>
+    public Id<DirectedEdge> CreateEdge(Id<Node> from, Id<Node> to)
     {
         var edgeId = Id.New<DirectedEdge>();
         DirectedEdge directedEdge = new(edgeId, from, to);
-        
+
         _edges.Add(edgeId, directedEdge);
 
         AddOutgoingEdgeForNode(from, edgeId);
         AddIncomingEdgeForNode(to, edgeId);
-        
+
         return edgeId;
     }
 
@@ -239,38 +234,38 @@ public class DirectedGraph
     }
     
     /// <summary>
-    /// Gets the set of incoming edge IDs for the specified node.
+    /// Tries to get the set of incoming edge IDs for the specified node.
     /// </summary>
     /// <param name="nodeId">The ID of the node.</param>
-    /// <returns>
-    /// A <see cref="Result{T}"/> containing the set of incoming edge IDs,
-    /// or an empty set if none exist.
-    /// </returns>
-    public Result<IReadOnlySet<Id<DirectedEdge>>> GetIncomingEdges(Id<Node> nodeId)
+    /// <param name="edges">When this method returns, contains the set of incoming edge IDs if found; otherwise <c>null</c>.</param>
+    /// <returns><c>true</c> if the node has incoming edges; otherwise <c>false</c>.</returns>
+    public bool TryGetIncomingEdges(Id<Node> nodeId, [NotNullWhen(true)] out IReadOnlySet<Id<DirectedEdge>>? edges)
     {
-        if (!_incomingEdgesForNode.TryGetValue(nodeId, out var edges))
+        if (_incomingEdgesForNode.TryGetValue(nodeId, out var set))
         {
-            return Result.Success<IReadOnlySet<Id<DirectedEdge>>>(new HashSet<Id<DirectedEdge>>());
+            edges = (IReadOnlySet<Id<DirectedEdge>>)set;
+            return true;
         }
 
-        return Result.Success((IReadOnlySet<Id<DirectedEdge>>)edges);
+        edges = null;
+        return false;
     }
-    
+
     /// <summary>
-    /// Gets the set of outgoing edge IDs for the specified node.
+    /// Tries to get the set of outgoing edge IDs for the specified node.
     /// </summary>
     /// <param name="nodeId">The ID of the node.</param>
-    /// <returns>
-    /// A <see cref="Result{T}"/> containing the set of outgoing edge IDs,
-    /// or an empty set if none exist.
-    /// </returns>
-    public Result<IReadOnlySet<Id<DirectedEdge>>> GetOutgoingEdges(Id<Node> nodeId)
+    /// <param name="edges">When this method returns, contains the set of outgoing edge IDs if found; otherwise <c>null</c>.</param>
+    /// <returns><c>true</c> if the node has outgoing edges; otherwise <c>false</c>.</returns>
+    public bool TryGetOutgoingEdges(Id<Node> nodeId, [NotNullWhen(true)] out IReadOnlySet<Id<DirectedEdge>>? edges)
     {
-        if (!_outgoingEdgesForNode.TryGetValue(nodeId, out var edges))
+        if (_outgoingEdgesForNode.TryGetValue(nodeId, out var set))
         {
-            return Result.Success<IReadOnlySet<Id<DirectedEdge>>>(new HashSet<Id<DirectedEdge>>());
+            edges = (IReadOnlySet<Id<DirectedEdge>>)set;
+            return true;
         }
 
-        return Result.Success((IReadOnlySet<Id<DirectedEdge>>)edges);
+        edges = null;
+        return false;
     }
 }
