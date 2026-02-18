@@ -1,3 +1,9 @@
+## v0.37.2 (2026-02-18)
+
+### Refactor
+
+- replace Result returns with TryGet pattern in DirectedGraph
+
 ## v0.37.1 (2026-02-18)
 
 ### Fix
