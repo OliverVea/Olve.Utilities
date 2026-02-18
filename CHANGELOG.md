@@ -1,3 +1,9 @@
+## v0.37.1 (2026-02-18)
+
+### Fix
+
+- add Olve.OpenRaster to NuGet publish matrix
+
 ## v0.37.0 (2026-02-17)
 
 ### Feat
