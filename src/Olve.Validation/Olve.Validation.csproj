@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Title>Olve.Results.Validation</Title>
+    <Title>Olve.Validation</Title>
     <Authors>Oliver Vea</Authors>
     <Description>Validation helpers built on top of Olve.Results</Description>
     <Copyright>Oliver Vea</Copyright>
-    <PackageProjectUrl>https://github.com/OliverVea/Olve.Utilities/src/Olve.Results.Validation</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/OliverVea/Olve.Utilities/src/Olve.Validation</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/OliverVea/Olve.Utilities</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
