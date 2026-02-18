@@ -2,7 +2,8 @@
     <PropertyGroup>
         <Title>Olve.Operations</Title>
         <Authors>Oliver Vea</Authors>
-        <Description>Operation type implementation and utilities</Description>
+        <Description>[Deprecated] Operation type implementation and utilities</Description>
+        <PackageDeprecationMessage>This package is deprecated. The abstractions add little value over plain method signatures. Consider using simple interfaces or delegates instead.</PackageDeprecationMessage>
         <Copyright>Oliver Vea</Copyright>
         <PackageProjectUrl>https://github.com/OliverVea/Olve.Utilities/src/Olve.Operations</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
