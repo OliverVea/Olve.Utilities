@@ -127,3 +127,25 @@ To ensure high-quality, maintainable, and effective tests across the repository,
     Regularly review and refactor tests as the codebase changes. Strive to improve coverage, clarity, and maintainability over time.
 
 By following these standards, we aim to keep our test suite robust, reliable, and easy to work with as the project grows.
+
+## README Code Examples
+
+Code examples in package READMEs must be sourced from test files using [embedme](https://github.com/zakhenry/embedme) via the `OliverVea/embed-md` GitHub Action. This prevents documentation from drifting out of sync with the actual code.
+
+### How it works
+
+1. Each package's test project should have a `ReadmeDemo.cs` file containing runnable test methods that demonstrate the package's API.
+2. In the README, code blocks reference lines from that file using an embedme comment as the first line. Use `cs` (not `csharp`) as the language tag, and paths are relative to the README file:
+   ````
+   ```cs
+   // ../../tests/Olve.Paths.Tests/ReadmeDemo.cs#L18-L24
+   ```
+   ````
+3. Running `npx embedme <README.md>` populates the code block with the referenced lines.
+4. CI runs `npx embedme <README.md> --verify` on PRs to master, failing if any snippet is out of sync.
+
+### Rules
+
+- Never manually copy code into a README. Always use an embedme marker pointing to a test file.
+- The referenced test must be a real, runnable `[Test]` method so examples are compile-verified and tested on every CI run.
+- When updating a package's API, update the `ReadmeDemo.cs` test first, then re-run `npx embedme` to refresh the README.

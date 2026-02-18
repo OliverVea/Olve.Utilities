@@ -58,6 +58,15 @@ jobs:
           }
         shell: pwsh
 
+  verify-docs:
+    name: Verify code snippets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: OliverVea/embed-md@main
+        with:
+          markdown-files: "src/*/README.md"
+
   dry-run-publish-packages:
     name: Dry Run Publish NuGet Packages in Parallel
     runs-on: ubuntu-latest

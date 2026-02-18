@@ -25,8 +25,10 @@ dotnet add package Olve.Paths
 
 ## Usage
 
-```csharp
-var path = Path.Create("/home/user/documents");
+```cs
+// ../../tests/Olve.Paths.Tests/ReadmeDemo.cs#L18-L24
+
+var path = Path.Create("/home/user/documents"); // /home/user/documents
 
 var parent = path.Parent; // /home/user
 var folderName = path.Name; // documents
