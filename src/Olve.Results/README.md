@@ -24,6 +24,7 @@ This library provides predictable control flow and composable error propagation 
 | ------------------------- | ----------------------------------------------------------------------------- |
 | `Result`                  | Represents success or a collection of problems.                               |
 | `Result<T>`               | Represents success with a value or a collection of problems.                  |
+| `DeletionResult`          | Three-state result: success, not found, or error with problems.               |
 | `ResultProblem`           | A single problem with message, optional exception, metadata, and origin info. |
 | `ResultProblemCollection` | Immutable collection supporting merge, prepend, and append.                   |
 
@@ -35,17 +36,17 @@ This library provides predictable control flow and composable error propagation 
 
 Wrap operations in `Result.Try()` to convert exceptions into structured problems instead of throwing them.
 
-```csharp
-Result<string> result = Result.Try(() => File.ReadAllText("/tmp/example.txt"));
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L11-L18
+
+Result<string> result = Result.Try<string, IOException>(
+    () => File.ReadAllText("/tmp/olve-results-readme-test.txt"));
 
 if (result.TryPickProblems(out var problems, out var text))
 {
     foreach (var p in problems)
         Console.WriteLine(p.Message);
-    return;
 }
-
-Console.WriteLine(text);
 ```
 
 This captures any thrown exceptions and converts them into `ResultProblem`s without disrupting control flow.
@@ -56,9 +57,11 @@ This captures any thrown exceptions and converts them into `ResultProblem`s with
 
 Use `Result.Chain()` to execute dependent steps where the second operation relies on the result of the first.
 
-```csharp
-Result<User> LoadUser(string name) => /* ... */;
-Result<Profile> LoadProfile(User user) => /* ... */;
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L26-L32
+
+Result<string> LoadUser(string name) => Result.Success(name);
+Result<string> LoadProfile(string user) => Result.Success($"profile:{user}");
 
 var result = Result.Chain(
     () => LoadUser("Alice"),
@@ -74,8 +77,13 @@ If the first step fails, the chain stops immediately and returns its problems; o
 
 Use `Result.Concat()` when multiple operations can run independently, and you want to collect all problems together.
 
-```csharp
-Result<(User user, Settings settings)> setup = Result.Concat(
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L40-L46
+
+Result<string> LoadUser(string name) => Result.Success(name);
+Result<int> LoadSettings() => Result.Success(42);
+
+Result<(string user, int settings)> setup = Result.Concat(
     () => LoadUser("current"),
     () => LoadSettings()
 );
@@ -89,10 +97,13 @@ If any operation fails, all problems are aggregated; otherwise, the combined suc
 
 Attach higher-level context to problems as they propagate upward for clear, hierarchical error traces.
 
-```csharp
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L57-L60
+
 var user = LoadUser("unknown");
 if (user.TryPickProblems(out var problems))
-    return problems.Prepend("User initialization failed");
+{
+    var contextualized = problems.Prepend("User initialization failed");
 ```
 
 Each layer can prepend its own message, building a human-readable error chain.
@@ -103,20 +114,19 @@ Each layer can prepend its own message, building a human-readable error chain.
 
 Return `Result` from validation routines to make checks composable and explicit.
 
-```csharp
-public Result Validate()
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L72-L81
+
+Result Validate(string? email)
 {
-    if (string.IsNullOrWhiteSpace(Email))
+    if (string.IsNullOrWhiteSpace(email))
         return new ResultProblem("Email is required");
 
-    if (!Email.Contains('@'))
-        return new ResultProblem("Invalid email: {0}", Email);
+    if (!email.Contains('@'))
+        return new ResultProblem("Invalid email: {0}", email);
 
     return Result.Success();
 }
-
-if (user.Validate().TryPickProblems(out var problems))
-    return problems.Prepend("Invalid user input");
 ```
 
 ---
@@ -125,22 +135,17 @@ if (user.Validate().TryPickProblems(out var problems))
 
 `ResultEnumerableExtensions` provide helpers for aggregating problems or values from collections of results.
 
-```csharp
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L95-L102
+
 var results = new[]
 {
     LoadUser("Alice"),
     LoadUser("Bob"),
-    LoadUser("Charlie")
+    LoadUser("Charlie"),
 };
 
-if (results.TryPickProblems(out var problems, out var users))
-{
-    Console.WriteLine("Some users failed to load:");
-    foreach (var p in problems) Console.WriteLine(p);
-    return;
-}
-
-Console.WriteLine($"Loaded {users.Count} users.");
+results.TryPickProblems(out var problems, out var users);
 ```
 
 Other useful extensions:
@@ -155,8 +160,13 @@ Other useful extensions:
 
 For high-performance code paths, use a `Try*` method to avoid allocations entirely.
 
-```csharp
-bool TryParseInt(string input, out int value, [MaybeNullWhen(true)] out ResultProblem problem)
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L112-L125
+
+bool TryParseInt(
+    string input,
+    out int value,
+    [NotNullWhen(false)] out ResultProblem? problem)
 {
     if (!int.TryParse(input, out value))
     {
@@ -185,18 +195,133 @@ This approach avoids constructing `Result<T>` entirely, ideal for inner loops.
 
 Example:
 
-```csharp
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L139-L144
+
 var problem = new ResultProblem("Database query failed: {0}", query)
 {
     Tags = ["database", "query"],
     Severity = 2,
-    Source = "Repository"
+    Source = "Repository",
 };
-
-// [Data/Repository.cs:42] Database query failed: SELECT * FROM Users
 ```
 
 Automatic origin capture provides traceable, stacktrace-like context without throwing exceptions.
+
+---
+
+## DeletionResult
+
+`DeletionResult` models deletion operations with three distinct outcomes: success, not found, and error.
+
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L154-L156
+
+var success = DeletionResult.Success();
+var notFound = DeletionResult.NotFound();
+var error = DeletionResult.Error(new ResultProblem("disk full"));
+```
+
+### Exhaustive matching
+
+Use `Match()` to handle all three states explicitly:
+
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L166-L171
+
+var result = DeletionResult.NotFound();
+
+var message = result.Match(
+    onSuccess: () => "Deleted",
+    onNotFound: () => "Already gone",
+    onProblems: problems => $"Error: {problems.First().Message}");
+```
+
+### Converting to Result
+
+`MapToResult()` converts a `DeletionResult` to a `Result`. By default, not-found is treated as success:
+
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L179-L182
+
+var result = DeletionResult.NotFound();
+
+var asResult = result.MapToResult(allowNotFound: true); // Success
+var strict = result.MapToResult(allowNotFound: false); // Failure
+```
+
+---
+
+## Result.Try
+
+`Result.Try<TException>()` catches a specific exception type and converts it into a `ResultProblem`:
+
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L203-L205
+
+var result = Result.Try<IOException>(
+    () => File.ReadAllText("/nonexistent/path.txt"),
+    "Could not read config file");
+```
+
+---
+
+## Implicit conversions
+
+A `ResultProblem` implicitly converts to `Result`, `Result<T>`, or `DeletionResult`, making failure returns concise:
+
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L191-L193
+
+Result result = new ResultProblem("not found");
+Result<int> typed = new ResultProblem("parse error");
+DeletionResult deletion = new ResultProblem("disk full");
+```
+
+---
+
+## Functional extensions
+
+### Map and Bind
+
+`Map` transforms the value inside a successful `Result<T>`. `Bind` (flatMap) does the same but the mapping function itself returns a `Result<T>`:
+
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L213-L220
+
+var result = Result.Success("42");
+
+var mapped = result.Map(s => s.Length); // Result<int> with value 2
+
+var bound = result.Bind(s =>
+    int.TryParse(s, out var n)
+        ? Result.Success(n)
+        : Result.Failure<int>(new ResultProblem("parse error")));
+```
+
+Other extensions:
+
+* `ToEmptyResult()` — discard the value, keeping only success/failure status
+* `WithValueOnSuccess()` — attach a value to a valueless `Result`
+
+---
+
+## Dictionary extensions
+
+`SetWithResult` and `GetWithResult` wrap dictionary operations in results instead of throwing or returning booleans:
+
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L229-L236
+
+var dictionary = new Dictionary<string, int>();
+
+var setResult = dictionary.SetWithResult("answer", 42); // Success
+var duplicate = dictionary.SetWithResult("answer", 99); // Failure: key exists
+
+IReadOnlyDictionary<string, int> readOnly = dictionary;
+var getResult = readOnly.GetWithResult("answer"); // Result<int> with value 42
+var missing = readOnly.GetWithResult("unknown"); // Failure: key not found
+```
 
 ---
 
