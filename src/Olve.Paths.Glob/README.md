@@ -1,28 +1,91 @@
 # Olve.Paths.Glob
-[![NuGet](https://img.shields.io/nuget/v/Olve.Paths.Glob?logo=nuget)](https://www.nuget.org/packages/Olve.Paths.Glob)[![GitHub](https://img.shields.io/github/license/OliverVea/Olve.Utilities)](LICENSE)![LOC](https://img.shields.io/endpoint?url=https%3A%2F%2Fghloc.vercel.app%2Fapi%2FOliverVea%2FOlve.Paths.Glob%2Fbadge)![NuGet Downloads](https://img.shields.io/nuget/dt/Olve.Paths.Glob)
 
-Globbing extension for `Olve.Paths` library.
+[![NuGet](https://img.shields.io/nuget/v/Olve.Paths.Glob?logo=nuget)](https://www.nuget.org/packages/Olve.Paths.Glob)
+[![Docs](https://img.shields.io/badge/docs-API%20Reference-blue)](https://olivervea.github.io/Olve.Utilities/api/Olve.Paths.Glob.html)
 
-## Features
+Glob pattern matching extension for [Olve.Paths](https://www.nuget.org/packages/Olve.Paths). Adds a `TryGlob` extension method to `IPath` for finding files using Unix-style wildcard patterns.
 
-- Support for Unix-style globbing patterns, including wildcards `*` and `**`.
+---
 
 ## Installation
-
-Simply install the package via NuGet:
 
 ```bash
 dotnet add package Olve.Paths.Glob
 ```
 
+---
+
 ## Usage
 
-```csharp
-using Olve.Paths;
+`TryGlob` follows the Try-pattern — it returns `true` when the path is absolute and matches are found:
 
-var path = Path.Create("/home/user/documents");
-var glob = path.Glob("*.txt"); // Matches all .txt files in the directory
-var allFiles = path.Glob("**/*"); // Matches all files in the directory and subdirectories
+```cs
+// ../../tests/Olve.Paths.Tests/GlobReadmeDemo.cs#L18-L22
+
+if (path.TryGlob("*.txt", out var matches))
+{
+    foreach (var match in matches)
+        Console.WriteLine(match.Path);
+}
 ```
 
-See the [API documentation](https://olivervea.github.io/Olve.Utilities/api/) for more details.
+### Recursive patterns
+
+Use `**` to match across directory boundaries:
+
+```cs
+// ../../tests/Olve.Paths.Tests/GlobReadmeDemo.cs#L33-L34
+
+// All .txt files in any subdirectory
+path.TryGlob("**/*.txt", out var sourceFiles);
+```
+
+### Case-insensitive matching
+
+Pass `ignoreCase: true` for case-insensitive pattern matching:
+
+```cs
+// ../../tests/Olve.Paths.Tests/GlobReadmeDemo.cs#L45-L45
+
+path.TryGlob("*.TXT", out var matches, ignoreCase: true);
+```
+
+### Hidden file exclusion
+
+Files and directories starting with `.` are automatically excluded from all glob results. This is not configurable.
+
+---
+
+## API Reference
+
+### `PathExtensions.TryGlob`
+
+```csharp
+public static bool TryGlob(
+    this IPath path,
+    string pattern,
+    out IEnumerable<IPath>? matches,
+    bool ignoreCase = false)
+```
+
+| Parameter | Description |
+| --- | --- |
+| `path` | The root directory to search within. Must be absolute. |
+| `pattern` | Glob pattern (`*` matches within a directory, `**` matches across directories). |
+| `matches` | Matched file paths, or `null` if the path is not absolute. |
+| `ignoreCase` | When `true`, uses case-insensitive matching. Default: `false`. |
+
+Returns `true` when the path is absolute and matches were found.
+
+---
+
+## Documentation
+
+Full API reference:
+[https://olivervea.github.io/Olve.Utilities/api/Olve.Paths.Glob.html](https://olivervea.github.io/Olve.Utilities/api/Olve.Paths.Glob.html)
+
+---
+
+## License
+
+MIT License © [OliverVea](https://github.com/OliverVea)
