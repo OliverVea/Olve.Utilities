@@ -18,6 +18,7 @@
 - Source generator tests compile in-memory using `Microsoft.CodeAnalysis.CSharp`.
 - `build/main.py` defines a Dagger pipeline that restores, builds, tests, packs
   and generates DocFX using the `.NET` version from `DOTNET_VERSION`.
+- Commit messages should be short: a single subject line using conventional commit format (e.g. `docs: fix Olve.Paths README`). No multi-line body unless truly necessary.
 
 ## Examples of XML Documentation in Source Code
 
