@@ -46,5 +46,6 @@
     <Project Path="tests/Olve.Utilities.Tests/Olve.Utilities.Tests.csproj" />
     <Project Path="tests/Olve.Utilities.Trimming/Olve.Utilities.Trimming.csproj" />
     <Project Path="tests/Olve.Validation.Tests/Olve.Validation.Tests.csproj" />
+    <Project Path="tests/Olve.OpenRaster.Tests/Olve.OpenRaster.Tests.csproj" />
   </Folder>
 </Solution>
