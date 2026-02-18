@@ -9,7 +9,7 @@
     public class DirectedGraphTests
     {
         [Test]
-        public async Task GetNode_OnExistingNode_SucceedsWithNodeValue()
+        public async Task TryGetNode_OnExistingNode_ReturnsTrue()
         {
             // Arrange
             var (graph, nodeIds) = CreateGraphWithNodes(1);
@@ -17,26 +17,25 @@
             var nodeId = nodeIds[0];
 
             // Act
-            var nodeResult = graph.GetNode(nodeId);
+            var found = graph.TryGetNode(nodeId, out var node);
 
             // Assert
-            await Assert.That(nodeResult.Succeeded).IsTrue();
-            var node = nodeResult.Value;
+            await Assert.That(found).IsTrue();
             await Assert.That(node.Id).IsEqualTo(nodeId);
         }
 
         [Test]
-        public async Task GetNode_OnNonExistentNode_Fails()
+        public async Task TryGetNode_OnNonExistentNode_ReturnsFalse()
         {
             // Arrange
             var graph = new DirectedGraph();
             var fakeNodeId = Id.New<Node>();
 
             // Act
-            var result = graph.GetNode(fakeNodeId);
+            var found = graph.TryGetNode(fakeNodeId, out _);
 
             // Assert
-            await Assert.That(result.Succeeded).IsFalse();
+            await Assert.That(found).IsFalse();
         }
 
         [Test]
@@ -51,10 +50,8 @@
             var edgeId = graph.CreateEdge(from, to);
 
             // Assert
-            var edgeGetResult = graph.GetEdge(edgeId);
-            await Assert.That(edgeGetResult.Succeeded).IsTrue();
-
-            var edge = edgeGetResult.Value;
+            var found = graph.TryGetEdge(edgeId, out var edge);
+            await Assert.That(found).IsTrue();
             await Assert.That(edge.From).IsEqualTo(from);
             await Assert.That(edge.To).IsEqualTo(to);
         }
@@ -112,7 +109,7 @@
         }
 
         [Test]
-        public async Task GetEdge_OnExistingEdge_Succeeds()
+        public async Task TryGetEdge_OnExistingEdge_ReturnsTrue()
         {
             // Arrange
             var (graph, nodeIds) = CreateGraphWithNodes(2);
@@ -121,27 +118,26 @@
             var edgeId = graph.CreateEdge(from, to);
 
             // Act
-            var result = graph.GetEdge(edgeId);
+            var found = graph.TryGetEdge(edgeId, out var edge);
 
             // Assert
-            await Assert.That(result.Succeeded).IsTrue();
-            var edge = result.Value;
+            await Assert.That(found).IsTrue();
             await Assert.That(edge.From).IsEqualTo(from);
             await Assert.That(edge.To).IsEqualTo(to);
         }
 
         [Test]
-        public async Task GetEdge_OnNonExistentEdge_Fails()
+        public async Task TryGetEdge_OnNonExistentEdge_ReturnsFalse()
         {
             // Arrange
             var graph = new DirectedGraph();
             var fakeEdgeId = Id.New<DirectedEdge>();
 
             // Act
-            var result = graph.GetEdge(fakeEdgeId);
+            var found = graph.TryGetEdge(fakeEdgeId, out _);
 
             // Assert
-            await Assert.That(result.Succeeded).IsFalse();
+            await Assert.That(found).IsFalse();
         }
 
         [Test]
@@ -154,13 +150,13 @@
             var edgeId = graph.CreateEdge(from, to);
 
             // Act
-            var deletionResult = graph.DeleteEdge(edgeId);
+            var deleted = graph.DeleteEdge(edgeId);
 
             // Assert
-            await Assert.That(deletionResult.Succeeded).IsTrue();
+            await Assert.That(deleted).IsTrue();
             // Try to get the deleted edge, should fail.
-            var getEdgeResult = graph.GetEdge(edgeId);
-            await Assert.That(getEdgeResult.Succeeded).IsFalse();
+            var found = graph.TryGetEdge(edgeId, out _);
+            await Assert.That(found).IsFalse();
         }
 
         [Test]
@@ -171,10 +167,10 @@
             var fakeEdgeId = Id.New<DirectedEdge>();
 
             // Act
-            var deletionResult = graph.DeleteEdge(fakeEdgeId);
+            var deleted = graph.DeleteEdge(fakeEdgeId);
 
             // Assert
-            await Assert.That(deletionResult.Succeeded).IsFalse();
+            await Assert.That(deleted).IsFalse();
         }
 
         [Test]
@@ -191,21 +187,21 @@
             var edgeId2 = graph.CreateEdge(nodeB, nodeC);
 
             // Pre-assert: edges exist
-            await Assert.That(graph.GetEdge(edgeId1).Succeeded).IsTrue();
-            await Assert.That(graph.GetEdge(edgeId2).Succeeded).IsTrue();
+            await Assert.That(graph.TryGetEdge(edgeId1, out _)).IsTrue();
+            await Assert.That(graph.TryGetEdge(edgeId2, out _)).IsTrue();
 
             // Act: Delete node B, which should remove both its incoming and outgoing edges.
-            var deletionResult = graph.DeleteNode(nodeB);
+            var deleted = graph.DeleteNode(nodeB);
 
             // Assert
-            await Assert.That(deletionResult.Succeeded).IsTrue();
-            await Assert.That(graph.GetNode(nodeB).Succeeded).IsFalse();
-            await Assert.That(graph.GetEdge(edgeId1).Succeeded).IsFalse();
-            await Assert.That(graph.GetEdge(edgeId2).Succeeded).IsFalse();
+            await Assert.That(deleted).IsTrue();
+            await Assert.That(graph.TryGetNode(nodeB, out _)).IsFalse();
+            await Assert.That(graph.TryGetEdge(edgeId1, out _)).IsFalse();
+            await Assert.That(graph.TryGetEdge(edgeId2, out _)).IsFalse();
         }
 
         [Test]
-        public async Task FollowEdge_OnValidEdge_ReturnsTargetNodeId()
+        public async Task TryFollowEdge_OnValidEdge_ReturnsTargetNodeId()
         {
             // Arrange
             var (graph, nodeIds) = CreateGraphWithNodes(2);
@@ -214,15 +210,15 @@
             var edgeId = graph.CreateEdge(from, to);
 
             // Act
-            var followResult = graph.FollowEdge(from, edgeId);
+            var found = graph.TryFollowEdge(from, edgeId, out var target);
 
             // Assert
-            await Assert.That(followResult.Succeeded).IsTrue();
-            await Assert.That(followResult.Value).IsEqualTo(to);
+            await Assert.That(found).IsTrue();
+            await Assert.That(target).IsEqualTo(to);
         }
 
         [Test]
-        public async Task FollowEdge_OnInvalidSource_Fails()
+        public async Task TryFollowEdge_OnInvalidSource_ReturnsFalse()
         {
             // Arrange
             var (graph, nodeIds) = CreateGraphWithNodes(2);
@@ -231,10 +227,10 @@
             var edgeId = graph.CreateEdge(from, to);
 
             // Act
-            var followResult = graph.FollowEdge(to, edgeId);
+            var found = graph.TryFollowEdge(to, edgeId, out _);
 
             // Assert
-            await Assert.That(followResult.Succeeded).IsFalse();
+            await Assert.That(found).IsFalse();
         }
 
         [Test]

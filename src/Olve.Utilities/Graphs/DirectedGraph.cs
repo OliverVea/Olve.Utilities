@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Olve.Results;
 using Olve.Utilities.CollectionExtensions;
 using Olve.Utilities.Ids;
 
@@ -51,34 +50,26 @@ public class DirectedGraph
     }
 
     /// <summary>
-    /// Gets the node with the specified ID.
+    /// Tries to get the node with the specified ID.
     /// </summary>
     /// <param name="nodeId">The ID of the node to retrieve.</param>
-    /// <returns>
-    /// A <see cref="Result{T}"/> containing the node if found; otherwise, a problem result.
-    /// </returns>
-    public Result<Node> GetNode(Id<Node> nodeId)
+    /// <param name="node">When this method returns, contains the node if found; otherwise <c>null</c>.</param>
+    /// <returns><c>true</c> if the node was found; otherwise <c>false</c>.</returns>
+    public bool TryGetNode(Id<Node> nodeId, [MaybeNullWhen(false)] out Node node)
     {
-        if (!_nodes.TryGetValue(nodeId, out var node))
-        {
-            return new ResultProblem("Could not find node with id '{0}'", nodeId);
-        }
-
-        return node;
+        return _nodes.TryGetValue(nodeId, out node);
     }
 
     /// <summary>
     /// Deletes the node with the specified ID and all its connected edges.
     /// </summary>
     /// <param name="nodeId">The ID of the node to delete.</param>
-    /// <returns>
-    /// A <see cref="DeletionResult"/> indicating whether the node was successfully deleted or not found.
-    /// </returns>
-    public DeletionResult DeleteNode(Id<Node> nodeId)
+    /// <returns><c>true</c> if the node was found and deleted; otherwise <c>false</c>.</returns>
+    public bool DeleteNode(Id<Node> nodeId)
     {
         if (!_nodes.ContainsKey(nodeId))
         {
-            return DeletionResult.NotFound();
+            return false;
         }
 
         if (_incomingEdgesForNode.TryGetValue(nodeId, out var edgesToDelete))
@@ -96,13 +87,13 @@ public class DirectedGraph
                 DeleteEdge(edgeId);
             }
         }
-        
+
         _incomingEdgesForNode.Remove(nodeId);
         _outgoingEdgesForNode.Remove(nodeId);
 
         _nodes.Remove(nodeId);
 
-        return DeletionResult.Success();
+        return true;
     }
 
     /// <summary>
@@ -131,42 +122,34 @@ public class DirectedGraph
         => _outgoingEdgesForNode.GetOrAdd(nodeId, () => new HashSet<Id<DirectedEdge>>()).Add(edgeId);
 
     /// <summary>
-    /// Gets the directed edge with the specified ID.
+    /// Tries to get the directed edge with the specified ID.
     /// </summary>
     /// <param name="edgeId">The ID of the edge to retrieve.</param>
-    /// <returns>
-    /// A <see cref="Result{T}"/> containing the edge if found; otherwise, a problem result.
-    /// </returns>
-    public Result<DirectedEdge> GetEdge(Id<DirectedEdge> edgeId)
+    /// <param name="edge">When this method returns, contains the edge if found; otherwise <c>null</c>.</param>
+    /// <returns><c>true</c> if the edge was found; otherwise <c>false</c>.</returns>
+    public bool TryGetEdge(Id<DirectedEdge> edgeId, [MaybeNullWhen(false)] out DirectedEdge edge)
     {
-        if (!_edges.TryGetValue(edgeId, out var edge))
-        {
-            return new ResultProblem("Could not find edge with id '{0}'.", edgeId);
-        }
-
-        return edge;
+        return _edges.TryGetValue(edgeId, out edge);
     }
 
     /// <summary>
     /// Deletes the directed edge with the specified ID.
     /// </summary>
     /// <param name="edgeId">The ID of the edge to delete.</param>
-    /// <returns>
-    /// A <see cref="DeletionResult"/> indicating whether the edge was successfully deleted or not found.
-    /// </returns>
-    public DeletionResult DeleteEdge(Id<DirectedEdge> edgeId)
+    /// <returns><c>true</c> if the edge was found and deleted; otherwise <c>false</c>.</returns>
+    public bool DeleteEdge(Id<DirectedEdge> edgeId)
     {
         if (!_edges.TryGetValue(edgeId, out var edge))
         {
-            return DeletionResult.NotFound();
+            return false;
         }
 
         RemoveFromOutgoingEdges(edge.From, edgeId);
         RemoveFromIncomingEdges(edge.To, edgeId);
-        
+
         _edges.Remove(edgeId);
-        
-        return DeletionResult.Success();
+
+        return true;
     }
 
     private bool RemoveFromIncomingEdges(Id<Node> nodeId, Id<DirectedEdge> edgeId)
@@ -210,27 +193,22 @@ public class DirectedGraph
     }
 
     /// <summary>
-    /// Follows a directed edge from the given source node.
+    /// Tries to follow a directed edge from the given source node.
     /// </summary>
     /// <param name="from">The ID of the source node.</param>
     /// <param name="edgeId">The ID of the edge to follow.</param>
-    /// <returns>
-    /// A <see cref="Result{T}"/> containing the ID of the target node if the edge exists and starts at the specified source node;
-    /// otherwise, a problem result.
-    /// </returns>
-    public Result<Id<Node>> FollowEdge(Id<Node> from, Id<DirectedEdge> edgeId)
+    /// <param name="to">When this method returns, contains the ID of the target node if the edge was followed successfully.</param>
+    /// <returns><c>true</c> if the edge exists and starts at <paramref name="from"/>; otherwise <c>false</c>.</returns>
+    public bool TryFollowEdge(Id<Node> from, Id<DirectedEdge> edgeId, out Id<Node> to)
     {
-        if (!_edges.TryGetValue(edgeId, out var edge))
+        if (_edges.TryGetValue(edgeId, out var edge) && edge.From == from)
         {
-            return new ResultProblem("Could not find edge with id '{0}'.", edgeId);
+            to = edge.To;
+            return true;
         }
-        
-        if (edge.From != from)
-        {
-            return new ResultProblem("Edge '{0}' does not start at node '{1}'.", edgeId, from);
-        }
-        
-        return edge.To;
+
+        to = default;
+        return false;
     }
     
     /// <summary>
