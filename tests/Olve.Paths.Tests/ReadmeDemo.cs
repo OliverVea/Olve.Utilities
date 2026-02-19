@@ -63,9 +63,7 @@ public class ReadmeDemo
     public async Task Snippet3()
     {
         // Filesystem operations
-        var tempDir = Path.Create(System.IO.Path.GetTempPath()) / "olve-paths-demo";
-        tempDir.EnsurePathExists(); // Creates the directory if it doesn't exist
-
+        var tempDir = Path.CreateTempDirectory("olve-paths-demo-"); // Creates a unique temp directory
         var exists = tempDir.Exists(); // true
         var elementType = tempDir.ElementType; // ElementType.Directory
 
@@ -83,5 +81,23 @@ public class ReadmeDemo
         // Assert
         await Assert.That(exists).IsTrue();
         await Assert.That(elementType).IsEqualTo(ElementType.Directory);
+    }
+
+    [Test]
+    public async Task Snippet4()
+    {
+        // Temporary paths
+        var tempDir = Path.GetTempDirectory(); // System temp directory
+        var tempSubDir = Path.CreateTempDirectory("my-app-"); // Unique temp subdirectory
+        var tempFile = Path.CreateTempFile(); // Unique temp file
+
+        // Assert
+        await Assert.That(tempDir.Exists()).IsTrue();
+        await Assert.That(tempSubDir.Exists()).IsTrue();
+        await Assert.That(tempFile.Exists()).IsTrue();
+
+        // Cleanup
+        Directory.Delete(tempSubDir.Path, true);
+        File.Delete(tempFile.Path);
     }
 }
