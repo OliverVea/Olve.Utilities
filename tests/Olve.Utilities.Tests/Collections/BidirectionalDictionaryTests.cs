@@ -53,26 +53,26 @@ public class BidirectionalDictionaryTests
             .That(dictionary.SecondValues)
             .DoesNotContain("one");
 
-        var firstWithValidSecond = dictionary.Get(validSecond);
-        var firstWithInvalidSecond = dictionary.Get(invalidSecond);
-        var secondFromFirst = dictionary.Get(first);
+        var foundValid = dictionary.TryGet(validSecond, out var firstWithValidSecond);
+        var foundInvalid = dictionary.TryGet(invalidSecond, out _);
+        var foundFirst = dictionary.TryGet(first, out var secondFromFirst);
 
         await Assert
-            .That(firstWithValidSecond.IsT0)
+            .That(foundValid)
             .IsTrue();
         await Assert
-            .That(firstWithValidSecond.AsT0)
+            .That(firstWithValidSecond)
             .IsEqualTo(first);
 
         await Assert
-            .That(firstWithInvalidSecond.IsT0)
+            .That(foundInvalid)
             .IsFalse();
 
         await Assert
-            .That(secondFromFirst.IsT0)
+            .That(foundFirst)
             .IsTrue();
         await Assert
-            .That(secondFromFirst.AsT0)
+            .That(secondFromFirst)
             .IsEqualTo(validSecond);
     }
 
@@ -173,32 +173,32 @@ public class BidirectionalDictionaryTests
     }
 
     [Test]
-    public async Task Get_WithNonExistentKey_ReturnsFailure()
+    public async Task TryGet_WithNonExistentKey_ReturnsFalse()
     {
         // Arrange
         var dictionary = GetNewBidirectionalDictionary<int, string>();
 
         // Act
-        var result = dictionary.Get(5);
+        var found = dictionary.TryGet(5, out _);
 
         // Assert
         await Assert
-            .That(result.IsT0)
+            .That(found)
             .IsFalse();
     }
 
     [Test]
-    public async Task Get_WithNonExistentValue_ReturnsFailure()
+    public async Task TryGet_WithNonExistentValue_ReturnsFalse()
     {
         // Arrange
         var dictionary = GetNewBidirectionalDictionary<int, string>();
 
         // Act
-        var result = dictionary.Get("non-existent");
+        var found = dictionary.TryGet("non-existent", out _);
 
         // Assert
         await Assert
-            .That(result.IsT0)
+            .That(found)
             .IsFalse();
     }
 

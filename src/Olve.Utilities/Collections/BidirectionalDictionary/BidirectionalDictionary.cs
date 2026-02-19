@@ -42,14 +42,12 @@ public class BidirectionalDictionary<T1, T2> : IBidirectionalDictionary<T1, T2>
     /// <inheritdoc />
     public void Set(T1 first, T2 second)
     {
-        if (Get(second)
-            .TryPickT0(out var existingFirst, out _))
+        if (TryGet(second, out var existingFirst))
         {
             _firstToSecond.Remove(existingFirst);
         }
 
-        if (Get(first)
-            .TryPickT0(out var existingSecond, out _))
+        if (TryGet(first, out var existingSecond))
         {
             _secondToFirst.Remove(existingSecond);
         }
@@ -93,16 +91,16 @@ public class BidirectionalDictionary<T1, T2> : IBidirectionalDictionary<T1, T2>
         => _secondToFirst.ContainsKey(second);
 
     /// <inheritdoc />
-    public OneOf<T2, NotFound> Get(T1 first) =>
-        _firstToSecond.TryGetValue(first, out var second)
-            ? second
-            : new NotFound();
+    public bool TryGet(T1 first, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out T2 second)
+    {
+        return _firstToSecond.TryGetValue(first, out second);
+    }
 
     /// <inheritdoc />
-    public OneOf<T1, NotFound> Get(T2 second) =>
-        _secondToFirst.TryGetValue(second, out var first)
-            ? first
-            : new NotFound();
+    public bool TryGet(T2 second, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out T1 first)
+    {
+        return _secondToFirst.TryGetValue(second, out first);
+    }
 
     /// <inheritdoc />
     /// <remarks>Instantiates an array with the values.</remarks>

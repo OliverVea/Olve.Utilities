@@ -11,13 +11,12 @@ public static class Sandbox
 
         var lookup = new IdFrozenLookup<TestClass, int>(items);
 
-        var item = lookup.GetValue(3);
-        Assert.That(() => item.IsT0, "Item should be found but was not");
-        Assert.That(() => item.AsT0.Id == 3, "Item should have id 3 but did not");
+        var found = lookup.TryGetValue(3, out var item);
+        Assert.That(() => found, "Item should be found but was not");
+        Assert.That(() => item!.Id == 3, "Item should have id 3 but did not");
 
-
-        var notFound = lookup.GetValue(6);
-        Assert.That(() => notFound.IsT1, "Item should not be found but was");
+        var notFound = lookup.TryGetValue(6, out _);
+        Assert.That(() => !notFound, "Item should not be found but was");
 
         Console.WriteLine(lookup.Count);
     }

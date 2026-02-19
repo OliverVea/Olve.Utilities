@@ -58,11 +58,13 @@ public class FrozenLookupBase<TKey, TValue>(IEnumerable<KeyValuePair<TKey, TValu
     public bool ContainsValue(TValue value) => _dictionary.Values.Contains(value);
 
     /// <summary>
-    ///     Gets the value associated with the specified key.
+    ///     Tries to get the value associated with the specified key.
     /// </summary>
     /// <param name="key">The key to get the value for.</param>
-    /// <returns>The value associated with the key, or a <see cref="NotFound" /> object if the key is not in the lookup.</returns>
-    public OneOf<TValue, NotFound> GetValue(TKey key) => _dictionary.TryGetValue(key, out var value)
-        ? OneOf<TValue, NotFound>.FromT0(value)
-        : new NotFound();
+    /// <param name="value">When this method returns, contains the value if found; otherwise, the default value.</param>
+    /// <returns><see langword="true" /> if the key was found; otherwise, <see langword="false" />.</returns>
+    public bool TryGetValue(TKey key, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out TValue value)
+    {
+        return _dictionary.TryGetValue(key, out value);
+    }
 }

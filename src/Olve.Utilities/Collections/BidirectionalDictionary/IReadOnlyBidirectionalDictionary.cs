@@ -1,5 +1,7 @@
 // Code inspired by: https://github.com/TwentyFourMinutes/BidirectionalDict/tree/master
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Olve.Utilities.Collections;
 
 /// <summary>
@@ -55,22 +57,18 @@ public interface IReadOnlyBidirectionalDictionary<T1, T2> : IEnumerable<KeyValue
     bool Contains(T2 second);
 
     /// <summary>
-    ///     Gets the value associated with the first value of the value pair.
+    ///     Tries to get the value associated with the first value of the value pair.
     /// </summary>
-    /// <param name="first">The first value of the pair</param>
-    /// <returns>
-    ///     The value associated with the first value of the pair, or a <see cref="NotFound" /> object if the first value
-    ///     is not in the dictionary.
-    /// </returns>
-    OneOf<T2, NotFound> Get(T1 first);
+    /// <param name="first">The first value of the pair.</param>
+    /// <param name="second">When this method returns, contains the associated second value if found; otherwise, the default value.</param>
+    /// <returns><see langword="true" /> if the first value was found; otherwise, <see langword="false" />.</returns>
+    bool TryGet(T1 first, [MaybeNullWhen(false)] out T2 second);
 
     /// <summary>
-    ///     Gets the value associated with the second value of the value pair.
+    ///     Tries to get the value associated with the second value of the value pair.
     /// </summary>
-    /// <param name="second">The second value of the pair</param>
-    /// <returns>
-    ///     The value associated with the second value of the pair, or a <see cref="NotFound" /> object if the second
-    ///     value is not in the dictionary.
-    /// </returns>
-    OneOf<T1, NotFound> Get(T2 second);
+    /// <param name="second">The second value of the pair.</param>
+    /// <param name="first">When this method returns, contains the associated first value if found; otherwise, the default value.</param>
+    /// <returns><see langword="true" /> if the second value was found; otherwise, <see langword="false" />.</returns>
+    bool TryGet(T2 second, [MaybeNullWhen(false)] out T1 first);
 }

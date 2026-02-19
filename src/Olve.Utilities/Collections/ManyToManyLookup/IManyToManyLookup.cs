@@ -1,4 +1,6 @@
-﻿namespace Olve.Utilities.Collections;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Olve.Utilities.Collections;
 
 /// <summary>
 ///     Represents a many-to-many lookup between two sets of items.
@@ -29,18 +31,20 @@ public interface IManyToManyLookup<TLeft, TRight> : IEnumerable<KeyValuePair<TLe
     bool Contains(TLeft left, TRight right);
 
     /// <summary>
-    ///     Gets all right-hand elements associated with the specified left-hand element.
+    ///     Tries to get all right-hand elements associated with the specified left-hand element.
     /// </summary>
     /// <param name="left">The left-hand element.</param>
-    /// <returns>A set of right-hand elements if found; otherwise, <see cref="NotFound" />.</returns>
-    OneOf<IReadOnlySet<TRight>, NotFound> Get(TLeft left);
+    /// <param name="rights">When this method returns, contains the associated right-hand elements if found; otherwise, <see langword="null" />.</param>
+    /// <returns><see langword="true" /> if the left-hand element was found; otherwise, <see langword="false" />.</returns>
+    bool TryGet(TLeft left, [NotNullWhen(true)] out IReadOnlySet<TRight>? rights);
 
     /// <summary>
-    ///     Gets all left-hand elements associated with the specified right-hand element.
+    ///     Tries to get all left-hand elements associated with the specified right-hand element.
     /// </summary>
     /// <param name="right">The right-hand element.</param>
-    /// <returns>A set of left-hand elements if found; otherwise, <see cref="NotFound" />.</returns>
-    OneOf<IReadOnlySet<TLeft>, NotFound> Get(TRight right);
+    /// <param name="lefts">When this method returns, contains the associated left-hand elements if found; otherwise, <see langword="null" />.</param>
+    /// <returns><see langword="true" /> if the right-hand element was found; otherwise, <see langword="false" />.</returns>
+    bool TryGet(TRight right, [NotNullWhen(true)] out IReadOnlySet<TLeft>? lefts);
 
     /// <summary>
     ///     Sets the mapping for the specified left-hand element to the provided right-hand elements.

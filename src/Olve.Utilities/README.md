@@ -32,7 +32,7 @@ Installing `Olve.Utilities` also brings in:
 | Category | Key Types | Description |
 | --- | --- | --- |
 | **IDs** | `Id`, `Id<T>`, `UnionId<T1, T2>` | GUID-backed typed identifiers with deterministic generation (UUIDv5) |
-| **Collections** | `BidirectionalDictionary<T1, T2>`, `FixedSizeQueue<T>`, `OneToManyLookup<TLeft, TRight>`, `ManyToManyLookup<TLeft, TRight>` | Specialized collection types returning `OneOf<T, NotFound>` |
+| **Collections** | `BidirectionalDictionary<T1, T2>`, `FixedSizeQueue<T>`, `OneToManyLookup<TLeft, TRight>`, `ManyToManyLookup<TLeft, TRight>` | Specialized collection types with `TryGet` pattern lookups |
 | **DateTime** | `DateTimeFormatter` | Human-readable relative time formatting |
 | **Pagination** | `Pagination`, `PaginatedResult<T>` | Page/offset calculation and paginated result wrapper |
 | **Graphs** | `DirectedGraph`, `Node`, `DirectedEdge` | ID-based directed graph with node/edge management |
@@ -70,7 +70,7 @@ await Assert.That(parsed).IsEqualTo(userId);
 
 ### BidirectionalDictionary
 
-`BidirectionalDictionary<T1, T2>` maintains two-way lookups. Both directions return `OneOf<T, NotFound>`.
+`BidirectionalDictionary<T1, T2>` maintains two-way lookups. Both directions use the `TryGet` pattern.
 
 ```cs
 // ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L35-L45
@@ -81,11 +81,11 @@ dict.Set("alice", 1);
 dict.Set("bob", 2);
 
 // Look up in both directions
-var id = dict.Get("alice");    // 1
-var name = dict.Get(2);        // "bob"
+dict.TryGet("alice", out var id);    // 1
+dict.TryGet(2, out var name);        // "bob"
 
-await Assert.That(id.AsT0).IsEqualTo(1);
-await Assert.That(name.AsT0).IsEqualTo("bob");
+await Assert.That(id).IsEqualTo(1);
+await Assert.That(name).IsEqualTo("bob");
 ```
 
 ---
@@ -105,12 +105,12 @@ lookup.Set("alice", 2, true);
 lookup.Set("bob", 3, true);
 
 // Get all values for a key
-var aliceValues = lookup.Get("alice").AsT0;
+lookup.TryGet("alice", out var aliceValues);
 
 // Reverse lookup: which key owns this value?
-var owner = lookup.Get(1).AsT0;
+lookup.TryGet(1, out var owner);
 
-await Assert.That(aliceValues).HasCount().EqualTo(2);
+await Assert.That(aliceValues!).HasCount().EqualTo(2);
 await Assert.That(owner).IsEqualTo("alice");
 ```
 
@@ -118,7 +118,7 @@ await Assert.That(owner).IsEqualTo("alice");
 
 ### ManyToManyLookup
 
-`ManyToManyLookup<TLeft, TRight>` maintains a bidirectional many-to-many relationship. Both directions return `OneOf<IReadOnlySet<T>, NotFound>`.
+`ManyToManyLookup<TLeft, TRight>` maintains a bidirectional many-to-many relationship. Both directions use the `TryGet` pattern.
 
 ```cs
 // ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L71-L84
@@ -130,13 +130,13 @@ enrollment.Set("alice", 102, true);
 enrollment.Set("bob", 101, true);
 
 // Get all course IDs for a student
-var aliceCourses = enrollment.Get("alice").AsT0;
+enrollment.TryGet("alice", out var aliceCourses);
 
 // Get all students in a course
-var mathStudents = enrollment.Get(101).AsT0;
+enrollment.TryGet(101, out var mathStudents);
 
-await Assert.That(aliceCourses).HasCount().EqualTo(2);
-await Assert.That(mathStudents).HasCount().EqualTo(2);
+await Assert.That(aliceCourses!).HasCount().EqualTo(2);
+await Assert.That(mathStudents!).HasCount().EqualTo(2);
 ```
 
 ---

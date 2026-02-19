@@ -41,16 +41,28 @@ public class ManyToManyLookup<TLeft, TRight> : IManyToManyLookup<TLeft, TRight>
         _leftToRights.TryGetValue(left, out var rights) && rights.Contains(right);
 
     /// <inheritdoc />
-    public OneOf<IReadOnlySet<TRight>, NotFound> Get(TLeft left) =>
-        _leftToRights.TryGetValue(left, out var rights)
-            ? rights
-            : new NotFound();
+    public bool TryGet(TLeft left, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out IReadOnlySet<TRight>? rights)
+    {
+        if (_leftToRights.TryGetValue(left, out var set))
+        {
+            rights = set;
+            return true;
+        }
+        rights = null;
+        return false;
+    }
 
     /// <inheritdoc />
-    public OneOf<IReadOnlySet<TLeft>, NotFound> Get(TRight right) =>
-        _rightToLefts.TryGetValue(right, out var lefts)
-            ? lefts
-            : new NotFound();
+    public bool TryGet(TRight right, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out IReadOnlySet<TLeft>? lefts)
+    {
+        if (_rightToLefts.TryGetValue(right, out var set))
+        {
+            lefts = set;
+            return true;
+        }
+        lefts = null;
+        return false;
+    }
 
     /// <inheritdoc />
     public void Set(TLeft left, ISet<TRight> rights)
