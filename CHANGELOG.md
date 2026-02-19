@@ -1,3 +1,13 @@
+## v0.38.0 (2026-02-19)
+
+### Feat
+
+- add temporary path creation to Olve.Paths (#53)
+
+### Refactor
+
+- replace OneOf returns with TryGet pattern in collections (#57)
+
 ## v0.37.2 (2026-02-18)
 
 ### Refactor
