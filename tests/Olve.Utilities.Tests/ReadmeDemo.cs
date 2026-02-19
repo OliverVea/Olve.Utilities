@@ -20,10 +20,10 @@ public class ReadmeDemo
 
         // Deterministic ID from a name (UUIDv5)
         var aliceId = Id.FromName<User>("alice");
-        var aliceId2 = Id.FromName<User>("alice");
+        var aliceId2 = Id.FromName<User>("alice"); // same as aliceId
 
         // Parse from string
-        Id.TryParse<User>(userId.Value.ToString(), out var parsed);
+        Id.TryParse<User>(userId.Value.ToString(), out var parsed); // parsed == userId
 
         await Assert.That(aliceId).IsEqualTo(aliceId2);
         await Assert.That(parsed).IsEqualTo(userId);
@@ -56,10 +56,10 @@ public class ReadmeDemo
         lookup.Set("bob", 3, true);
 
         // Get all values for a key
-        lookup.TryGet("alice", out var aliceValues);
+        lookup.TryGet("alice", out var aliceValues); // { 1, 2 }
 
         // Reverse lookup: which key owns this value?
-        lookup.TryGet(1, out var owner);
+        lookup.TryGet(1, out var owner); // "alice"
 
         await Assert.That(aliceValues!).HasCount().EqualTo(2);
         await Assert.That(owner).IsEqualTo("alice");
@@ -75,10 +75,10 @@ public class ReadmeDemo
         enrollment.Set("bob", 101, true);
 
         // Get all course IDs for a student
-        enrollment.TryGet("alice", out var aliceCourses);
+        enrollment.TryGet("alice", out var aliceCourses); // { 101, 102 }
 
         // Get all students in a course
-        enrollment.TryGet(101, out var mathStudents);
+        enrollment.TryGet(101, out var mathStudents); // { "alice", "bob" }
 
         await Assert.That(aliceCourses!).HasCount().EqualTo(2);
         await Assert.That(mathStudents!).HasCount().EqualTo(2);
@@ -92,7 +92,7 @@ public class ReadmeDemo
         queue.Enqueue("a");
         queue.Enqueue("b");
         queue.Enqueue("c");
-        queue.Enqueue("d"); // "a" is dropped
+        queue.Enqueue("d"); // "a" is dropped, queue is now { "b", "c", "d" }
 
         await Assert.That(queue.Count).IsEqualTo(3);
         await Assert.That(queue.TryDequeue(out var first) && first == "b").IsTrue();
@@ -104,7 +104,7 @@ public class ReadmeDemo
         var now = new DateTimeOffset(2025, 6, 15, 12, 0, 0, TimeSpan.Zero);
         var then = new DateTimeOffset(2025, 6, 13, 12, 0, 0, TimeSpan.Zero);
 
-        var text = DateTimeFormatter.FormatTimeAgo(now, then);
+        var text = DateTimeFormatter.FormatTimeAgo(now, then); // "2 days ago"
 
         await Assert.That(text).IsEqualTo("2 days ago");
     }
@@ -119,6 +119,9 @@ public class ReadmeDemo
             items: items[..2],
             pagination: pagination,
             totalCount: items.Length);
+
+        // result.HasNextPage == true
+        // result.TotalPages == 2
 
         await Assert.That(result.HasNextPage).IsTrue();
         await Assert.That(result.TotalPages).IsEqualTo(2);
@@ -140,7 +143,7 @@ public class ReadmeDemo
         graph.CreateEdge(nodeA, nodeC);
 
         // Query outgoing edges
-        graph.TryGetOutgoingEdges(nodeA, out var edges);
+        graph.TryGetOutgoingEdges(nodeA, out var edges); // 2 edges
 
         await Assert.That(edges!).HasCount().EqualTo(2);
         await Assert.That(graph.Nodes).HasCount().EqualTo(3);
@@ -155,11 +158,11 @@ public class ReadmeDemo
         var list = cache.GetOrAdd("scores", () => []);
         list.Add(100);
 
-        var same = cache.GetOrAdd("scores", () => []);
+        var same = cache.GetOrAdd("scores", () => []); // same reference as list
 
         // TryUpdate: update only if the key exists
-        var updated = cache.TryUpdate("scores", old => [..old, 200]);
-        var missed = cache.TryUpdate("missing", _ => []);
+        var updated = cache.TryUpdate("scores", old => [..old, 200]); // true
+        var missed = cache.TryUpdate("missing", _ => []); // false
 
         await Assert.That(same).IsSameReferenceAs(list);
         await Assert.That(updated).IsTrue();

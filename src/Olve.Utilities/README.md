@@ -50,20 +50,17 @@ Installing `Olve.Utilities` also brings in:
 `Id<T>` provides compile-time safety so you can't accidentally pass a user ID where an order ID is expected. `Id.FromName()` generates deterministic UUIDv5 identifiers from strings.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L18-L29
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L18-L26
 
 // Create a random typed ID
 var userId = Id.New<User>();
 
 // Deterministic ID from a name (UUIDv5)
 var aliceId = Id.FromName<User>("alice");
-var aliceId2 = Id.FromName<User>("alice");
+var aliceId2 = Id.FromName<User>("alice"); // same as aliceId
 
 // Parse from string
-Id.TryParse<User>(userId.Value.ToString(), out var parsed);
-
-await Assert.That(aliceId).IsEqualTo(aliceId2);
-await Assert.That(parsed).IsEqualTo(userId);
+Id.TryParse<User>(userId.Value.ToString(), out var parsed); // parsed == userId
 ```
 
 ---
@@ -73,7 +70,7 @@ await Assert.That(parsed).IsEqualTo(userId);
 `BidirectionalDictionary<T1, T2>` maintains two-way lookups. Both directions use the `TryGet` pattern.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L35-L45
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L35-L42
 
 var dict = new BidirectionalDictionary<string, int>();
 
@@ -83,9 +80,6 @@ dict.Set("bob", 2);
 // Look up in both directions
 dict.TryGet("alice", out var id);    // 1
 dict.TryGet(2, out var name);        // "bob"
-
-await Assert.That(id).IsEqualTo(1);
-await Assert.That(name).IsEqualTo("bob");
 ```
 
 ---
@@ -95,7 +89,7 @@ await Assert.That(name).IsEqualTo("bob");
 `OneToManyLookup<TLeft, TRight>` maps one key to many values. Reverse lookup returns the single owner of a value.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L51-L65
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L51-L62
 
 var lookup = new OneToManyLookup<string, int>();
 
@@ -105,13 +99,10 @@ lookup.Set("alice", 2, true);
 lookup.Set("bob", 3, true);
 
 // Get all values for a key
-lookup.TryGet("alice", out var aliceValues);
+lookup.TryGet("alice", out var aliceValues); // { 1, 2 }
 
 // Reverse lookup: which key owns this value?
-lookup.TryGet(1, out var owner);
-
-await Assert.That(aliceValues!).HasCount().EqualTo(2);
-await Assert.That(owner).IsEqualTo("alice");
+lookup.TryGet(1, out var owner); // "alice"
 ```
 
 ---
@@ -121,7 +112,7 @@ await Assert.That(owner).IsEqualTo("alice");
 `ManyToManyLookup<TLeft, TRight>` maintains a bidirectional many-to-many relationship. Both directions use the `TryGet` pattern.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L71-L84
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L71-L81
 
 var enrollment = new ManyToManyLookup<string, int>();
 
@@ -130,13 +121,10 @@ enrollment.Set("alice", 102, true);
 enrollment.Set("bob", 101, true);
 
 // Get all course IDs for a student
-enrollment.TryGet("alice", out var aliceCourses);
+enrollment.TryGet("alice", out var aliceCourses); // { 101, 102 }
 
 // Get all students in a course
-enrollment.TryGet(101, out var mathStudents);
-
-await Assert.That(aliceCourses!).HasCount().EqualTo(2);
-await Assert.That(mathStudents!).HasCount().EqualTo(2);
+enrollment.TryGet(101, out var mathStudents); // { "alice", "bob" }
 ```
 
 ---
@@ -146,17 +134,14 @@ await Assert.That(mathStudents!).HasCount().EqualTo(2);
 `FixedSizeQueue<T>` automatically drops the oldest items when the maximum size is exceeded.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L90-L98
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L90-L95
 
 var queue = new FixedSizeQueue<string>(maxSize: 3);
 
 queue.Enqueue("a");
 queue.Enqueue("b");
 queue.Enqueue("c");
-queue.Enqueue("d"); // "a" is dropped
-
-await Assert.That(queue.Count).IsEqualTo(3);
-await Assert.That(queue.TryDequeue(out var first) && first == "b").IsTrue();
+queue.Enqueue("d"); // "a" is dropped, queue is now { "b", "c", "d" }
 ```
 
 ---
@@ -166,14 +151,12 @@ await Assert.That(queue.TryDequeue(out var first) && first == "b").IsTrue();
 `DateTimeFormatter.FormatTimeAgo()` produces human-readable relative time strings like "2 days ago" or "just now".
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L104-L109
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L104-L107
 
 var now = new DateTimeOffset(2025, 6, 15, 12, 0, 0, TimeSpan.Zero);
 var then = new DateTimeOffset(2025, 6, 13, 12, 0, 0, TimeSpan.Zero);
 
-var text = DateTimeFormatter.FormatTimeAgo(now, then);
-
-await Assert.That(text).IsEqualTo("2 days ago");
+var text = DateTimeFormatter.FormatTimeAgo(now, then); // "2 days ago"
 ```
 
 ---
@@ -183,7 +166,7 @@ await Assert.That(text).IsEqualTo("2 days ago");
 `Pagination` computes offsets from page number and size. `PaginatedResult<T>` wraps a page of items with total count and navigation metadata.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L115-L125
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L115-L124
 
 var items = new[] { "alice", "bob", "charlie" };
 var pagination = new Pagination(Page: 0, PageSize: 2);
@@ -193,9 +176,8 @@ var result = new PaginatedResult<string>(
     pagination: pagination,
     totalCount: items.Length);
 
-await Assert.That(result.HasNextPage).IsTrue();
-await Assert.That(result.TotalPages).IsEqualTo(2);
-await Assert.That(result.Count).IsEqualTo(2);
+// result.HasNextPage == true
+// result.TotalPages == 2
 ```
 
 ---
@@ -205,7 +187,7 @@ await Assert.That(result.Count).IsEqualTo(2);
 `DirectedGraph` provides an ID-based directed graph with node and edge management.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L131-L146
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L134-L146
 
 var graph = new DirectedGraph();
 
@@ -219,10 +201,7 @@ graph.CreateEdge(nodeA, nodeB);
 graph.CreateEdge(nodeA, nodeC);
 
 // Query outgoing edges
-graph.TryGetOutgoingEdges(nodeA, out var edges);
-
-await Assert.That(edges!).HasCount().EqualTo(2);
-await Assert.That(graph.Nodes).HasCount().EqualTo(3);
+graph.TryGetOutgoingEdges(nodeA, out var edges); // 2 edges
 ```
 
 ---
@@ -232,7 +211,7 @@ await Assert.That(graph.Nodes).HasCount().EqualTo(3);
 High-performance `GetOrAdd` and `TryUpdate` extensions using `CollectionsMarshal` for zero-overhead dictionary operations.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L152-L167
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L155-L165
 
 var cache = new Dictionary<string, List<int>>();
 
@@ -240,16 +219,11 @@ var cache = new Dictionary<string, List<int>>();
 var list = cache.GetOrAdd("scores", () => []);
 list.Add(100);
 
-var same = cache.GetOrAdd("scores", () => []);
+var same = cache.GetOrAdd("scores", () => []); // same reference as list
 
 // TryUpdate: update only if the key exists
-var updated = cache.TryUpdate("scores", old => [..old, 200]);
-var missed = cache.TryUpdate("missing", _ => []);
-
-await Assert.That(same).IsSameReferenceAs(list);
-await Assert.That(updated).IsTrue();
-await Assert.That(missed).IsFalse();
-await Assert.That(cache["scores"]).HasCount().EqualTo(2);
+var updated = cache.TryUpdate("scores", old => [..old, 200]); // true
+var missed = cache.TryUpdate("missing", _ => []); // false
 ```
 
 ---
