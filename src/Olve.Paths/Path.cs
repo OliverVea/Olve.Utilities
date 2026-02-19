@@ -172,6 +172,37 @@ public static class Path
         return Create(home);
     }
 
+    /// <summary>
+    /// Gets the current user's temporary directory as a path.
+    /// </summary>
+    /// <returns>An instance of <see cref="IPath"/> representing the temporary directory.</returns>
+    public static IPath GetTempDirectory()
+    {
+        var tempPath = System.IO.Path.GetTempPath();
+        return Create(tempPath);
+    }
+
+    /// <summary>
+    /// Creates a uniquely named, empty directory in the current user's temporary directory.
+    /// </summary>
+    /// <param name="prefix">An optional prefix for the subdirectory name.</param>
+    /// <returns>An instance of <see cref="IPath"/> representing the created temporary directory.</returns>
+    public static IPath CreateTempDirectory(string? prefix = null)
+    {
+        var dirInfo = Directory.CreateTempSubdirectory(prefix);
+        return Create(dirInfo.FullName);
+    }
+
+    /// <summary>
+    /// Creates a uniquely named, zero-byte temporary file on disk and returns its path.
+    /// </summary>
+    /// <returns>An instance of <see cref="IPath"/> representing the created temporary file.</returns>
+    public static IPath CreateTempFile()
+    {
+        var filePath = System.IO.Path.GetTempFileName();
+        return Create(filePath);
+    }
+
     private static UnixPath CreateUnixPath(string path, IPathEnvironment? pathEnvironment)
     {
         path = ProcessUnixPath(path);

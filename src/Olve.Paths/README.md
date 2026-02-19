@@ -79,11 +79,10 @@ var windowsPlatform = windowsPath.Platform; // PathPlatform.Windows
 `IPath` provides methods for querying and manipulating the filesystem: `Exists()`, `ElementType`, `TryGetChildren()`, and `EnsurePathExists()`.
 
 ```cs
-// ../../tests/Olve.Paths.Tests/ReadmeDemo.cs#L66-L78
+// ../../tests/Olve.Paths.Tests/ReadmeDemo.cs#L65-L76
 
-var tempDir = Path.Create(System.IO.Path.GetTempPath()) / "olve-paths-demo";
-tempDir.EnsurePathExists(); // Creates the directory if it doesn't exist
-
+// Filesystem operations
+var tempDir = Path.CreateTempDirectory("olve-paths-demo-"); // Creates a unique temp directory
 var exists = tempDir.Exists(); // true
 var elementType = tempDir.ElementType; // ElementType.Directory
 
@@ -94,6 +93,19 @@ if (tempDir.TryGetChildren(out var children))
         Console.WriteLine(child.Path);
     }
 }
+```
+
+### Temporary paths
+
+`Path` wraps .NET's temporary path APIs and returns `IPath` objects. `GetTempDirectory()` returns the system temp directory, `CreateTempDirectory()` creates a unique subdirectory, and `CreateTempFile()` creates a unique zero-byte file.
+
+```cs
+// ../../tests/Olve.Paths.Tests/ReadmeDemo.cs#L89-L92
+
+// Temporary paths
+var tempDir = Path.GetTempDirectory(); // System temp directory
+var tempSubDir = Path.CreateTempDirectory("my-app-"); // Unique temp subdirectory
+var tempFile = Path.CreateTempFile(); // Unique temp file
 ```
 
 ---

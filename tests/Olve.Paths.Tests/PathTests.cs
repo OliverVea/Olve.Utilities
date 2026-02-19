@@ -173,6 +173,55 @@ public class PathTests
         }
     }
 
+    [Test]
+    public async Task GetTempDirectory_ReturnsExistingDirectory()
+    {
+        // Act
+        var tempDir = Path.GetTempDirectory();
+
+        // Assert
+        await Assert.That(tempDir.Exists()).IsTrue();
+        await Assert.That(tempDir.ElementType).IsEqualTo(ElementType.Directory);
+        await Assert.That(System.IO.Path.GetTempPath()).StartsWith(tempDir.Path);
+    }
+
+    [Test]
+    public async Task CreateTempDirectory_CreatesUniqueDirectory()
+    {
+        // Act
+        var tempDir = Path.CreateTempDirectory("olve-test-");
+
+        // Assert
+        try
+        {
+            await Assert.That(tempDir.Exists()).IsTrue();
+            await Assert.That(tempDir.ElementType).IsEqualTo(ElementType.Directory);
+            await Assert.That(tempDir.Path).Contains("olve-test-");
+        }
+        finally
+        {
+            Directory.Delete(tempDir.Path, true);
+        }
+    }
+
+    [Test]
+    public async Task CreateTempFile_CreatesUniqueFile()
+    {
+        // Act
+        var tempFile = Path.CreateTempFile();
+
+        // Assert
+        try
+        {
+            await Assert.That(tempFile.Exists()).IsTrue();
+            await Assert.That(tempFile.ElementType).IsEqualTo(ElementType.File);
+        }
+        finally
+        {
+            File.Delete(tempFile.Path);
+        }
+    }
+
     private class ConstantPathEnvironment(string? cwd = null, string? executable = null) : IPathEnvironment
     {
         public bool TryGetCurrentDirectory([NotNullWhen(true)] out string? path)
