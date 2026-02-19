@@ -1,4 +1,4 @@
-﻿using Olve.Utilities.Collections;
+using Olve.Utilities.Collections;
 using TUnit.Assertions;
 using TUnit.Assertions.Extensions;
 using TUnit.Core;
@@ -64,40 +64,40 @@ public class ManyToManyLookupTests
     }
 
     [Test]
-    public async Task Get_LeftExists_ReturnsAssociatedRights()
+    public async Task TryGet_LeftExists_ReturnsAssociatedRights()
     {
         // Arrange
         var lookup = GetNewBidirectionalDictionary<int, string>();
         lookup.Set(1, new HashSet<string> { "one", "uno" });
 
         // Act
-        var result = lookup.Get(1);
+        var found = lookup.TryGet(1, out var rights);
 
         // Assert
         await Assert
-            .That(result.IsT0)
+            .That(found)
             .IsTrue();
         await Assert
-            .That(result.AsT0)
+            .That(rights!)
             .Contains("one");
         await Assert
-            .That(result.AsT0)
+            .That(rights!)
             .Contains("uno");
     }
 
     [Test]
-    public async Task Get_LeftDoesNotExist_ReturnsNotFound()
+    public async Task TryGet_LeftDoesNotExist_ReturnsFalse()
     {
         // Arrange
         var lookup = GetNewBidirectionalDictionary<int, string>();
 
         // Act
-        var result = lookup.Get(1);
+        var found = lookup.TryGet(1, out _);
 
         // Assert
         await Assert
-            .That(result.IsT1)
-            .IsTrue();
+            .That(found)
+            .IsFalse();
     }
 
     [Test]
@@ -150,15 +150,15 @@ public class ManyToManyLookupTests
         lookup.Set(1, new HashSet<string> { "two" });
 
         // Assert
-        var result = lookup.Get(1);
+        var found = lookup.TryGet(1, out var rights);
         await Assert
-            .That(result.IsT0)
+            .That(found)
             .IsTrue();
         await Assert
-            .That(result.AsT0)
+            .That(rights!)
             .Contains("two");
         await Assert
-            .That(result.AsT0)
+            .That(rights!)
             .DoesNotContain("one");
     }
 
@@ -173,15 +173,15 @@ public class ManyToManyLookupTests
         lookup.Set("one", new HashSet<int> { 3 });
 
         // Assert
-        var result = lookup.Get("one");
+        var found = lookup.TryGet("one", out var lefts);
         await Assert
-            .That(result.IsT0)
+            .That(found)
             .IsTrue();
         await Assert
-            .That(result.AsT0)
+            .That(lefts!)
             .Contains(3);
         await Assert
-            .That(result.AsT0)
+            .That(lefts!)
             .DoesNotContain(1);
     }
 
@@ -235,7 +235,7 @@ public class ManyToManyLookupTests
     }
 
     [Test]
-    public async Task Get_RightExists_ReturnsAssociatedLefts()
+    public async Task TryGet_RightExists_ReturnsAssociatedLefts()
     {
         // Arrange
         var lookup = GetNewBidirectionalDictionary<int, string>();
@@ -243,33 +243,33 @@ public class ManyToManyLookupTests
         lookup.Set(2, "one", true);
 
         // Act
-        var result = lookup.Get("one");
+        var found = lookup.TryGet("one", out var lefts);
 
         // Assert
         await Assert
-            .That(result.IsT0)
+            .That(found)
             .IsTrue();
         await Assert
-            .That(result.AsT0)
+            .That(lefts!)
             .Contains(1);
         await Assert
-            .That(result.AsT0)
+            .That(lefts!)
             .Contains(2);
     }
 
     [Test]
-    public async Task Get_RightDoesNotExist_ReturnsNotFound()
+    public async Task TryGet_RightDoesNotExist_ReturnsFalse()
     {
         // Arrange
         var lookup = GetNewBidirectionalDictionary<int, string>();
 
         // Act
-        var result = lookup.Get("one");
+        var found = lookup.TryGet("one", out _);
 
         // Assert
         await Assert
-            .That(result.IsT1)
-            .IsTrue();
+            .That(found)
+            .IsFalse();
     }
 
     [Test]
@@ -358,10 +358,10 @@ public class ManyToManyLookupTests
         lookup.Set(1, new HashSet<string>());
 
         // Assert
-        var result = lookup.Get(1);
+        var found = lookup.TryGet(1, out _);
         await Assert
-            .That(result.IsT1)
-            .IsTrue();
+            .That(found)
+            .IsFalse();
     }
 
     [Test]
@@ -375,10 +375,10 @@ public class ManyToManyLookupTests
         lookup.Set("one", new HashSet<int>());
 
         // Assert
-        var result = lookup.Get("one");
+        var found = lookup.TryGet("one", out _);
         await Assert
-            .That(result.IsT1)
-            .IsTrue();
+            .That(found)
+            .IsFalse();
     }
 
     [Test]

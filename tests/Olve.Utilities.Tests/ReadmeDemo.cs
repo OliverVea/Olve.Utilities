@@ -38,11 +38,11 @@ public class ReadmeDemo
         dict.Set("bob", 2);
 
         // Look up in both directions
-        var id = dict.Get("alice");    // 1
-        var name = dict.Get(2);        // "bob"
+        dict.TryGet("alice", out var id);    // 1
+        dict.TryGet(2, out var name);        // "bob"
 
-        await Assert.That(id.AsT0).IsEqualTo(1);
-        await Assert.That(name.AsT0).IsEqualTo("bob");
+        await Assert.That(id).IsEqualTo(1);
+        await Assert.That(name).IsEqualTo("bob");
     }
 
     [Test]
@@ -56,12 +56,12 @@ public class ReadmeDemo
         lookup.Set("bob", 3, true);
 
         // Get all values for a key
-        var aliceValues = lookup.Get("alice").AsT0;
+        lookup.TryGet("alice", out var aliceValues);
 
         // Reverse lookup: which key owns this value?
-        var owner = lookup.Get(1).AsT0;
+        lookup.TryGet(1, out var owner);
 
-        await Assert.That(aliceValues).HasCount().EqualTo(2);
+        await Assert.That(aliceValues!).HasCount().EqualTo(2);
         await Assert.That(owner).IsEqualTo("alice");
     }
 
@@ -75,13 +75,13 @@ public class ReadmeDemo
         enrollment.Set("bob", 101, true);
 
         // Get all course IDs for a student
-        var aliceCourses = enrollment.Get("alice").AsT0;
+        enrollment.TryGet("alice", out var aliceCourses);
 
         // Get all students in a course
-        var mathStudents = enrollment.Get(101).AsT0;
+        enrollment.TryGet(101, out var mathStudents);
 
-        await Assert.That(aliceCourses).HasCount().EqualTo(2);
-        await Assert.That(mathStudents).HasCount().EqualTo(2);
+        await Assert.That(aliceCourses!).HasCount().EqualTo(2);
+        await Assert.That(mathStudents!).HasCount().EqualTo(2);
     }
 
     [Test]

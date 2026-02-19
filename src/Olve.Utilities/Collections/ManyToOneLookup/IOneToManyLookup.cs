@@ -1,4 +1,6 @@
-﻿namespace Olve.Utilities.Collections;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Olve.Utilities.Collections;
 
 /// <summary>
 ///     Represents a one-to-many lookup between two sets of items.
@@ -28,18 +30,20 @@ public interface IOneToManyLookup<TLeft, TRight> : IEnumerable<KeyValuePair<TLef
     bool Contains(TLeft left, TRight right);
 
     /// <summary>
-    ///     Gets the right-hand elements associated with the specified left-hand element.
+    ///     Tries to get the right-hand elements associated with the specified left-hand element.
     /// </summary>
     /// <param name="left">The left-hand element.</param>
-    /// <returns>A set of right-hand elements if found; otherwise, <see cref="NotFound" />.</returns>
-    OneOf<IReadOnlySet<TRight>, NotFound> Get(TLeft left);
+    /// <param name="rights">When this method returns, contains the associated right-hand elements if found; otherwise, <see langword="null" />.</param>
+    /// <returns><see langword="true" /> if the left-hand element was found; otherwise, <see langword="false" />.</returns>
+    bool TryGet(TLeft left, [NotNullWhen(true)] out IReadOnlySet<TRight>? rights);
 
     /// <summary>
-    ///     Gets the left-hand element associated with the specified right-hand element.
+    ///     Tries to get the left-hand element associated with the specified right-hand element.
     /// </summary>
     /// <param name="right">The right-hand element.</param>
-    /// <returns>The left-hand element if found; otherwise, <see cref="NotFound" />.</returns>
-    OneOf<TLeft, NotFound> Get(TRight right);
+    /// <param name="left">When this method returns, contains the associated left-hand element if found; otherwise, the default value.</param>
+    /// <returns><see langword="true" /> if the right-hand element was found; otherwise, <see langword="false" />.</returns>
+    bool TryGet(TRight right, [MaybeNullWhen(false)] out TLeft left);
 
     /// <summary>
     ///     Sets the mapping for the specified left-hand element to the provided right-hand elements.

@@ -36,12 +36,22 @@ public class OneToManyLookup<TLeft, TRight> : IOneToManyLookup<TLeft, TRight>
         _leftToRights.TryGetValue(left, out var rights) && rights.Contains(right);
 
     /// <inheritdoc />
-    public OneOf<IReadOnlySet<TRight>, NotFound> Get(TLeft left) =>
-        _leftToRights.TryGetValue(left, out var rights) ? rights : new NotFound();
+    public bool TryGet(TLeft left, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out IReadOnlySet<TRight>? rights)
+    {
+        if (_leftToRights.TryGetValue(left, out var set))
+        {
+            rights = set;
+            return true;
+        }
+        rights = null;
+        return false;
+    }
 
     /// <inheritdoc />
-    public OneOf<TLeft, NotFound> Get(TRight right) =>
-        _rightToLeft.TryGetValue(right, out var left) ? left : new NotFound();
+    public bool TryGet(TRight right, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out TLeft left)
+    {
+        return _rightToLeft.TryGetValue(right, out left);
+    }
 
     /// <inheritdoc />
     public void Set(TLeft left, ISet<TRight> rights)
