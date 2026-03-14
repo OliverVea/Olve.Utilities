@@ -81,7 +81,51 @@ var version = TinyExr.ParseEXRVersionFromFile(tempFile); // version.version == 2
 
 ## Native library
 
-The package includes a prebuilt `libtinyexr.so` for linux-x64. The native shared library is built from [syoyo/tinyexr](https://github.com/syoyo/tinyexr) with [miniz](https://github.com/richgel999/miniz) for compression. Cross-platform builds (win-x64, osx-x64, osx-arm64) are planned.
+The package includes prebuilt native libraries for linux-x64 and win-x64. Cross-platform builds for osx-x64 and osx-arm64 are planned.
+
+### Rebuilding the native libraries
+
+The native shared libraries are built from [syoyo/tinyexr](https://github.com/syoyo/tinyexr) with [miniz](https://github.com/richgel999/miniz) for compression. Source files are not included in this repository — only the prebuilt artifacts under `runtimes/`.
+
+To rebuild, download the following files from the upstream repositories into a working directory:
+
+- `tinyexr.h` from [syoyo/tinyexr](https://github.com/syoyo/tinyexr)
+- `miniz.h` and `miniz.c` from [richgel999/miniz](https://github.com/richgel999/miniz)
+
+Create `tinyexr.cc`:
+
+```cpp
+#define TINYEXR_IMPLEMENTATION
+#include "tinyexr.h"
+```
+
+Create `CMakeLists.txt`:
+
+```cmake
+cmake_minimum_required(VERSION 3.10)
+project(tinyexr LANGUAGES C CXX)
+
+add_library(tinyexr SHARED tinyexr.cc miniz.c)
+target_include_directories(tinyexr PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+```
+
+**Windows (MSVC):**
+
+```bash
+mkdir build && cd build
+cmake -G "Visual Studio 17 2022" -A x64 -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON ..
+cmake --build . --config Release
+# Output: build/Release/tinyexr.dll → runtimes/win-x64/native/
+```
+
+**Linux (GCC/Clang):**
+
+```bash
+mkdir build && cd build
+cmake -DCMAKE_BUILD_TYPE=Release ..
+cmake --build .
+# Output: build/libtinyexr.so → runtimes/linux-x64/native/
+```
 
 ---
 

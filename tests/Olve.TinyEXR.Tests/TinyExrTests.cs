@@ -32,7 +32,7 @@ public class TinyExrTests
         return pixels;
     }
 
-    [Test, LinuxOnly]
+    [Test]
     public async Task SaveEXR_AndLoadEXR_RoundTripsSuccessfully()
     {
         const int width = 4;
@@ -60,7 +60,7 @@ public class TinyExrTests
         await Assert.That(loadedCopy[3]).IsEqualTo(1.0f);
     }
 
-    [Test, LinuxOnly]
+    [Test]
     public async Task IsEXR_WithValidFile_ReturnsTrue()
     {
         var filePath = Path.Combine(_tempDir, "valid.exr");
@@ -71,7 +71,7 @@ public class TinyExrTests
         await Assert.That(result).IsTrue();
     }
 
-    [Test, LinuxOnly]
+    [Test]
     public async Task IsEXR_WithInvalidFile_ReturnsFalse()
     {
         var filePath = Path.Combine(_tempDir, "invalid.exr");
@@ -82,7 +82,7 @@ public class TinyExrTests
         await Assert.That(result).IsFalse();
     }
 
-    [Test, LinuxOnly]
+    [Test]
     public async Task IsEXRFromMemory_WithValidData_ReturnsTrue()
     {
         var filePath = Path.Combine(_tempDir, "valid.exr");
@@ -94,7 +94,7 @@ public class TinyExrTests
         await Assert.That(result).IsTrue();
     }
 
-    [Test, LinuxOnly]
+    [Test]
     public async Task IsEXRFromMemory_WithInvalidData_ReturnsFalse()
     {
         var result = TinyExr.IsEXRFromMemory("not an exr"u8);
@@ -102,7 +102,7 @@ public class TinyExrTests
         await Assert.That(result).IsFalse();
     }
 
-    [Test, LinuxOnly]
+    [Test]
     public async Task ParseEXRVersionFromFile_WithValidFile_ReturnsVersion()
     {
         var filePath = Path.Combine(_tempDir, "version.exr");
@@ -113,7 +113,7 @@ public class TinyExrTests
         await Assert.That(version.version).IsEqualTo(2);
     }
 
-    [Test, LinuxOnly]
+    [Test]
     public async Task ParseEXRVersionFromMemory_WithValidData_ReturnsVersion()
     {
         var filePath = Path.Combine(_tempDir, "version.exr");
@@ -125,7 +125,7 @@ public class TinyExrTests
         await Assert.That(version.version).IsEqualTo(2);
     }
 
-    [Test, LinuxOnly]
+    [Test]
     public async Task LoadEXRFromMemory_WithValidData_LoadsSuccessfully()
     {
         var filePath = Path.Combine(_tempDir, "memory.exr");
@@ -148,7 +148,7 @@ public class TinyExrTests
         await Assert.That(loadedLength).IsEqualTo(width * height * 4);
     }
 
-    [Test, LinuxOnly]
+    [Test]
     public unsafe Task SaveEXRToMemory_AndFreeBuffer_DoesNotThrow()
     {
         var pixels = CreateTestPixels(2, 2);
@@ -159,7 +159,7 @@ public class TinyExrTests
         return Task.CompletedTask;
     }
 
-    [Test, LinuxOnly]
+    [Test]
     public async Task SaveEXR_WithFp16_RoundTripsSuccessfully()
     {
         const int width = 2;
@@ -180,7 +180,7 @@ public class TinyExrTests
         await Assert.That(h).IsEqualTo(height);
     }
 
-    [Test, LinuxOnly]
+    [Test]
     public Task LoadEXR_WithNonexistentFile_ThrowsTinyExrException()
     {
         Assert.Throws<TinyExrException>(() =>

@@ -5,7 +5,7 @@ namespace Olve.TinyEXR.Tests;
 [SuppressMessage("Usage", "TUnit0033:Intentional")]
 public class ReadmeDemo
 {
-    [Test, LinuxOnly]
+    [Test]
     public unsafe Task SaveAndLoadExr()
     {
         var pixels = new float[] { 1.0f, 0.5f, 0.0f, 1.0f }; // Single RGBA pixel
@@ -26,7 +26,7 @@ public class ReadmeDemo
         return Task.CompletedTask;
     }
 
-    [Test, LinuxOnly]
+    [Test]
     public unsafe Task LoadFromMemory()
     {
         var pixels = new float[] { 1.0f, 0.0f, 0.0f, 1.0f };
@@ -44,7 +44,7 @@ public class ReadmeDemo
         return Task.CompletedTask;
     }
 
-    [Test, LinuxOnly]
+    [Test]
     public Task ValidateExrFile()
     {
         var pixels = new float[] { 1.0f, 0.0f, 0.0f, 1.0f };
