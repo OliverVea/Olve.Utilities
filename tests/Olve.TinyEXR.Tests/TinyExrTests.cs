@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace Olve.TinyEXR.Tests;
 
 public class TinyExrTests
@@ -40,76 +42,78 @@ public class TinyExrTests
         var pixels = CreateTestPixels(width, height);
         var filePath = Path.Combine(_tempDir, "test.exr");
 
-        TinyExr.SaveEXR(pixels, width, height, 4, false, filePath);
-
         int w, h;
-        float[] loadedCopy;
+        float r, g, b, a;
         unsafe
         {
-            var loaded = TinyExr.LoadEXR(filePath, out w, out h, out var ptr);
-            loadedCopy = loaded.ToArray();
-            TinyExr.FreeImageData(ptr);
+            NativeMethods.SaveEXR(pixels, width, height, 4, 0, filePath, out _);
+            NativeMethods.LoadEXR(out var rgba, out w, out h, filePath, out _);
+            r = rgba[0];
+            g = rgba[1];
+            b = rgba[2];
+            a = rgba[3];
+            NativeMemory.Free(rgba);
         }
 
         await Assert.That(w).IsEqualTo(width);
         await Assert.That(h).IsEqualTo(height);
-        await Assert.That(loadedCopy).HasCount().EqualTo(width * height * 4);
-        await Assert.That(loadedCopy[0]).IsEqualTo(1.0f);
-        await Assert.That(loadedCopy[1]).IsEqualTo(0.5f);
-        await Assert.That(loadedCopy[2]).IsEqualTo(0.0f);
-        await Assert.That(loadedCopy[3]).IsEqualTo(1.0f);
+        await Assert.That(r).IsEqualTo(1.0f);
+        await Assert.That(g).IsEqualTo(0.5f);
+        await Assert.That(b).IsEqualTo(0.0f);
+        await Assert.That(a).IsEqualTo(1.0f);
     }
 
     [Test]
-    public async Task IsEXR_WithValidFile_ReturnsTrue()
+    public async Task IsEXR_WithValidFile_ReturnsSuccess()
     {
         var filePath = Path.Combine(_tempDir, "valid.exr");
-        TinyExr.SaveEXR(CreateTestPixels(2, 2), 2, 2, 4, false, filePath);
+        unsafe { NativeMethods.SaveEXR(CreateTestPixels(2, 2), 2, 2, 4, 0, filePath, out _); }
 
-        var result = TinyExr.IsEXR(filePath);
+        var result = NativeMethods.IsEXR(filePath);
 
-        await Assert.That(result).IsTrue();
+        await Assert.That(result).IsEqualTo(TinyExrConstants.TINYEXR_SUCCESS);
     }
 
     [Test]
-    public async Task IsEXR_WithInvalidFile_ReturnsFalse()
+    public async Task IsEXR_WithInvalidFile_ReturnsNonSuccess()
     {
         var filePath = Path.Combine(_tempDir, "invalid.exr");
         await File.WriteAllTextAsync(filePath, "not an exr file");
 
-        var result = TinyExr.IsEXR(filePath);
+        var result = NativeMethods.IsEXR(filePath);
 
-        await Assert.That(result).IsFalse();
+        await Assert.That(result).IsNotEqualTo(TinyExrConstants.TINYEXR_SUCCESS);
     }
 
     [Test]
-    public async Task IsEXRFromMemory_WithValidData_ReturnsTrue()
+    public async Task IsEXRFromMemory_WithValidData_ReturnsSuccess()
     {
         var filePath = Path.Combine(_tempDir, "valid.exr");
-        TinyExr.SaveEXR(CreateTestPixels(2, 2), 2, 2, 4, false, filePath);
+        unsafe { NativeMethods.SaveEXR(CreateTestPixels(2, 2), 2, 2, 4, 0, filePath, out _); }
         var bytes = await File.ReadAllBytesAsync(filePath);
 
-        var result = TinyExr.IsEXRFromMemory(bytes);
+        var result = NativeMethods.IsEXRFromMemory(bytes);
 
-        await Assert.That(result).IsTrue();
+        await Assert.That(result).IsEqualTo(TinyExrConstants.TINYEXR_SUCCESS);
     }
 
     [Test]
-    public async Task IsEXRFromMemory_WithInvalidData_ReturnsFalse()
+    public async Task IsEXRFromMemory_WithInvalidData_ReturnsNonSuccess()
     {
-        var result = TinyExr.IsEXRFromMemory("not an exr"u8);
+        var result = NativeMethods.IsEXRFromMemory("not an exr"u8);
 
-        await Assert.That(result).IsFalse();
+        await Assert.That(result).IsNotEqualTo(TinyExrConstants.TINYEXR_SUCCESS);
     }
 
     [Test]
     public async Task ParseEXRVersionFromFile_WithValidFile_ReturnsVersion()
     {
         var filePath = Path.Combine(_tempDir, "version.exr");
-        TinyExr.SaveEXR(CreateTestPixels(2, 2), 2, 2, 4, false, filePath);
+        unsafe { NativeMethods.SaveEXR(CreateTestPixels(2, 2), 2, 2, 4, 0, filePath, out _); }
 
-        var version = TinyExr.ParseEXRVersionFromFile(filePath);
+        var ret = NativeMethods.ParseEXRVersionFromFile(out var version, filePath);
 
+        await Assert.That(ret).IsEqualTo(TinyExrConstants.TINYEXR_SUCCESS);
         await Assert.That(version.version).IsEqualTo(2);
     }
 
@@ -117,11 +121,12 @@ public class TinyExrTests
     public async Task ParseEXRVersionFromMemory_WithValidData_ReturnsVersion()
     {
         var filePath = Path.Combine(_tempDir, "version.exr");
-        TinyExr.SaveEXR(CreateTestPixels(2, 2), 2, 2, 4, false, filePath);
+        unsafe { NativeMethods.SaveEXR(CreateTestPixels(2, 2), 2, 2, 4, 0, filePath, out _); }
         var bytes = await File.ReadAllBytesAsync(filePath);
 
-        var version = TinyExr.ParseEXRVersionFromMemory(bytes);
+        var ret = NativeMethods.ParseEXRVersionFromMemory(out var version, bytes);
 
+        await Assert.That(ret).IsEqualTo(TinyExrConstants.TINYEXR_SUCCESS);
         await Assert.That(version.version).IsEqualTo(2);
     }
 
@@ -131,32 +136,32 @@ public class TinyExrTests
         var filePath = Path.Combine(_tempDir, "memory.exr");
         const int width = 2;
         const int height = 2;
-        TinyExr.SaveEXR(CreateTestPixels(width, height), width, height, 4, false, filePath);
+        unsafe { NativeMethods.SaveEXR(CreateTestPixels(width, height), width, height, 4, 0, filePath, out _); }
         var bytes = await File.ReadAllBytesAsync(filePath);
 
         int w, h;
-        int loadedLength;
         unsafe
         {
-            var loaded = TinyExr.LoadEXRFromMemory(bytes, out w, out h, out var ptr);
-            loadedLength = loaded.Length;
-            TinyExr.FreeImageData(ptr);
+            NativeMethods.LoadEXRFromMemory(out var rgba, out w, out h, bytes, out _);
+            NativeMemory.Free(rgba);
         }
 
         await Assert.That(w).IsEqualTo(width);
         await Assert.That(h).IsEqualTo(height);
-        await Assert.That(loadedLength).IsEqualTo(width * height * 4);
     }
 
     [Test]
-    public unsafe Task SaveEXRToMemory_AndFreeBuffer_DoesNotThrow()
+    public async Task SaveEXRToMemory_ReturnsPositiveSize()
     {
         var pixels = CreateTestPixels(2, 2);
+        int size;
+        unsafe
+        {
+            size = NativeMethods.SaveEXRToMemory(pixels, 2, 2, 4, 0, out var buffer, out _);
+            NativeMemory.Free(buffer);
+        }
 
-        var data = TinyExr.SaveEXRToMemory(pixels, 2, 2, 4, false, out var ptr);
-        TinyExr.FreeMemoryBuffer(ptr);
-
-        return Task.CompletedTask;
+        await Assert.That(size).IsGreaterThan(0);
     }
 
     [Test]
@@ -167,13 +172,12 @@ public class TinyExrTests
         var pixels = CreateTestPixels(width, height);
         var filePath = Path.Combine(_tempDir, "fp16.exr");
 
-        TinyExr.SaveEXR(pixels, width, height, 4, true, filePath);
-
         int w, h;
         unsafe
         {
-            TinyExr.LoadEXR(filePath, out w, out h, out var ptr);
-            TinyExr.FreeImageData(ptr);
+            NativeMethods.SaveEXR(pixels, width, height, 4, 1, filePath, out _);
+            NativeMethods.LoadEXR(out var rgba, out w, out h, filePath, out _);
+            NativeMemory.Free(rgba);
         }
 
         await Assert.That(w).IsEqualTo(width);
@@ -181,16 +185,15 @@ public class TinyExrTests
     }
 
     [Test]
-    public Task LoadEXR_WithNonexistentFile_ThrowsTinyExrException()
+    public async Task LoadEXR_WithNonexistentFile_ReturnsError()
     {
-        Assert.Throws<TinyExrException>(() =>
+        int ret;
+        unsafe
         {
-            unsafe
-            {
-                TinyExr.LoadEXR("/nonexistent/file.exr", out _, out _, out _);
-            }
-        });
+            ret = NativeMethods.LoadEXR(out _, out _, out _, "/nonexistent/file.exr", out var err);
+            NativeMethods.FreeEXRErrorMessage(err);
+        }
 
-        return Task.CompletedTask;
+        await Assert.That(ret).IsNotEqualTo(TinyExrConstants.TINYEXR_SUCCESS);
     }
 }

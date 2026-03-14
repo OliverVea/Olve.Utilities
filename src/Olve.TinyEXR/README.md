@@ -17,12 +17,16 @@ dotnet add package Olve.TinyEXR
 
 ## Overview
 
+This package provides thin, source-generated `[LibraryImport]` bindings to the tinyexr C API. All functions are on `NativeMethods` and follow the upstream signatures closely — return codes, `out` error pointers, and caller-managed memory.
+
 | Type | Description |
 | --- | --- |
-| `TinyExr` | Safe managed wrapper with exception-based error handling for loading, saving, and validating EXR images. |
-| `TinyExrException` | Exception thrown on native library errors, carrying the error code and message. |
-| `EXRVersion` | Parsed EXR version header information (version number, tiled, multipart flags). |
-| `NativeMethods` | Low-level P/Invoke declarations using `[LibraryImport]` source-generated interop. |
+| `NativeMethods` | P/Invoke bindings to the tinyexr C API. |
+| `TinyExrConstants` | Return codes, pixel types, compression types, and other constants. |
+| `EXRVersion` | Parsed EXR version header (version number, tiled, multipart flags). |
+| `EXRHeader` | EXR header with channel info, compression, tiling, and custom attributes. |
+| `EXRImage` | EXR image data with per-channel image buffers. |
+| `DeepImage` | Deep image data with per-pixel sample counts. |
 
 ---
 
@@ -30,51 +34,87 @@ dotnet add package Olve.TinyEXR
 
 ### Saving and loading an EXR file
 
-Create pixel data as RGBA floats, save to an EXR file, and load it back.
-
 ```cs
-// ../../tests/Olve.TinyEXR.Tests/ReadmeDemo.cs#L11-L24
+// ../../tests/Olve.TinyEXR.Tests/ReadmeDemo.cs#L12-L25
 
 var pixels = new float[] { 1.0f, 0.5f, 0.0f, 1.0f }; // Single RGBA pixel
 var tempFile = Path.GetTempFileName() + ".exr";
 
-TinyExr.SaveEXR(pixels, 1, 1, 4, false, tempFile); // Save as 32-bit float EXR
+NativeMethods.SaveEXR(pixels, 1, 1, 4, 0, tempFile, out _);
 
-var loaded = TinyExr.LoadEXR(tempFile, out var width, out var height, out var ptr);
+NativeMethods.LoadEXR(out var rgba, out var width, out var height, tempFile, out _);
 
-var r = loaded[0]; // 1.0
-var g = loaded[1]; // 0.5
-var b = loaded[2]; // 0.0
-var a = loaded[3]; // 1.0
+var r = rgba[0]; // 1.0
+var g = rgba[1]; // 0.5
+var b = rgba[2]; // 0.0
+var a = rgba[3]; // 1.0
 
-TinyExr.FreeImageData(ptr);
+NativeMemory.Free(rgba);
 File.Delete(tempFile);
 ```
 
 ### Loading from memory
 
-EXR data can also be validated and loaded directly from a byte buffer.
-
 ```cs
-// ../../tests/Olve.TinyEXR.Tests/ReadmeDemo.cs#L36-L41
+// ../../tests/Olve.TinyEXR.Tests/ReadmeDemo.cs#L37-L43
 
 var bytes = File.ReadAllBytes(tempFile);
 
-var isExr = TinyExr.IsEXRFromMemory(bytes); // true
-var loaded = TinyExr.LoadEXRFromMemory(bytes, out var width, out var height, out var ptr);
+var isExr = NativeMethods.IsEXRFromMemory(bytes); // TINYEXR_SUCCESS
+NativeMethods.LoadEXRFromMemory(out var rgba, out var width, out var height, bytes, out _);
 
-TinyExr.FreeImageData(ptr);
+NativeMemory.Free(rgba);
+File.Delete(tempFile);
+```
+
+### Saving to memory
+
+```cs
+// ../../tests/Olve.TinyEXR.Tests/ReadmeDemo.cs#L66-L73
+
+var pixels = new float[] { 1.0f, 0.5f, 0.0f, 1.0f };
+
+var size = NativeMethods.SaveEXRToMemory(pixels, 1, 1, 4, 0, out var buffer, out _);
+var exrBytes = new ReadOnlySpan<byte>(buffer, (int)size);
+
+// use exrBytes...
+
+NativeMemory.Free(buffer);
 ```
 
 ### Validating and inspecting EXR files
 
-Check whether a file is a valid EXR and parse its version header.
+```cs
+// ../../tests/Olve.TinyEXR.Tests/ReadmeDemo.cs#L55-L56
+
+var isExr = NativeMethods.IsEXR(tempFile); // TINYEXR_SUCCESS
+NativeMethods.ParseEXRVersionFromFile(out var version, tempFile); // version.version == 2
+```
+
+### Parsing header and loading image data
+
+For full control over channels, compression, and pixel types, use the advanced multi-step workflow.
 
 ```cs
-// ../../tests/Olve.TinyEXR.Tests/ReadmeDemo.cs#L54-L55
+// ../../tests/Olve.TinyEXR.Tests/ReadmeDemo.cs#L85-L101
 
-var isExr = TinyExr.IsEXR(tempFile); // true
-var version = TinyExr.ParseEXRVersionFromFile(tempFile); // version.version == 2
+NativeMethods.ParseEXRVersionFromFile(out var version, tempFile);
+
+EXRHeader header;
+NativeMethods.InitEXRHeader(&header);
+NativeMethods.ParseEXRHeaderFromFile(&header, in version, tempFile, out _);
+
+var numChannels = header.num_channels; // 4 (RGBA)
+var compression = header.compression_type; // TINYEXR_COMPRESSIONTYPE_ZIP
+
+EXRImage image;
+NativeMethods.InitEXRImage(&image);
+NativeMethods.LoadEXRImageFromFile(&image, &header, tempFile, out _);
+
+// use image.images, image.width, image.height ...
+
+NativeMethods.FreeEXRImage(&image);
+NativeMethods.FreeEXRHeader(&header);
 ```
 
 ---

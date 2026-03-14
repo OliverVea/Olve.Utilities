@@ -11,7 +11,7 @@ namespace Olve.TinyEXR;
 
 // --- Constants ---
 
-internal static partial class TinyExrConstants
+public static partial class TinyExrConstants
 {
     // Return codes
     public const int TINYEXR_SUCCESS = 0;
@@ -85,7 +85,7 @@ public struct EXRVersion
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct EXRAttribute
+public unsafe struct EXRAttribute
 {
     public fixed byte name[256];
     public fixed byte type[256];
@@ -95,7 +95,7 @@ internal unsafe struct EXRAttribute
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct EXRChannelInfo
+public unsafe struct EXRChannelInfo
 {
     public fixed byte name[256];
     public int pixel_type;
@@ -106,7 +106,7 @@ internal unsafe struct EXRChannelInfo
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct EXRTile
+public unsafe struct EXRTile
 {
     public int offset_x;
     public int offset_y;
@@ -118,7 +118,7 @@ internal unsafe struct EXRTile
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal struct EXRBox2i
+public struct EXRBox2i
 {
     public int min_x;
     public int min_y;
@@ -127,7 +127,7 @@ internal struct EXRBox2i
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct EXRHeader
+public unsafe struct EXRHeader
 {
     public float pixel_aspect_ratio;
     public int line_order;
@@ -164,14 +164,14 @@ internal unsafe struct EXRHeader
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct EXRMultiPartHeader
+public unsafe struct EXRMultiPartHeader
 {
     public int num_headers;
     public EXRHeader* headers;
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct EXRImage
+public unsafe struct EXRImage
 {
     public EXRTile* tiles;
     public EXRImage* next_level;
@@ -188,14 +188,14 @@ internal unsafe struct EXRImage
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct EXRMultiPartImage
+public unsafe struct EXRMultiPartImage
 {
     public int num_images;
     public EXRImage* images;
 }
 
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct DeepImage
+public unsafe struct DeepImage
 {
     public byte** channel_names;
     public float*** image;
@@ -208,7 +208,7 @@ internal unsafe struct DeepImage
 
 // --- P/Invoke declarations ---
 
-internal static unsafe partial class NativeMethods
+public static unsafe partial class NativeMethods
 {
     private const string LibName = "tinyexr";
 
