@@ -1,3 +1,9 @@
+## v0.39.1 (2026-03-14)
+
+### Refactor
+
+- remove TinyExr wrapper, expose bindings as public API
+
 ## v0.39.0 (2026-03-14)
 
 ### Feat
