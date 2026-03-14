@@ -1,28 +1,16 @@
 items:
-- name: Olve.Utilities
+- name: Olve.MinimalApi
   items:
     - name: Overview
-      href: ../src/Olve.Utilities/README.md
+      href: ../src/Olve.MinimalApi/README.md
     - name: API
-      href: api/Olve.Utilities.Assertions.yml
-- name: Olve.Operations
+      href: api/Olve.MinimalApi.yml
+- name: Olve.OpenRaster
   items:
     - name: Overview
-      href: ../src/Olve.Operations/README.md
+      href: ../src/Olve.OpenRaster/README.md
     - name: API
-      href: api/Olve.Operations.yml
-- name: Olve.Results
-  items:
-    - name: Overview
-      href: ../src/Olve.Results/README.md
-    - name: API
-      href: api/Olve.Results.yml
-- name: Olve.Results.TUnit
-  items:
-    - name: Overview
-      href: ../src/Olve.Results.TUnit/README.md
-    - name: API
-      href: api/Olve.Results.TUnit.yml
+      href: api/Olve.OpenRaster.yml
 - name: Olve.Paths
   items:
     - name: Overview
@@ -35,27 +23,33 @@ items:
       href: ../src/Olve.Paths.Glob/README.md
     - name: API
       href: api/Olve.Paths.Glob.yml
+- name: Olve.Results
+  items:
+    - name: Overview
+      href: ../src/Olve.Results/README.md
+    - name: API
+      href: api/Olve.Results.yml
+- name: Olve.Results.TUnit
+  items:
+    - name: Overview
+      href: ../src/Olve.Results.TUnit/README.md
+    - name: API
+      href: api/Olve.Results.TUnit.yml
+- name: Olve.TinyEXR
+  items:
+    - name: Overview
+      href: ../src/Olve.TinyEXR/README.md
+    - name: API
+      href: api/Olve.TinyEXR.yml
+- name: Olve.Utilities
+  items:
+    - name: Overview
+      href: ../src/Olve.Utilities/README.md
+    - name: API
+      href: api/Olve.Utilities.Assertions.yml
 - name: Olve.Validation
   items:
     - name: Overview
       href: ../src/Olve.Validation/README.md
     - name: API
       href: api/Olve.Validation.yml
-- name: Olve.MinimalApi
-  items:
-    - name: Overview
-      href: ../src/Olve.MinimalApi/README.md
-    - name: API
-      href: api/Olve.MinimalApi.yml
-- name: Olve.Logging
-  items:
-    - name: Overview
-      href: ../src/Olve.Logging/README.md
-    - name: API
-      href: api/Olve.Logging.yml
-- name: Olve.OpenRaster
-  items:
-    - name: Overview
-      href: ../src/Olve.OpenRaster/README.md
-    - name: API
-      href: api/Olve.OpenRaster.yml
