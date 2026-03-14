@@ -1,3 +1,9 @@
+## v0.39.0 (2026-03-14)
+
+### Feat
+
+- add win-x64 TinyEXR build, remove native source from repo
+
 ## v0.38.0 (2026-02-19)
 
 ### Feat
