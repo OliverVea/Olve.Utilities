@@ -63,6 +63,12 @@
           "files": [
             "**/Olve.OpenRaster.csproj"
           ]
+        },
+        {
+          "src": "../src/Olve.TinyEXR",
+          "files": [
+            "**/Olve.TinyEXR.csproj"
+          ]
         }
       ],
       "dest": "api"

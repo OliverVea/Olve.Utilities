@@ -16,6 +16,7 @@ env:
     src/Olve.Utilities/Olve.Utilities.csproj
     src/Olve.Validation/Olve.Validation.csproj
     src/Olve.MinimalApi/Olve.MinimalApi.csproj
+    src/Olve.TinyEXR/Olve.TinyEXR.csproj
 
 jobs:
   test-ubuntu:
@@ -81,6 +82,7 @@ jobs:
           - id: Olve.MinimalApi
           - id: Olve.Paths
           - id: Olve.Paths.Glob
+          - id: Olve.TinyEXR
     steps:
       - uses: actions/checkout@v4
       - name: Dry run publish ${{ matrix.id }} to NuGet
