@@ -11,11 +11,14 @@ public interface IQueue<T> : IEnumerable<T>
 {
     /// <summary>
     /// Adds an item to the queue.
-    /// If adding the item causes the queue to exceed its maximum size,
-    /// the oldest item is removed.
+    /// The behavior when the queue is full depends on the configured <see cref="FullQueueBehavior"/>.
     /// </summary>
     /// <param name="item">The item to enqueue.</param>
-    void Enqueue(T item);
+    /// <returns>
+    /// <c>true</c> if the item was added to the queue;
+    /// <c>false</c> if the item was rejected (e.g. when using <see cref="FullQueueBehavior.DropNewest"/>).
+    /// </returns>
+    bool Enqueue(T item);
 
     /// <summary>
     /// Attempts to remove and return the item at the front of the queue.

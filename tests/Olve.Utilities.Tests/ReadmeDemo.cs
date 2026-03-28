@@ -94,8 +94,22 @@ public class ReadmeDemo
         queue.Enqueue("c");
         queue.Enqueue("d"); // "a" is dropped, queue is now { "b", "c", "d" }
 
-        await Assert.That(queue.Count).IsEqualTo(3);
-        await Assert.That(queue.TryDequeue(out var first) && first == "b").IsTrue();
+        queue.TryDequeue(out var first); // "b"
+
+        // configure back-pressure behavior
+        var strict = new FixedSizeQueue<string>(maxSize: 2, FullQueueBehavior.Throw);
+        strict.Enqueue("x");
+        strict.Enqueue("y");
+        // strict.Enqueue("z"); // throws InvalidOperationException
+
+        var dropping = new FixedSizeQueue<string>(maxSize: 2, FullQueueBehavior.DropNewest);
+        dropping.Enqueue("x");
+        dropping.Enqueue("y");
+        var accepted = dropping.Enqueue("z"); // false — "z" is rejected
+
+        await Assert.That(queue.Count).IsEqualTo(2);
+        await Assert.That(first).IsEqualTo("b");
+        await Assert.That(accepted).IsFalse();
     }
 
     [Test]

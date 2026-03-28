@@ -7,7 +7,9 @@ namespace Olve.Utilities.Tests.Collections;
 
 public class FixedSizeQueueTests
 {
-    private static FixedSizeQueue<T> GetNewQueue<T>(int maxSize) => new(maxSize);
+    private static FixedSizeQueue<T> GetNewQueue<T>(
+        int maxSize,
+        FullQueueBehavior fullBehavior = FullQueueBehavior.DropOldest) => new(maxSize, fullBehavior);
 
     [Test]
     public async Task Constructor_WithValidMaxSize_InitializesEmptyQueue()
@@ -167,5 +169,98 @@ public class FixedSizeQueueTests
         // Assert
         await Assert.That(result).IsFalse();
         await Assert.That(dequeuedItem).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task Enqueue_DropNewest_WhenFull_RejectsNewItem()
+    {
+        // Arrange
+        var queue = GetNewQueue<int>(2, FullQueueBehavior.DropNewest);
+        queue.Enqueue(1);
+        queue.Enqueue(2);
+
+        // Act
+        var result = queue.Enqueue(3);
+
+        // Assert
+        await Assert.That(result).IsFalse();
+        await Assert.That(queue.Count).IsEqualTo(2);
+        var items = queue.ToList();
+        await Assert.That(items[0]).IsEqualTo(1);
+        await Assert.That(items[1]).IsEqualTo(2);
+    }
+
+    [Test]
+    public async Task Enqueue_DropNewest_WhenNotFull_AddsItem()
+    {
+        // Arrange
+        var queue = GetNewQueue<int>(3, FullQueueBehavior.DropNewest);
+
+        // Act
+        var result = queue.Enqueue(1);
+
+        // Assert
+        await Assert.That(result).IsTrue();
+        await Assert.That(queue.Count).IsEqualTo(1);
+    }
+
+    [Test]
+    public Task Enqueue_Throw_WhenFull_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var queue = GetNewQueue<int>(2, FullQueueBehavior.Throw);
+        queue.Enqueue(1);
+        queue.Enqueue(2);
+
+        // Act & Assert
+        Assert.Throws<InvalidOperationException>(() => queue.Enqueue(3));
+        return Task.CompletedTask;
+    }
+
+    [Test]
+    public async Task Enqueue_Throw_WhenNotFull_AddsItem()
+    {
+        // Arrange
+        var queue = GetNewQueue<int>(3, FullQueueBehavior.Throw);
+
+        // Act
+        var result = queue.Enqueue(1);
+
+        // Assert
+        await Assert.That(result).IsTrue();
+        await Assert.That(queue.Count).IsEqualTo(1);
+    }
+
+    [Test]
+    public async Task Enqueue_DropOldest_ReturnsTrue()
+    {
+        // Arrange
+        var queue = GetNewQueue<int>(2);
+        queue.Enqueue(1);
+        queue.Enqueue(2);
+
+        // Act
+        var result = queue.Enqueue(3);
+
+        // Assert
+        await Assert.That(result).IsTrue();
+        await Assert.That(queue.Count).IsEqualTo(2);
+    }
+
+    [Test]
+    public async Task Constructor_DefaultBehavior_IsDropOldest()
+    {
+        // Arrange
+        var queue = new FixedSizeQueue<int>(2);
+        queue.Enqueue(1);
+        queue.Enqueue(2);
+
+        // Act
+        queue.Enqueue(3);
+
+        // Assert - oldest item (1) should be gone
+        var items = queue.ToList();
+        await Assert.That(items[0]).IsEqualTo(2);
+        await Assert.That(items[1]).IsEqualTo(3);
     }
 }
