@@ -10,7 +10,6 @@ env:
 permissions:
   actions: read
   pages: write
-  id-token: write
   contents: write
 
 concurrency:
@@ -64,16 +63,16 @@ jobs:
 
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - id: cz
         name: Create bump and changelog
         uses: commitizen-tools/commitizen-action@master
         with:
-          github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - id: version-changed
         name: Check if version changed
@@ -88,7 +87,6 @@ jobs:
         if: "${{ steps.version-changed.outputs.changed == 'true' }}"
         with:
           body_path: ${{ github.workspace }}/CHANGELOG.md
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
           tag_name: v${{ steps.cz.outputs.version }}
 
       - name: Echo release id
