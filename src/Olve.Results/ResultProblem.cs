@@ -59,13 +59,14 @@ public class ResultProblem
     ///     Initializes a new instance of the <see cref="ResultProblem" /> class for JSON deserialization.
     /// </summary>
     [JsonConstructor]
-    public ResultProblem(string formattedMessage, string[]? tags, int severity, string? source)
+    public ResultProblem(string formattedMessage, string[]? tags, int severity, string? source, string? exceptionSummary)
     {
         Message = formattedMessage;
         Args = [];
         Tags = tags ?? [];
         Severity = severity;
         Source = source;
+        ExceptionSummary = exceptionSummary;
         Exception = null;
         OriginInformation = default;
     }
@@ -76,6 +77,7 @@ public class ResultProblem
         StackFrame stackFrame)
     {
         Exception = exception;
+        ExceptionSummary = exception is not null ? $"{exception.GetType().Name}: {exception.Message}" : null;
         Message = message;
         Args = args;
 
@@ -129,6 +131,12 @@ public class ResultProblem
     public Exception? Exception { get; }
 
     /// <summary>
+    ///     Gets a summary of the exception that caused the problem, if any.
+    ///     This is preserved during JSON serialization unlike <see cref="Exception"/>.
+    /// </summary>
+    public string? ExceptionSummary { get; }
+
+    /// <summary>
     ///     Gets the origin information of the problem.
     /// </summary>
     [JsonIgnore]
@@ -149,7 +157,9 @@ public class ResultProblem
     /// <returns>The formatted string.</returns>
     public string ToBriefString() => Exception != null
         ? $"{string.Format(Message, Args)} ({Exception.GetType().Name}: {Exception.Message})"
-        : string.Format(Message, Args);
+        : ExceptionSummary != null
+            ? $"{string.Format(Message, Args)} ({ExceptionSummary})"
+            : string.Format(Message, Args);
 
     /// <summary>
     ///    Formats the problem as a string for debugging purposes.
