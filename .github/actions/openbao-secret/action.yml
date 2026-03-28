@@ -1,0 +1,55 @@
+name: 'Get OpenBao Secret'
+description: 'Authenticates to OpenBao via AppRole and retrieves a KV v2 secret'
+inputs:
+  role-id:
+    description: 'OpenBao AppRole role ID'
+    required: true
+  secret-id:
+    description: 'OpenBao AppRole secret ID'
+    required: true
+  secret-path:
+    description: 'KV v2 API path (e.g. external/data/nuget/api-key)'
+    required: true
+  secret-field:
+    description: 'Field name within .data.data to extract'
+    required: true
+  openbao-addr:
+    description: 'OpenBao server address'
+    required: false
+    default: 'https://openbao.ovea.pro'
+outputs:
+  secret:
+    description: 'The retrieved secret value'
+    value: ${{ steps.read-secret.outputs.secret }}
+runs:
+  using: "composite"
+  steps:
+    - name: Login to OpenBao via AppRole
+      id: login
+      shell: bash
+      run: |
+        LOGIN_RESPONSE=$(curl -sf --request POST \
+          "${{ inputs.openbao-addr }}/v1/auth/approle/login" \
+          --data "{\"role_id\": \"${{ inputs.role-id }}\", \"secret_id\": \"${{ inputs.secret-id }}\"}")
+        TOKEN=$(echo "$LOGIN_RESPONSE" | jq -r '.auth.client_token')
+        if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+          echo "::error::Failed to authenticate to OpenBao"
+          exit 1
+        fi
+        echo "::add-mask::$TOKEN"
+        echo "token=$TOKEN" >> "$GITHUB_OUTPUT"
+
+    - name: Read secret
+      id: read-secret
+      shell: bash
+      run: |
+        SECRET_RESPONSE=$(curl -sf \
+          --header "X-Vault-Token: ${{ steps.login.outputs.token }}" \
+          "${{ inputs.openbao-addr }}/v1/${{ inputs.secret-path }}")
+        SECRET=$(echo "$SECRET_RESPONSE" | jq -r '.data.data["${{ inputs.secret-field }}"]')
+        if [ -z "$SECRET" ] || [ "$SECRET" = "null" ]; then
+          echo "::error::Failed to read secret at ${{ inputs.secret-path }} field ${{ inputs.secret-field }}"
+          exit 1
+        fi
+        echo "::add-mask::$SECRET"
+        echo "secret=$SECRET" >> "$GITHUB_OUTPUT"

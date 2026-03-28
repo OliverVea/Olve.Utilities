@@ -11,6 +11,7 @@ permissions:
   actions: read
   pages: write
   contents: write
+  id-token: write
 
 concurrency:
   group: "deploy"
@@ -117,13 +118,21 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Get NuGet API key from OpenBao
+        id: nuget-secret
+        uses: ./.github/actions/openbao-secret
+        with:
+          role-id: ${{ secrets.OPENBAO_ROLE_ID }}
+          secret-id: ${{ secrets.OPENBAO_SECRET_ID }}
+          secret-path: external/data/nuget/api-key
+          secret-field: key
       - name: Publish ${{ matrix.id }} to NuGet
         uses: ./.github/actions/dotnet-publish
         with:
           project: ./src/${{ matrix.id }}
           package-name: ${{ matrix.id }}
           version: ${{ needs.bump-version.outputs.version }}
-          nuget-api-key: ${{ secrets.NUGET_API_KEY }}
+          nuget-api-key: ${{ steps.nuget-secret.outputs.secret }}
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
   publish-docs:
