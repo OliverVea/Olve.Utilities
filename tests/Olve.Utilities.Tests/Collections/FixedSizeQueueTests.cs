@@ -263,4 +263,53 @@ public class FixedSizeQueueTests
         await Assert.That(items[0]).IsEqualTo(2);
         await Assert.That(items[1]).IsEqualTo(3);
     }
+
+    [Test]
+    public async Task TryEnqueue_WhenNotFull_AddsItem()
+    {
+        // Arrange
+        var queue = GetNewQueue<int>(2);
+
+        // Act
+        var result = queue.TryEnqueue(1);
+
+        // Assert
+        await Assert.That(result).IsTrue();
+        await Assert.That(queue.Count).IsEqualTo(1);
+    }
+
+    [Test]
+    public async Task TryEnqueue_WhenFull_ReturnsFalse()
+    {
+        // Arrange
+        var queue = GetNewQueue<int>(2);
+        queue.Enqueue(1);
+        queue.Enqueue(2);
+
+        // Act
+        var result = queue.TryEnqueue(3);
+
+        // Assert
+        await Assert.That(result).IsFalse();
+        await Assert.That(queue.Count).IsEqualTo(2);
+    }
+
+    [Test]
+    public async Task TryEnqueue_WhenFull_IgnoresFullQueueBehavior()
+    {
+        // Arrange — even with DropOldest, TryEnqueue should just return false
+        var queue = GetNewQueue<int>(2, FullQueueBehavior.DropOldest);
+        queue.Enqueue(1);
+        queue.Enqueue(2);
+
+        // Act
+        var result = queue.TryEnqueue(3);
+
+        // Assert
+        await Assert.That(result).IsFalse();
+        await Assert.That(queue.Count).IsEqualTo(2);
+        var items = queue.ToList();
+        await Assert.That(items[0]).IsEqualTo(1);
+        await Assert.That(items[1]).IsEqualTo(2);
+    }
 }
