@@ -6,7 +6,7 @@ namespace Olve.Results;
 /// <summary>
 ///     Represents a result of an operation without a value, indicating success or failure.
 /// </summary>
-public readonly partial struct Result
+public readonly partial struct Result : IResultType
 {
     private Result(ResultProblemCollection? problems)
     {
@@ -199,6 +199,12 @@ public readonly partial struct Result
         problems = Problems;
         return problems is not null;
     }
+
+    /// <inheritdoc />
+    object? IResultType.BoxedValue => null;
+
+    /// <inheritdoc />
+    bool IResultType.HasValue => false;
 
     /// <summary>
     ///     Converts the specified problem to a failure result.

@@ -6,7 +6,7 @@ namespace Olve.Results;
 ///     Represents a result of an operation with a value, indicating success or failure.
 /// </summary>
 /// <typeparam name="T">The type of the result value.</typeparam>
-public readonly struct Result<T>
+public readonly struct Result<T> : IResultType
 {
     internal Result(T? result, ResultProblemCollection? problems)
     {
@@ -151,6 +151,12 @@ public readonly struct Result<T>
     {
         return Succeeded ? $"Success({Value})" : "Failure";
     }
+
+    /// <inheritdoc />
+    object? IResultType.BoxedValue => Value;
+
+    /// <inheritdoc />
+    bool IResultType.HasValue => true;
 
     /// <summary>
     ///     Converts the specified value to a success result.

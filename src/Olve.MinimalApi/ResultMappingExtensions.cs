@@ -1,4 +1,3 @@
-using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Olve.Results;
@@ -42,16 +41,12 @@ public static class ResultMappingExtensions
         return builder.AddEndpointFilterFactory((context, next) =>
         {
             var returnType = context.MethodInfo.ReturnType;
-            var isTask = typeof(Task).IsAssignableFrom(returnType);
-            if (isTask && returnType.IsGenericType)
+            if (typeof(Task).IsAssignableFrom(returnType) && returnType.IsGenericType)
             {
                 returnType = returnType.GenericTypeArguments[0];
             }
 
-            var isResult = returnType == typeof(Result);
-            var isGenericResult = returnType.IsGenericType && returnType.GetGenericTypeDefinition() == typeof(Result<>);
-
-            if (!isResult && !isGenericResult)
+            if (!typeof(IResultType).IsAssignableFrom(returnType))
             {
                 return next;
             }
@@ -59,22 +54,20 @@ public static class ResultMappingExtensions
             return async invocationContext =>
             {
                 var result = await next(invocationContext);
-                if (result is Result r)
-                {
-                    return r.ToHttpResult();
-                }
 
-                var type = result!.GetType();
-                if (!type.IsGenericType || type.GetGenericTypeDefinition() != typeof(Result<>))
+                if (result is not IResultType r)
                 {
                     return result;
                 }
 
-                var method = typeof(ResultMappingExtensions)
-                    .GetMethod(nameof(MapGenericResult), BindingFlags.NonPublic | BindingFlags.Static)!
-                    .MakeGenericMethod(type.GenericTypeArguments[0]);
+                if (r.Failed)
+                {
+                    return TypedResults.BadRequest(r.Problems?.ToArray());
+                }
 
-                return (IResult)method.Invoke(null, [result])!;
+                return r.HasValue
+                    ? TypedResults.Ok(r.BoxedValue)
+                    : TypedResults.Ok();
             };
         });
     }
@@ -103,6 +96,4 @@ public static class ResultMappingExtensions
             ? TypedResults.BadRequest(problems.ToArray())
             : TypedResults.Ok(value);
     }
-
-    private static IResult MapGenericResult<T>(Result<T> result) => result.ToHttpResult();
 }
