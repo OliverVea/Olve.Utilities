@@ -1,3 +1,9 @@
+## v0.41.0 (2026-03-28)
+
+### Feat
+
+- fetch NuGet API key from OpenBao via AppRole
+
 ## v0.40.0 (2026-03-28)
 
 ### Feat
