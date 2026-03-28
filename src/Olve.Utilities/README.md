@@ -131,10 +131,10 @@ enrollment.TryGet(101, out var mathStudents); // { "alice", "bob" }
 
 ### FixedSizeQueue
 
-`FixedSizeQueue<T>` automatically drops the oldest items when the maximum size is exceeded.
+`FixedSizeQueue<T>` automatically manages items when the maximum size is exceeded. Configure the behavior with `FullQueueBehavior`: `DropOldest` (default), `DropNewest`, or `Throw`.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L90-L95
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L90-L108
 
 var queue = new FixedSizeQueue<string>(maxSize: 3);
 
@@ -142,6 +142,19 @@ queue.Enqueue("a");
 queue.Enqueue("b");
 queue.Enqueue("c");
 queue.Enqueue("d"); // "a" is dropped, queue is now { "b", "c", "d" }
+
+queue.TryDequeue(out var first); // "b"
+
+// configure back-pressure behavior
+var strict = new FixedSizeQueue<string>(maxSize: 2, FullQueueBehavior.Throw);
+strict.Enqueue("x");
+strict.Enqueue("y");
+// strict.Enqueue("z"); // throws InvalidOperationException
+
+var dropping = new FixedSizeQueue<string>(maxSize: 2, FullQueueBehavior.DropNewest);
+dropping.Enqueue("x");
+dropping.Enqueue("y");
+var accepted = dropping.Enqueue("z"); // false — "z" is rejected
 ```
 
 ---
@@ -151,7 +164,7 @@ queue.Enqueue("d"); // "a" is dropped, queue is now { "b", "c", "d" }
 `DateTimeFormatter.FormatTimeAgo()` produces human-readable relative time strings like "2 days ago" or "just now".
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L104-L107
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L118-L121
 
 var now = new DateTimeOffset(2025, 6, 15, 12, 0, 0, TimeSpan.Zero);
 var then = new DateTimeOffset(2025, 6, 13, 12, 0, 0, TimeSpan.Zero);
@@ -166,7 +179,7 @@ var text = DateTimeFormatter.FormatTimeAgo(now, then); // "2 days ago"
 `Pagination` computes offsets from page number and size. `PaginatedResult<T>` wraps a page of items with total count and navigation metadata.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L115-L124
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L129-L138
 
 var items = new[] { "alice", "bob", "charlie" };
 var pagination = new Pagination(Page: 0, PageSize: 2);
@@ -187,7 +200,7 @@ var result = new PaginatedResult<string>(
 `DirectedGraph` provides an ID-based directed graph with node and edge management.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L134-L146
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L148-L160
 
 var graph = new DirectedGraph();
 
@@ -211,7 +224,7 @@ graph.TryGetOutgoingEdges(nodeA, out var edges); // 2 edges
 High-performance `GetOrAdd` and `TryUpdate` extensions using `CollectionsMarshal` for zero-overhead dictionary operations.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L155-L165
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L169-L179
 
 var cache = new Dictionary<string, List<int>>();
 

@@ -12,16 +12,18 @@ public class FixedSizeQueue<T> : IQueue<T>
 {
     private readonly Queue<T> _queue = new();
     private readonly int _maxSize;
+    private readonly FullQueueBehavior _fullBehavior;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FixedSizeQueue{T}"/> class
-    /// with the specified maximum size.
+    /// with the specified maximum size and full-queue behavior.
     /// </summary>
     /// <param name="maxSize">The maximum number of items the queue can hold. Must be greater than zero.</param>
+    /// <param name="fullBehavior">The behavior when the queue is full. Defaults to <see cref="FullQueueBehavior.DropOldest"/>.</param>
     /// <exception cref="ArgumentOutOfRangeException">
     /// Thrown when <paramref name="maxSize"/> is less than or equal to zero.
     /// </exception>
-    public FixedSizeQueue(int maxSize)
+    public FixedSizeQueue(int maxSize, FullQueueBehavior fullBehavior = FullQueueBehavior.DropOldest)
     {
         if (maxSize <= 0)
         {
@@ -29,16 +31,33 @@ public class FixedSizeQueue<T> : IQueue<T>
         }
 
         _maxSize = maxSize;
+        _fullBehavior = fullBehavior;
     }
 
     /// <inheritdoc />
-    public void Enqueue(T item)
+    public bool Enqueue(T item)
     {
-        _queue.Enqueue(item);
-        while (_queue.Count > _maxSize)
+        if (_queue.Count >= _maxSize)
         {
-            _queue.Dequeue();
+            switch (_fullBehavior)
+            {
+                case FullQueueBehavior.DropNewest:
+                    return false;
+                case FullQueueBehavior.Throw:
+                    throw new InvalidOperationException(
+                        $"Queue is full (capacity: {_maxSize}).");
+                case FullQueueBehavior.DropOldest:
+                default:
+                    while (_queue.Count >= _maxSize)
+                    {
+                        _queue.Dequeue();
+                    }
+                    break;
+            }
         }
+
+        _queue.Enqueue(item);
+        return true;
     }
 
     /// <inheritdoc />
