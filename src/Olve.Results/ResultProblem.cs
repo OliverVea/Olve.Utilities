@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace Olve.Results;
 
@@ -54,6 +55,21 @@ public class ResultProblem
     {
     }
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ResultProblem" /> class for JSON deserialization.
+    /// </summary>
+    [JsonConstructor]
+    public ResultProblem(string formattedMessage, string[]? tags, int severity, string? source)
+    {
+        Message = formattedMessage;
+        Args = [];
+        Tags = tags ?? [];
+        Severity = severity;
+        Source = source;
+        Exception = null;
+        OriginInformation = default;
+    }
+
     internal ResultProblem(Exception? exception,
         string message,
         object[] args,
@@ -71,9 +87,16 @@ public class ResultProblem
 
 
     /// <summary>
-    ///     Gets the message describing the problem.
+    ///     Gets the raw format string describing the problem.
     /// </summary>
+    [JsonIgnore]
     public string Message { get; }
+
+    /// <summary>
+    ///     Gets the formatted message describing the problem, with arguments applied.
+    /// </summary>
+    [JsonPropertyName("message")]
+    public string FormattedMessage => Args.Length > 0 ? string.Format(Message, Args) : Message;
 
     /// <summary>
     ///     Gets the optional tags categorizing the problem.
@@ -90,6 +113,7 @@ public class ResultProblem
     /// <summary>
     ///     Gets the optional arguments providing additional details about the problem.
     /// </summary>
+    [JsonIgnore]
     public object[] Args { get; }
 
     /// <summary>
@@ -101,11 +125,13 @@ public class ResultProblem
     /// <summary>
     ///     Gets the exception that caused the problem, if any.
     /// </summary>
+    [JsonIgnore]
     public Exception? Exception { get; }
 
     /// <summary>
     ///     Gets the origin information of the problem.
     /// </summary>
+    [JsonIgnore]
     public ProblemOriginInformation OriginInformation { get; }
 
 
