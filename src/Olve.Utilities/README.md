@@ -134,7 +134,7 @@ enrollment.TryGet(101, out var mathStudents); // { "alice", "bob" }
 `FixedSizeQueue<T>` automatically manages items when the maximum size is exceeded. Configure the behavior with `FullQueueBehavior`: `DropOldest` (default), `DropNewest`, or `Throw`.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L90-L108
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L90-L111
 
 var queue = new FixedSizeQueue<string>(maxSize: 3);
 
@@ -155,6 +155,9 @@ var dropping = new FixedSizeQueue<string>(maxSize: 2, FullQueueBehavior.DropNewe
 dropping.Enqueue("x");
 dropping.Enqueue("y");
 var accepted = dropping.Enqueue("z"); // false — "z" is rejected
+
+// TryEnqueue fails when full, regardless of policy
+var tried = strict.TryEnqueue("z"); // false — queue is at capacity
 ```
 
 ---
@@ -164,7 +167,7 @@ var accepted = dropping.Enqueue("z"); // false — "z" is rejected
 `DateTimeFormatter.FormatTimeAgo()` produces human-readable relative time strings like "2 days ago" or "just now".
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L118-L121
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L122-L125
 
 var now = new DateTimeOffset(2025, 6, 15, 12, 0, 0, TimeSpan.Zero);
 var then = new DateTimeOffset(2025, 6, 13, 12, 0, 0, TimeSpan.Zero);
@@ -179,7 +182,8 @@ var text = DateTimeFormatter.FormatTimeAgo(now, then); // "2 days ago"
 `Pagination` computes offsets from page number and size. `PaginatedResult<T>` wraps a page of items with total count and navigation metadata.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L129-L138
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L132-L141
+
 
 var items = new[] { "alice", "bob", "charlie" };
 var pagination = new Pagination(Page: 0, PageSize: 2);
@@ -190,7 +194,6 @@ var result = new PaginatedResult<string>(
     totalCount: items.Length);
 
 // result.HasNextPage == true
-// result.TotalPages == 2
 ```
 
 ---
@@ -200,7 +203,8 @@ var result = new PaginatedResult<string>(
 `DirectedGraph` provides an ID-based directed graph with node and edge management.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L148-L160
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L151-L163
+
 
 var graph = new DirectedGraph();
 
@@ -214,7 +218,6 @@ graph.CreateEdge(nodeA, nodeB);
 graph.CreateEdge(nodeA, nodeC);
 
 // Query outgoing edges
-graph.TryGetOutgoingEdges(nodeA, out var edges); // 2 edges
 ```
 
 ---
@@ -224,7 +227,8 @@ graph.TryGetOutgoingEdges(nodeA, out var edges); // 2 edges
 High-performance `GetOrAdd` and `TryUpdate` extensions using `CollectionsMarshal` for zero-overhead dictionary operations.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L169-L179
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L172-L182
+
 
 var cache = new Dictionary<string, List<int>>();
 
@@ -236,7 +240,6 @@ var same = cache.GetOrAdd("scores", () => []); // same reference as list
 
 // TryUpdate: update only if the key exists
 var updated = cache.TryUpdate("scores", old => [..old, 200]); // true
-var missed = cache.TryUpdate("missing", _ => []); // false
 ```
 
 ---

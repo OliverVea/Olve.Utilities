@@ -107,9 +107,13 @@ public class ReadmeDemo
         dropping.Enqueue("y");
         var accepted = dropping.Enqueue("z"); // false — "z" is rejected
 
+        // TryEnqueue fails when full, regardless of policy
+        var tried = strict.TryEnqueue("z"); // false — queue is at capacity
+
         await Assert.That(queue.Count).IsEqualTo(2);
         await Assert.That(first).IsEqualTo("b");
         await Assert.That(accepted).IsFalse();
+        await Assert.That(tried).IsFalse();
     }
 
     [Test]
