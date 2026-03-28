@@ -23,9 +23,9 @@ jobs:
     name: Run tests (Ubuntu)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       - run: dotnet restore
@@ -42,9 +42,9 @@ jobs:
     name: Run tests (Windows)
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Install .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       - run: dotnet restore
@@ -63,7 +63,7 @@ jobs:
     name: Verify code snippets
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - uses: OliverVea/embed-md@main
         with:
           markdown-files: "src/*/README.md"
@@ -84,7 +84,7 @@ jobs:
           - id: Olve.Paths.Glob
           - id: Olve.TinyEXR
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Dry run publish ${{ matrix.id }} to NuGet
         uses: ./.github/actions/dotnet-publish
         with:
