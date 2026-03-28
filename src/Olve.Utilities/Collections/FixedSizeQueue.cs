@@ -61,6 +61,18 @@ public class FixedSizeQueue<T> : IQueue<T>
     }
 
     /// <inheritdoc />
+    public bool TryEnqueue(T item)
+    {
+        if (_queue.Count >= _maxSize)
+        {
+            return false;
+        }
+
+        _queue.Enqueue(item);
+        return true;
+    }
+
+    /// <inheritdoc />
     public bool TryDequeue([MaybeNullWhen(false)] out T item)
     {
         return _queue.TryDequeue(out item);

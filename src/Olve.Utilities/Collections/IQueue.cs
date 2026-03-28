@@ -21,6 +21,16 @@ public interface IQueue<T> : IEnumerable<T>
     bool Enqueue(T item);
 
     /// <summary>
+    /// Attempts to add an item to the queue.
+    /// Returns <c>false</c> if the queue is at capacity, regardless of the configured <see cref="FullQueueBehavior"/>.
+    /// </summary>
+    /// <param name="item">The item to enqueue.</param>
+    /// <returns>
+    /// <c>true</c> if the item was added; <c>false</c> if the queue is full.
+    /// </returns>
+    bool TryEnqueue(T item);
+
+    /// <summary>
     /// Attempts to remove and return the item at the front of the queue.
     /// </summary>
     /// <param name="item">
