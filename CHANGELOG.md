@@ -1,3 +1,16 @@
+## v0.40.0 (2026-03-28)
+
+### Feat
+
+- add TryEnqueue to FixedSizeQueue
+- add back-pressure configuration to FixedSizeQueue (#56)
+- add ExceptionSummary property to ResultProblem for JSON round-tripping
+- add AOT/trimming support for Olve.Results and Olve.MinimalApi
+
+### Fix
+
+- use GITHUB_TOKEN instead of expired PAT in push workflow
+
 ## v0.39.1 (2026-03-14)
 
 ### Refactor
