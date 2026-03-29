@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace Olve.Utilities.Ids;
 
@@ -8,7 +9,8 @@ namespace Olve.Utilities.Ids;
 /// Represents an opaque, type-agnostic identifier backed by a <see cref="Guid"/>.
 /// </summary>
 [DebuggerDisplay("{ToDisplayString()}")]
-public readonly record struct Id(Guid Value) : IComparable<Id>
+[JsonConverter(typeof(IdJsonConverter))]
+public readonly record struct Id(Guid Value) : IComparable<Id>, IParsable<Id>
 {
     /// <summary>
     /// Gets the underlying <see cref="Guid"/> value for this identifier.
@@ -88,6 +90,34 @@ public readonly record struct Id(Guid Value) : IComparable<Id>
         }
         id = default;
         return false;
+    }
+
+    /// <summary>
+    /// Parses a string into an <see cref="Id"/>.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">An optional format provider (ignored).</param>
+    /// <returns>The parsed <see cref="Id"/>.</returns>
+    /// <exception cref="FormatException">Thrown when <paramref name="s"/> is not a valid GUID.</exception>
+    public static Id Parse(string s, IFormatProvider? provider)
+    {
+        if (TryParse(s, provider, out var result))
+            return result;
+        throw new FormatException($"'{s}' is not a valid Id.");
+    }
+
+    /// <summary>
+    /// Attempts to parse a string into an <see cref="Id"/>.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">An optional format provider (ignored).</param>
+    /// <param name="result">When the method returns, contains the parsed <see cref="Id"/> if parsing succeeded; otherwise the default value.</param>
+    /// <returns><c>true</c> if <paramref name="s"/> was parsed successfully; otherwise <c>false</c>.</returns>
+    public static bool TryParse(string? s, IFormatProvider? provider, out Id result)
+    {
+        result = default;
+        if (s is null) return false;
+        return TryParse(s, out result);
     }
 
     /// <summary>
@@ -173,7 +203,8 @@ public readonly record struct Id(Guid Value) : IComparable<Id>
 /// </summary>
 /// <typeparam name="T">The logical entity type represented by this identifier (used only for compile-time safety).</typeparam>
 [DebuggerDisplay("{ToDisplayString()}")]
-public readonly record struct Id<T> : IComparable<Id<T>>
+[JsonConverter(typeof(IdOfTJsonConverterFactory))]
+public readonly record struct Id<T> : IComparable<Id<T>>, IParsable<Id<T>>
 {
     /// <summary>
     /// Gets the underlying untyped <see cref="Id"/> value held by this typed identifier.
@@ -185,6 +216,34 @@ public readonly record struct Id<T> : IComparable<Id<T>>
     /// </summary>
     /// <param name="value">The underlying <see cref="Id"/> value.</param>
     public Id(Id value) => Value = value;
+
+    /// <summary>
+    /// Parses a string into an <see cref="Id{T}"/>.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">An optional format provider (ignored).</param>
+    /// <returns>The parsed <see cref="Id{T}"/>.</returns>
+    /// <exception cref="FormatException">Thrown when <paramref name="s"/> is not a valid GUID.</exception>
+    public static Id<T> Parse(string s, IFormatProvider? provider)
+    {
+        if (TryParse(s, provider, out var result))
+            return result;
+        throw new FormatException($"'{s}' is not a valid Id<{typeof(T).Name}>.");
+    }
+
+    /// <summary>
+    /// Attempts to parse a string into an <see cref="Id{T}"/>.
+    /// </summary>
+    /// <param name="s">The string to parse.</param>
+    /// <param name="provider">An optional format provider (ignored).</param>
+    /// <param name="result">When the method returns, contains the parsed <see cref="Id{T}"/> if parsing succeeded; otherwise the default value.</param>
+    /// <returns><c>true</c> if <paramref name="s"/> was parsed successfully; otherwise <c>false</c>.</returns>
+    public static bool TryParse(string? s, IFormatProvider? provider, out Id<T> result)
+    {
+        result = default;
+        if (s is null) return false;
+        return Id.TryParse(s, out result);
+    }
 
     /// <summary>
     /// Returns a human-readable representation of this typed identifier, including the logical type name and value.
