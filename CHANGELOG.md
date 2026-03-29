@@ -1,3 +1,9 @@
+## v0.42.0 (2026-03-29)
+
+### Feat
+
+- add AOT-compatible JSON serialization and IParsable to Id/Id<T>
+
 ## v0.41.0 (2026-03-28)
 
 ### Feat
