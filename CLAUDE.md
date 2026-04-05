@@ -2,6 +2,7 @@
 
 ## Commits
 - Short single subject line, conventional commit format. No verbose body.
+- PRs use rebase merge (no merge commits or squash).
 
 ## Tests
 - Test framework: TUnit.
