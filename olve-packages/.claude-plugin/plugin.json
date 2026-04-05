@@ -1,0 +1,8 @@
+{
+  "name": "olve-packages",
+  "description": "API references and usage guides for Olve.* shared NuGet packages",
+  "version": "1.0.0",
+  "author": { "name": "Oliver Vea" },
+  "repository": "https://github.com/OliverVea/Olve.Utilities",
+  "license": "MIT"
+}
