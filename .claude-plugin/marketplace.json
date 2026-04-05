@@ -1,0 +1,14 @@
+{
+  "name": "olve-packages",
+  "owner": { "name": "Oliver Vea" },
+  "metadata": {
+    "description": "Olve.* shared NuGet package skills for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "olve-packages",
+      "source": "./olve-packages",
+      "description": "API references and usage guides for Olve.* shared NuGet packages"
+    }
+  ]
+}
