@@ -1,3 +1,10 @@
+## v0.43.0 (2026-04-05)
+
+### Feat
+
+- add marketplace manifest for plugin distribution
+- add olve-packages Claude Code plugin with API reference skills
+
 ## v0.42.0 (2026-03-29)
 
 ### Feat
