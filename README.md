@@ -31,6 +31,20 @@ Full API documentation: [olivervea.github.io/Olve.Utilities](https://olivervea.g
 
 ---
 
+## Claude Code Skills
+
+This repo includes a [Claude Code plugin](olve-packages/) with API reference skills for each package. To install in a downstream project:
+
+```bash
+# Add the marketplace (one-time)
+claude plugin marketplace add OliverVea/Olve.Utilities --sparse .claude-plugin olve-packages
+
+# Install the plugin
+claude plugin install olve-packages --scope project
+```
+
+---
+
 ## License
 
 MIT License © [OliverVea](https://github.com/OliverVea)
