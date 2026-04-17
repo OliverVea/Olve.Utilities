@@ -131,19 +131,19 @@ public class ReadmeDemo
     public async Task PaginationExample()
     {
         var items = new[] { "alice", "bob", "charlie" };
-        var pagination = new Pagination(Page: 0, PageSize: 2);
 
-        var result = new PaginatedResult<string>(
-            items: items[..2],
-            pagination: pagination,
-            totalCount: items.Length);
+        var page = new Page<string>(
+            Items: items[..2],
+            PageNumber: 0,
+            PageSize: 2,
+            TotalCount: items.Length);
 
-        // result.HasNextPage == true
-        // result.TotalPages == 2
+        // page.HasNextPage == true
+        // page.TotalPages == 2
 
-        await Assert.That(result.HasNextPage).IsTrue();
-        await Assert.That(result.TotalPages).IsEqualTo(2);
-        await Assert.That(result.Count).IsEqualTo(2);
+        await Assert.That(page.HasNextPage).IsTrue();
+        await Assert.That(page.TotalPages).IsEqualTo(2);
+        await Assert.That(page.Items.Count).IsEqualTo(2);
     }
 
     [Test]

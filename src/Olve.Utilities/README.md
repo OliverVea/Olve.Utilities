@@ -34,7 +34,7 @@ Installing `Olve.Utilities` also brings in:
 | **IDs** | `Id`, `Id<T>`, `UnionId<T1, T2>` | GUID-backed typed identifiers with deterministic generation (UUIDv5) |
 | **Collections** | `BidirectionalDictionary<T1, T2>`, `FixedSizeQueue<T>`, `OneToManyLookup<TLeft, TRight>`, `ManyToManyLookup<TLeft, TRight>` | Specialized collection types with `TryGet` pattern lookups |
 | **DateTime** | `DateTimeFormatter` | Human-readable relative time formatting |
-| **Pagination** | `Pagination`, `PaginatedResult<T>` | Page/offset calculation and paginated result wrapper |
+| **Pagination** | `Pagination`, `Page<T>` | Page/offset calculation and paginated result wrapper |
 | **Graphs** | `DirectedGraph`, `Node`, `DirectedEdge` | ID-based directed graph with node/edge management |
 | **Builders** | `IBuilder<T>`, `BuilderExtensions` | Builder pattern interface with validation integration |
 | **Sentinel types** | `NotFound`, `Success`, `AlreadyExists`, `Waiting`, `Skipped`, `Yes`, `Any` | Zero-size marker types for use with `OneOf<T>` discriminated unions |
@@ -179,21 +179,21 @@ var text = DateTimeFormatter.FormatTimeAgo(now, then); // "2 days ago"
 
 ### Pagination
 
-`Pagination` computes offsets from page number and size. `PaginatedResult<T>` wraps a page of items with total count and navigation metadata.
+`Pagination` computes offsets from page number and size. `Page<T>` wraps a page of items with total count and navigation metadata.
 
 ```cs
 // ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L132-L141
 
 
 var items = new[] { "alice", "bob", "charlie" };
-var pagination = new Pagination(Page: 0, PageSize: 2);
 
-var result = new PaginatedResult<string>(
-    items: items[..2],
-    pagination: pagination,
-    totalCount: items.Length);
+var page = new Page<string>(
+    Items: items[..2],
+    PageNumber: 0,
+    PageSize: 2,
+    TotalCount: items.Length);
 
-// result.HasNextPage == true
+// page.HasNextPage == true
 ```
 
 ---
