@@ -1,3 +1,13 @@
+## v0.44.0 (2026-04-17)
+
+### BREAKING CHANGE
+
+- PaginatedResult<T> removed. Use Page<T> instead.
+
+### Feat
+
+- replace PaginatedResult<T> with Page<T>
+
 ## v0.43.0 (2026-04-05)
 
 ### Feat
