@@ -135,6 +135,38 @@ public class ResultTests
     }
 
     [Test]
+    public async Task Concat_WhenBothFail_AggregatesAllProblems()
+    {
+        // Arrange
+        Result<int> a = new ResultProblem("problem A");
+        Result<int> b = new ResultProblem("problem B");
+
+        // Act
+        var result = Result.Concat(a, b);
+
+        // Assert
+        await Assert.That(result.Failed).IsTrue();
+        await Assert.That(result.TryPickProblems(out var problems)).IsTrue();
+        await Assert.That(problems!.Count()).IsEqualTo(2);
+    }
+
+    [Test]
+    public async Task Concat_Func_WhenBothFail_AggregatesAllProblems()
+    {
+        // Arrange
+        Func<Result<int>> a = () => new ResultProblem("problem A");
+        Func<Result<int>> b = () => new ResultProblem("problem B");
+
+        // Act
+        var result = Result.Concat(a, b);
+
+        // Assert
+        await Assert.That(result.Failed).IsTrue();
+        await Assert.That(result.TryPickProblems(out var problems)).IsTrue();
+        await Assert.That(problems!.Count()).IsEqualTo(2);
+    }
+
+    [Test]
     [Arguments(false, false, false, false)]
     [Arguments(true, false, true, false)]
     [Arguments(false, true, false, false)]

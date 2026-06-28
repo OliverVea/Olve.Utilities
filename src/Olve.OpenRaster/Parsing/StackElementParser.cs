@@ -11,7 +11,7 @@ internal static class StackElementParser
 
         if (results.TryPickProblems(out var problems))
         {
-            problems.Prepend(new ResultProblem("could not parse stack elements"));
+            problems = problems.Prepend(new ResultProblem("could not parse stack elements"));
             return problems;
         }
 

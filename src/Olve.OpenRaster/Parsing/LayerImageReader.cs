@@ -17,7 +17,7 @@ internal static class LayerImageReader
 
         if (layerParser.ParseLayer(stream).TryPickProblems(out var problems, out var image))
         {
-            problems.Prepend(new ResultProblem("could not read image file '{0}'", imageSource));
+            problems = problems.Prepend(new ResultProblem("could not read image file '{0}'", imageSource));
             return problems;
         }
 

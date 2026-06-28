@@ -21,9 +21,9 @@ public readonly partial struct Result
 
         var problems = new ResultProblemCollection();
         if (a.TryPickProblems(out var p1))
-            problems.Append(p1);
+            problems = problems.Append(p1);
         if (b.TryPickProblems(out var p2))
-            problems.Append(p2);
+            problems = problems.Append(p2);
 
         return problems;
     }
@@ -52,11 +52,11 @@ public readonly partial struct Result
 
         var problems = new ResultProblemCollection();
         if (a.TryPickProblems(out var p1))
-            problems.Append(p1);
+            problems = problems.Append(p1);
         if (b.TryPickProblems(out var p2))
-            problems.Append(p2);
+            problems = problems.Append(p2);
         if (c.TryPickProblems(out var p3))
-            problems.Append(p3);
+            problems = problems.Append(p3);
 
         return problems;
     }
@@ -88,13 +88,13 @@ public readonly partial struct Result
 
         var problems = new ResultProblemCollection();
         if (a.TryPickProblems(out var p1))
-            problems.Append(p1);
+            problems = problems.Append(p1);
         if (b.TryPickProblems(out var p2))
-            problems.Append(p2);
+            problems = problems.Append(p2);
         if (c.TryPickProblems(out var p3))
-            problems.Append(p3);
+            problems = problems.Append(p3);
         if (d.TryPickProblems(out var p4))
-            problems.Append(p4);
+            problems = problems.Append(p4);
 
         return problems;
     }
@@ -129,15 +129,15 @@ public readonly partial struct Result
 
         var problems = new ResultProblemCollection();
         if (a.TryPickProblems(out var p1))
-            problems.Append(p1);
+            problems = problems.Append(p1);
         if (b.TryPickProblems(out var p2))
-            problems.Append(p2);
+            problems = problems.Append(p2);
         if (c.TryPickProblems(out var p3))
-            problems.Append(p3);
+            problems = problems.Append(p3);
         if (d.TryPickProblems(out var p4))
-            problems.Append(p4);
+            problems = problems.Append(p4);
         if (e.TryPickProblems(out var p5))
-            problems.Append(p5);
+            problems = problems.Append(p5);
 
         return problems;
     }
@@ -175,17 +175,17 @@ public readonly partial struct Result
 
         var problems = new ResultProblemCollection();
         if (a.TryPickProblems(out var p1))
-            problems.Append(p1);
+            problems = problems.Append(p1);
         if (b.TryPickProblems(out var p2))
-            problems.Append(p2);
+            problems = problems.Append(p2);
         if (c.TryPickProblems(out var p3))
-            problems.Append(p3);
+            problems = problems.Append(p3);
         if (d.TryPickProblems(out var p4))
-            problems.Append(p4);
+            problems = problems.Append(p4);
         if (e.TryPickProblems(out var p5))
-            problems.Append(p5);
+            problems = problems.Append(p5);
         if (f.TryPickProblems(out var p6))
-            problems.Append(p6);
+            problems = problems.Append(p6);
 
         return problems;
     }
