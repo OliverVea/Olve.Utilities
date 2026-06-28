@@ -6,6 +6,7 @@ namespace Olve.Results;
 /// <summary>
 ///     Represents a result of an operation without a value, indicating success or failure.
 /// </summary>
+[MustBeUsedWhenReturned]
 public readonly partial struct Result : IResultType
 {
     private Result(ResultProblemCollection? problems)
