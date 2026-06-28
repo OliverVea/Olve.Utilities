@@ -24,4 +24,28 @@
       <ProjectReference Include="..\Olve.Paths\Olve.Paths.csproj" />
     </ItemGroup>
 
+    <!--
+        Pack the Olve.Results analyzer DLL into this package so consumers automatically enforce
+        [MustBeUsedWhenReturned] (ORES001). The analyzer is attached to this project for its own
+        build via Directory.Build.props.
+    -->
+    <PropertyGroup>
+        <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_PackOlveResultsAnalyzer</TargetsForTfmSpecificContentInPackage>
+    </PropertyGroup>
+
+    <Target Name="_PackOlveResultsAnalyzer">
+        <!-- RemoveProperties strips the ambient TargetFramework=net10.0 so the netstandard2.0 analyzer builds correctly. -->
+        <MSBuild Projects="..\Olve.Results.Analyzers\Olve.Results.Analyzers.csproj"
+                 Targets="Build"
+                 Properties="Configuration=$(Configuration)"
+                 RemoveProperties="TargetFramework">
+            <Output TaskParameter="TargetOutputs" ItemName="_OlveResultsAnalyzerOutput" />
+        </MSBuild>
+        <ItemGroup>
+            <TfmSpecificPackageFile Include="@(_OlveResultsAnalyzerOutput)"
+                                    Condition="'%(Extension)' == '.dll'"
+                                    PackagePath="analyzers/dotnet/cs" />
+        </ItemGroup>
+    </Target>
+
 </Project>

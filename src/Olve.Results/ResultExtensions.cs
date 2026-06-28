@@ -6,6 +6,23 @@ namespace Olve.Results;
 public static class ResultExtensions
 {
     /// <summary>
+    ///     Explicitly discards a <see cref="Result"/>, signalling that its success or failure is
+    ///     intentionally not observed. Use this to satisfy the unobserved-result analyzer (EPC13)
+    ///     when ignoring a result is deliberate, e.g. <c>(await CreateUser(request)).DiscardResult();</c>.
+    /// </summary>
+    /// <param name="result">The result to discard.</param>
+    public static void DiscardResult(this Result result) => _ = result;
+
+    /// <summary>
+    ///     Explicitly discards a <see cref="Result{T}"/>, signalling that its success or failure is
+    ///     intentionally not observed. Use this to satisfy the unobserved-result analyzer (EPC13)
+    ///     when ignoring a result is deliberate, e.g. <c>(await CreateUser(request)).DiscardResult();</c>.
+    /// </summary>
+    /// <param name="result">The result to discard.</param>
+    /// <typeparam name="T">The type of the discarded value.</typeparam>
+    public static void DiscardResult<T>(this Result<T> result) => _ = result;
+
+    /// <summary>
     ///     Discards the value of a <see cref="Result{T}"/>, keeping only the success/failure status.
     /// </summary>
     /// <param name="result">The result to convert.</param>

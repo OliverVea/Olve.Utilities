@@ -33,6 +33,7 @@
     <Project Path="src/Olve.Operations/Olve.Operations.csproj" />
     <Project Path="src/Olve.Paths.Glob/Olve.Paths.Glob.csproj" />
     <Project Path="src/Olve.Paths/Olve.Paths.csproj" />
+    <Project Path="src/Olve.Results.Analyzers/Olve.Results.Analyzers.csproj" />
     <Project Path="src/Olve.Results.TUnit/Olve.Results.TUnit.csproj" />
     <Project Path="src/Olve.Results/Olve.Results.csproj" />
     <Project Path="src/Olve.Utilities/Olve.Utilities.csproj" />

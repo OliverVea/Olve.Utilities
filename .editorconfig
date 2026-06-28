@@ -1,0 +1,12 @@
+root = true
+
+[*.cs]
+# ORES001 (Olve.Results MustBeUsedWhenReturned): result types must be observed.
+# Enforced as a build error in production via TreatWarningsAsErrors.
+dotnet_diagnostic.ORES001.severity = warning
+
+# Tests frequently exercise results for their side effects without observing the
+# return value. Keep ORES001 visible there as a non-breaking suggestion rather than
+# failing the test build; clean these up incrementally.
+[tests/**.cs]
+dotnet_diagnostic.ORES001.severity = suggestion

@@ -6,6 +6,7 @@ namespace Olve.Results;
 ///     Represents a result of an operation with a value, indicating success or failure.
 /// </summary>
 /// <typeparam name="T">The type of the result value.</typeparam>
+[MustBeUsedWhenReturned]
 public readonly struct Result<T> : IResultType
 {
     internal Result(T? result, ResultProblemCollection? problems)

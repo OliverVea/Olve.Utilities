@@ -1,6 +1,7 @@
 <Project>
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
+        <!-- The analyzer project pins its own TargetFramework (netstandard2.0); don't force net10.0 on it. -->
+        <TargetFramework Condition="'$(MSBuildProjectName)' != 'Olve.Results.Analyzers'">net10.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <Nullable>enable</Nullable>
@@ -8,4 +9,17 @@
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
         <RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>
     </PropertyGroup>
+
+    <!--
+        Attach the local Olve.Results analyzer (MustBeUsedWhenReturned / ORES001) to every project
+        in the repo so result observation is enforced repo-wide. The analyzer no-ops in projects that
+        don't reference Olve.Results (the marker attribute symbol won't resolve). External consumers
+        receive the same analyzer via the Olve.Results NuGet package (packed under analyzers/dotnet/cs).
+    -->
+    <ItemGroup Condition="'$(MSBuildProjectName)' != 'Olve.Results.Analyzers'">
+        <ProjectReference Include="$(MSBuildThisFileDirectory)src/Olve.Results.Analyzers/Olve.Results.Analyzers.csproj"
+                          PrivateAssets="all"
+                          ReferenceOutputAssembly="false"
+                          OutputItemType="Analyzer" />
+    </ItemGroup>
 </Project>
