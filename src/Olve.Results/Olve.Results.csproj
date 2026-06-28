@@ -34,11 +34,17 @@
     </PropertyGroup>
 
     <Target Name="_PackOlveResultsAnalyzer">
-        <!-- RemoveProperties strips the ambient TargetFramework=net10.0 so the netstandard2.0 analyzer builds correctly. -->
+        <!--
+            RemoveProperties strips:
+            - TargetFramework: the ambient net10.0 must not leak into the netstandard2.0 analyzer build (NETSDK1005).
+            - NoBuild: `dotnet pack` with the no-build flag sets NoBuild=true globally; without removing it the
+              nested Build target errors with NETSDK1085. The analyzer is already built by the prior build step,
+              so this nested call is an incremental no-op that just surfaces TargetOutputs.
+        -->
         <MSBuild Projects="..\Olve.Results.Analyzers\Olve.Results.Analyzers.csproj"
                  Targets="Build"
                  Properties="Configuration=$(Configuration)"
-                 RemoveProperties="TargetFramework">
+                 RemoveProperties="TargetFramework;NoBuild">
             <Output TaskParameter="TargetOutputs" ItemName="_OlveResultsAnalyzerOutput" />
         </MSBuild>
         <ItemGroup>
