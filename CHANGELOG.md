@@ -1,3 +1,14 @@
+## v0.45.0 (2026-06-28)
+
+### Feat
+
+- enforce result observation with MustBeUsedWhenReturned analyzer
+
+### Fix
+
+- strip NoBuild in analyzer pack target so dotnet pack --no-build works
+- aggregate all problems in Result.Concat and OpenRaster parsers
+
 ## v0.44.0 (2026-04-17)
 
 ### BREAKING CHANGE
