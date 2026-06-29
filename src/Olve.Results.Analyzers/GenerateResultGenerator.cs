@@ -15,8 +15,10 @@ namespace Olve.Results.Analyzers;
 ///     Emits a state discriminator, per-case <c>Is…</c> predicates, <c>Succeeded</c> (any success
 ///     case), <c>Failed</c> (any error case; grey cases are neither), the partial factory bodies, an
 ///     exhaustive <c>Match</c>, and <c>Problems</c>/<c>TryPickProblems</c>. Cases may carry a single
-///     typed payload, surfaced typed through <c>Match</c>. Implicit conversions, <c>ToString</c>,
-///     equality and diagnostics are layered in later slices.
+///     typed payload, surfaced typed through <c>Match</c>. When exactly one error case exists, implicit
+///     conversions from <c>ResultProblem</c>/<c>ResultProblemCollection</c> are emitted, and the type is
+///     marked <c>[MustBeUsedWhenReturned]</c>. <c>ToString</c>, equality and diagnostics are layered in
+///     later slices.
 /// </remarks>
 [Generator(LanguageNames.CSharp)]
 public sealed class GenerateResultGenerator : IIncrementalGenerator
@@ -172,6 +174,7 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
         var body = member + "    ";
         var readonlyModifier = isReadOnly ? "readonly " : string.Empty;
 
+        sb.AppendLine($"{indent}[global::Olve.Results.MustBeUsedWhenReturned]");
         sb.AppendLine($"{indent}{readonlyModifier}partial struct {typeName}");
         sb.AppendLine($"{indent}{{");
 
@@ -299,6 +302,28 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
         sb.AppendLine($"{body}problems = Problems;");
         sb.AppendLine($"{body}return problems is not null;");
         sb.AppendLine($"{member}}}");
+
+        // Implicit conversions from problems — only when exactly one error case exists (otherwise the
+        // conversion target would be ambiguous). Skipped silently for zero or multiple error cases.
+        var errorCases = cases.Where(c => c.Kind == CaseKind.Error).ToList();
+        if (errorCases.Count == 1)
+        {
+            var e = errorCases[0];
+            if (e.ErrorPayloadKind == ErrorPayloadKind.Collection)
+            {
+                sb.AppendLine();
+                sb.AppendLine($"{member}/// <summary>Converts a problem collection into a <c>{e.Name}</c> result.</summary>");
+                sb.AppendLine($"{member}public static implicit operator {typeName}(global::Olve.Results.ResultProblemCollection problems) => {typeName}.{e.Name}(problems);");
+                sb.AppendLine($"{member}/// <summary>Converts a single problem into a <c>{e.Name}</c> result.</summary>");
+                sb.AppendLine($"{member}public static implicit operator {typeName}(global::Olve.Results.ResultProblem problem) => {typeName}.{e.Name}(new global::Olve.Results.ResultProblemCollection(problem));");
+            }
+            else if (e.ErrorPayloadKind == ErrorPayloadKind.SingleProblem)
+            {
+                sb.AppendLine();
+                sb.AppendLine($"{member}/// <summary>Converts a problem into a <c>{e.Name}</c> result.</summary>");
+                sb.AppendLine($"{member}public static implicit operator {typeName}({e.PayloadType} {e.PayloadName}) => {typeName}.{e.Name}({e.PayloadName});");
+            }
+        }
 
         sb.AppendLine($"{indent}}}");
 

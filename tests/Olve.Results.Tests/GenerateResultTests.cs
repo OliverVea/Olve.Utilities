@@ -26,6 +26,24 @@ public readonly partial struct ParseResult
     [ErrorCase] public static partial ParseResult Invalid(ResultProblem problem);
 }
 
+// A DeletionResult-shaped sample (single collection error case) for the implicit conversions.
+[GenerateResult]
+public readonly partial struct SaveResult
+{
+    [SuccessCase] public static partial SaveResult Saved();
+    [GreyCase] public static partial SaveResult Skipped();
+    [ErrorCase] public static partial SaveResult Errored(ResultProblemCollection problems);
+}
+
+// A two-error-case sample: implicit conversions are suppressed (ambiguous target).
+[GenerateResult]
+public readonly partial struct DualErrorResult
+{
+    [SuccessCase] public static partial DualErrorResult Ok();
+    [ErrorCase] public static partial DualErrorResult Left(ResultProblemCollection problems);
+    [ErrorCase] public static partial DualErrorResult Right(ResultProblemCollection problems);
+}
+
 public class GenerateResultTests
 {
     [Test]
@@ -140,5 +158,45 @@ public class GenerateResultTests
         await Assert.That(ParseResult.Parsed(42).Match(
             onParsed: value => value,
             onInvalid: _ => -1)).IsEqualTo(42);
+    }
+
+    [Test]
+    public async Task ImplicitConversion_FromCollection_ProducesErrorState_AndRoundTrips()
+    {
+        var collection = new ResultProblemCollection(new ResultProblem("boom"));
+
+        SaveResult result = collection;
+
+        await Assert.That(result.IsErrored).IsTrue();
+        await Assert.That(result.Failed).IsTrue();
+        await Assert.That(result.Problems).IsSameReferenceAs(collection);
+    }
+
+    [Test]
+    public async Task ImplicitConversion_FromSingleProblem_WrapsIntoCollection()
+    {
+        var problem = new ResultProblem("boom");
+
+        SaveResult result = problem;
+
+        await Assert.That(result.IsErrored).IsTrue();
+        await Assert.That(result.Failed).IsTrue();
+        await Assert.That(result.Problems!.Single()).IsSameReferenceAs(problem);
+    }
+
+    [Test]
+    public async Task TwoErrorCases_SuppressImplicitConversions_ButTypeStillWorks()
+    {
+        // No implicit operator is generated when more than one error case exists (ambiguous target),
+        // so a collection cannot convert implicitly — the explicit factories still work.
+        var collection = new ResultProblemCollection(new ResultProblem("boom"));
+
+        var left = DualErrorResult.Left(collection);
+        var right = DualErrorResult.Right(collection);
+
+        await Assert.That(left.IsLeft).IsTrue();
+        await Assert.That(left.Failed).IsTrue();
+        await Assert.That(right.IsRight).IsTrue();
+        await Assert.That(DualErrorResult.Ok().Succeeded).IsTrue();
     }
 }
