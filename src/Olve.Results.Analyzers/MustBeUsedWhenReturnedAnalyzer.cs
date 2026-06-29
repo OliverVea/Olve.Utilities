@@ -13,6 +13,16 @@ namespace Olve.Results.Analyzers;
 ///     <c>await resultAsync;</c> are covered. Discards (<c>_ = ...</c>) and methods that consume the
 ///     value (e.g. <c>DiscardResult()</c>) are not reported.
 /// </summary>
+/// <remarks>
+///     The <c>await</c> case only fires when the awaited operand is itself a task-like wrapper
+///     (<see cref="System.Threading.Tasks.Task{TResult}"/>, <see cref="System.Threading.Tasks.ValueTask{TResult}"/>,
+///     or their <c>Configured*Awaitable</c> forms) around a marked type — i.e. an async method that
+///     <em>returns</em> a result. Awaiting any other custom awaitable that merely <em>yields</em> a marked
+///     type on completion is an observation, not a discard, and is intentionally ignored. The motivating
+///     case is a fluent assertion such as <c>await Assert.That(result).Failed();</c>: TUnit assertion
+///     builders surface the asserted value as the await result, so without this gate every result
+///     assertion would be a false positive.
+/// </remarks>
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public sealed class MustBeUsedWhenReturnedAnalyzer : DiagnosticAnalyzer
 {
@@ -54,8 +64,20 @@ public sealed class MustBeUsedWhenReturnedAnalyzer : DiagnosticAnalyzer
         var taskOfT = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.Task`1");
         var valueTaskOfT = context.Compilation.GetTypeByMetadataName("System.Threading.Tasks.ValueTask`1");
 
+        // The set of task-like wrappers whose bare 'await' counts as discarding a returned result.
+        // ConfiguredTaskAwaitable<T> / ConfiguredValueTaskAwaitable<T> cover 'await foo.ConfigureAwait(false);'.
+        var taskLike = new[]
+            {
+                taskOfT,
+                valueTaskOfT,
+                context.Compilation.GetTypeByMetadataName("System.Runtime.CompilerServices.ConfiguredTaskAwaitable`1"),
+                context.Compilation.GetTypeByMetadataName("System.Runtime.CompilerServices.ConfiguredValueTaskAwaitable`1"),
+            }
+            .Where(t => t is not null)
+            .ToImmutableArray();
+
         context.RegisterOperationAction(
-            ctx => Analyze(ctx, marker, taskOfT, valueTaskOfT),
+            ctx => Analyze(ctx, marker, taskOfT, valueTaskOfT, taskLike!),
             OperationKind.ExpressionStatement);
     }
 
@@ -63,7 +85,8 @@ public sealed class MustBeUsedWhenReturnedAnalyzer : DiagnosticAnalyzer
         OperationAnalysisContext context,
         INamedTypeSymbol marker,
         INamedTypeSymbol? taskOfT,
-        INamedTypeSymbol? valueTaskOfT)
+        INamedTypeSymbol? valueTaskOfT,
+        ImmutableArray<INamedTypeSymbol> taskLike)
     {
         var statement = (IExpressionStatementOperation)context.Operation;
 
@@ -80,7 +103,11 @@ public sealed class MustBeUsedWhenReturnedAnalyzer : DiagnosticAnalyzer
 
                 break;
 
-            case IAwaitOperation { Type: { } awaitedType } await when IsMarked(awaitedType, marker):
+            // Only flag 'await' when the awaited operand is a task-like wrapper around a marked type
+            // (an async method that returns a result). Awaiting any other awaitable that merely yields a
+            // marked type — e.g. a TUnit assertion builder — is an observation, not a discard.
+            case IAwaitOperation { Type: { } awaitedType } await
+                when IsMarked(awaitedType, marker) && IsTaskLike(await.Operation.Type, taskLike):
                 context.ReportDiagnostic(Diagnostic.Create(Rule, await.Syntax.GetLocation(), awaitedType.Name));
                 break;
         }
@@ -99,6 +126,17 @@ public sealed class MustBeUsedWhenReturnedAnalyzer : DiagnosticAnalyzer
         }
 
         return type;
+    }
+
+    private static bool IsTaskLike(ITypeSymbol? operandType, ImmutableArray<INamedTypeSymbol> taskLike)
+    {
+        if (operandType is not INamedTypeSymbol { IsGenericType: true } named)
+        {
+            return false;
+        }
+
+        var definition = named.OriginalDefinition;
+        return taskLike.Any(t => SymbolEqualityComparer.Default.Equals(definition, t));
     }
 
     private static bool IsMarked(ITypeSymbol? type, INamedTypeSymbol marker)

@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="TUnit"/>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <!--
+            Directory.Build.props attaches Olve.Results.Analyzers as an analyzer-only reference
+            (OutputItemType=Analyzer, ReferenceOutputAssembly=false). These tests instantiate the
+            analyzer type directly and drive it through Compilation.WithAnalyzers, so swap that for a
+            normal assembly reference. (Removing it also keeps the analyzer from running on the harness
+            itself, which never references Olve.Results anyway, so it would no-op regardless.)
+        -->
+        <ProjectReference Remove="$(MSBuildThisFileDirectory)..\..\src\Olve.Results.Analyzers\Olve.Results.Analyzers.csproj" />
+        <ProjectReference Include="..\..\src\Olve.Results.Analyzers\Olve.Results.Analyzers.csproj" />
+    </ItemGroup>
+</Project>

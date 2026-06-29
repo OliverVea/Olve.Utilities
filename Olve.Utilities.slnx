@@ -44,6 +44,7 @@
     <Project Path="tests/Olve.MinimalApi.Tests/Olve.MinimalApi.Tests.csproj" />
     <Project Path="tests/Olve.Operations.Tests/Olve.Operations.Tests.csproj" />
     <Project Path="tests/Olve.Paths.Tests/Olve.Paths.Tests.csproj" />
+    <Project Path="tests/Olve.Results.Analyzers.Tests/Olve.Results.Analyzers.Tests.csproj" />
     <Project Path="tests/Olve.Results.Tests/Olve.Results.Tests.csproj" />
     <Project Path="tests/Olve.Utilities.Tests/Olve.Utilities.Tests.csproj" />
     <Project Path="tests/Olve.Utilities.Trimming/Olve.Utilities.Trimming.csproj" />
