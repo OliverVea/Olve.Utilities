@@ -30,6 +30,21 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
     private const string ResultProblemCollectionType = "Olve.Results.ResultProblemCollection";
     private const string ResultProblemType = "Olve.Results.ResultProblem";
 
+    /// <summary>
+    ///     A case factory may declare at most one payload parameter. Multi-parameter factories are
+    ///     skipped (no body is generated), which on its own surfaces only a cryptic CS8795; this rule
+    ///     explains why.
+    /// </summary>
+    private static readonly DiagnosticDescriptor MultipleParametersRule = new(
+        id: "ORES002",
+        title: "Result case factory may declare at most one parameter",
+        messageFormat: "Result case factory '{0}' declares {1} parameters; a [GenerateResult] case factory may declare at most one payload parameter",
+        category: "Usage",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "A [GenerateResult] case factory carries at most one payload parameter, surfaced typed through Match. " +
+                     "Declare a single payload parameter, or wrap multiple values in one type.");
+
     /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -42,12 +57,20 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
 
         context.RegisterSourceOutput(results, static (spc, item) =>
         {
-            var value = item!.Value;
-            spc.AddSource(value.HintName, value.Source);
+            var value = item!;
+            foreach (var diagnostic in value.Diagnostics)
+            {
+                spc.ReportDiagnostic(diagnostic.ToDiagnostic());
+            }
+
+            if (value.Source is not null)
+            {
+                spc.AddSource(value.HintName!, value.Source);
+            }
         });
     }
 
-    private static (string HintName, string Source)? Transform(
+    private static GenerationResult? Transform(
         GeneratorAttributeSyntaxContext context,
         CancellationToken cancellationToken)
     {
@@ -57,6 +80,7 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
         }
 
         var cases = new List<CaseModel>();
+        var diagnostics = new List<DiagnosticInfo>();
         foreach (var method in type.GetMembers().OfType<IMethodSymbol>())
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -64,6 +88,20 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
             var kind = GetCaseKind(method);
             if (kind is null || !method.IsStatic)
             {
+                continue;
+            }
+
+            if (method.Parameters.Length > 1)
+            {
+                // A case factory carries at most one payload. Skip it (no body emitted) and flag why.
+                diagnostics.Add(new DiagnosticInfo(
+                    MultipleParametersRule,
+                    LocationInfo.CreateFrom(method.Locations.FirstOrDefault()),
+                    new EquatableArray<string>(new[]
+                    {
+                        method.Name,
+                        method.Parameters.Length.ToString(),
+                    })));
                 continue;
             }
 
@@ -91,11 +129,6 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
                     }
                 }
             }
-            else if (method.Parameters.Length > 1)
-            {
-                // Multi-parameter cases are deferred to a later slice (diagnostics will flag them).
-                continue;
-            }
 
             cases.Add(new CaseModel(
                 method.Name,
@@ -107,9 +140,15 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
                 errorPayloadKind));
         }
 
-        if (cases.Count == 0)
+        if (cases.Count == 0 && diagnostics.Count == 0)
         {
             return null;
+        }
+
+        var diagnosticArray = new EquatableArray<DiagnosticInfo>(diagnostics.ToArray());
+        if (cases.Count == 0)
+        {
+            return new GenerationResult(null, null, diagnosticArray);
         }
 
         var ns = type.ContainingNamespace.IsGlobalNamespace
@@ -118,7 +157,7 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
 
         var source = Emit(ns, type.Name, type.IsReadOnly, cases);
         var hintName = (ns is null ? string.Empty : ns + ".") + type.Name + ".GenerateResult.g.cs";
-        return (hintName, source);
+        return new GenerationResult(hintName, source, diagnosticArray);
     }
 
     private static CaseKind? GetCaseKind(IMethodSymbol method)
@@ -356,6 +395,15 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
         Accessibility.ProtectedAndInternal => "private protected",
         _ => "public",
     };
+
+    /// <summary>
+    ///     The pipeline output for one <c>[GenerateResult]</c> type: the source to add (when any cases
+    ///     were found) plus any diagnostics to report. Value-equatable so it caches incrementally.
+    /// </summary>
+    private sealed record GenerationResult(
+        string? HintName,
+        string? Source,
+        EquatableArray<DiagnosticInfo> Diagnostics);
 
     private enum CaseKind
     {
