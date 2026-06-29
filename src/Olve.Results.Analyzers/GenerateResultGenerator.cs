@@ -18,8 +18,9 @@ namespace Olve.Results.Analyzers;
 ///     typed payload, surfaced typed through <c>Match</c>. When exactly one error case exists, implicit
 ///     conversions from <c>ResultProblem</c>/<c>ResultProblemCollection</c> are emitted, and the type is
 ///     marked <c>[MustBeUsedWhenReturned]</c>. <c>ToString</c> renders the case name plus any payload, and
-///     value equality (<c>IEquatable&lt;T&gt;</c>, <c>==</c>/<c>!=</c>) is emitted. Types with no grey case
-///     also get a <c>MapToResult()</c> that collapses onto the binary success/failure <c>Result</c>.
+///     value equality (<c>IEquatable&lt;T&gt;</c>, <c>==</c>/<c>!=</c>) is emitted. A <c>MapToResult()</c>
+///     collapses onto the binary success/failure <c>Result</c>, taking an optional <c>allow{Case}</c> flag
+///     per grey case to choose whether that grey state maps to success or a problem.
 /// </remarks>
 [Generator(LanguageNames.CSharp)]
 public sealed class GenerateResultGenerator : IIncrementalGenerator
@@ -463,28 +464,51 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
         sb.AppendLine($"{member}/// <summary>Determines whether two results are unequal.</summary>");
         sb.AppendLine($"{member}public static bool operator !=({typeName} left, {typeName} right) => !left.Equals(right);");
 
-        // MapToResult — collapses onto the binary success/failure Result. Emitted only when there are no
-        // grey cases: a grey state maps onto neither success nor failure, so such types (e.g. DeletionResult)
-        // provide their own conversion that decides how grey is treated.
-        if (cases.All(c => c.Kind != CaseKind.Grey))
+        // MapToResult — collapses onto the binary success/failure Result. A grey state maps onto neither,
+        // so each grey case gets an optional 'allow{Case}' flag (default true = treat as success); pass
+        // false to map that grey state to a problem instead.
+        var greyCases = cases.Where(c => c.Kind == CaseKind.Grey).ToList();
+        sb.AppendLine();
+        if (greyCases.Count == 0)
         {
-            sb.AppendLine();
             sb.AppendLine($"{member}/// <summary>Converts this result to a <c>Result</c>: success when succeeded, otherwise its problems.</summary>");
             sb.AppendLine($"{member}public global::Olve.Results.Result MapToResult()");
-            sb.AppendLine($"{member}{{");
-            sb.AppendLine($"{body}if (Succeeded)");
-            sb.AppendLine($"{body}{{");
-            sb.AppendLine($"{body}    return global::Olve.Results.Result.Success();");
-            sb.AppendLine($"{body}}}");
-            sb.AppendLine();
-            sb.AppendLine($"{body}if (Problems is {{ }} __problems)");
-            sb.AppendLine($"{body}{{");
-            sb.AppendLine($"{body}    return __problems;");
-            sb.AppendLine($"{body}}}");
-            sb.AppendLine();
-            sb.AppendLine($"{body}return new global::Olve.Results.ResultProblem(\"{typeName} was in an error state without problem details.\");");
-            sb.AppendLine($"{member}}}");
         }
+        else
+        {
+            sb.AppendLine($"{member}/// <summary>Converts this result to a <c>Result</c>: success when succeeded, problems when failed, and each grey state per its flag.</summary>");
+            foreach (var g in greyCases)
+            {
+                sb.AppendLine($"{member}/// <param name=\"allow{g.Name}\">When <see langword=\"true\"/> (default), the <c>{g.Name}</c> state maps to success; otherwise it maps to a problem.</param>");
+            }
+            sb.AppendLine($"{member}public global::Olve.Results.Result MapToResult(");
+            for (var i = 0; i < greyCases.Count; i++)
+            {
+                var comma = i == greyCases.Count - 1 ? ")" : ",";
+                sb.AppendLine($"{body}bool allow{greyCases[i].Name} = true{comma}");
+            }
+        }
+        sb.AppendLine($"{member}{{");
+        sb.AppendLine($"{body}if (Succeeded)");
+        sb.AppendLine($"{body}{{");
+        sb.AppendLine($"{body}    return global::Olve.Results.Result.Success();");
+        sb.AppendLine($"{body}}}");
+        foreach (var g in greyCases)
+        {
+            sb.AppendLine();
+            sb.AppendLine($"{body}if (Is{g.Name})");
+            sb.AppendLine($"{body}{{");
+            sb.AppendLine($"{body}    return allow{g.Name} ? global::Olve.Results.Result.Success() : new global::Olve.Results.ResultProblem(\"{typeName} was {g.Name}.\");");
+            sb.AppendLine($"{body}}}");
+        }
+        sb.AppendLine();
+        sb.AppendLine($"{body}if (Problems is {{ }} __problems)");
+        sb.AppendLine($"{body}{{");
+        sb.AppendLine($"{body}    return __problems;");
+        sb.AppendLine($"{body}}}");
+        sb.AppendLine();
+        sb.AppendLine($"{body}return new global::Olve.Results.ResultProblem(\"{typeName} was in an error state without problem details.\");");
+        sb.AppendLine($"{member}}}");
 
         // Implicit conversions from problems — only when exactly one error case exists (otherwise the
         // conversion target would be ambiguous). Skipped silently for zero or multiple error cases.

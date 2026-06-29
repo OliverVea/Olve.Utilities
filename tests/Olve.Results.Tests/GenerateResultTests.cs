@@ -287,11 +287,17 @@ public class GenerateResultTests
     }
 
     [Test]
-    public async Task MapToResult_IsNotEmittedForTypesWithGreyCases()
+    public async Task MapToResult_GreyCase_DefaultsToSuccess_ButCanMapToProblem()
     {
-        // Grey states have no unambiguous success/failure mapping, so the generator emits no MapToResult;
-        // such types provide their own (e.g. DeletionResult's hand-written extension with allowNotFound).
-        await Assert.That(typeof(SampleResult).GetMethod("MapToResult")).IsNull();
-        await Assert.That(typeof(LoadResult).GetMethod("MapToResult")).IsNull();
+        // A grey state has no inherent success/failure mapping; the allow{Case} flag (default true) decides.
+        await Assert.That(SampleResult.Missing().MapToResult().Succeeded).IsTrue();
+        await Assert.That(SampleResult.Missing().MapToResult(allowMissing: false).Failed).IsTrue();
+    }
+
+    [Test]
+    public async Task MapToResult_GreyType_SuccessAndErrorStatesStillMap()
+    {
+        await Assert.That(SampleResult.Created().MapToResult().Succeeded).IsTrue();
+        await Assert.That(SampleResult.Broke().MapToResult().Failed).IsTrue();
     }
 }
