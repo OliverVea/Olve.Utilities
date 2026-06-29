@@ -17,8 +17,9 @@ namespace Olve.Results.Analyzers;
 ///     exhaustive <c>Match</c>, and <c>Problems</c>/<c>TryPickProblems</c>. Cases may carry a single
 ///     typed payload, surfaced typed through <c>Match</c>. When exactly one error case exists, implicit
 ///     conversions from <c>ResultProblem</c>/<c>ResultProblemCollection</c> are emitted, and the type is
-///     marked <c>[MustBeUsedWhenReturned]</c>. <c>ToString</c> renders the case name plus any payload;
-///     equality and diagnostics are layered in later slices.
+///     marked <c>[MustBeUsedWhenReturned]</c>. <c>ToString</c> renders the case name plus any payload, and
+///     value equality (<c>IEquatable&lt;T&gt;</c>, <c>==</c>/<c>!=</c>) is emitted. Types with no grey case
+///     also get a <c>MapToResult()</c> that collapses onto the binary success/failure <c>Result</c>.
 /// </remarks>
 [Generator(LanguageNames.CSharp)]
 public sealed class GenerateResultGenerator : IIncrementalGenerator
@@ -44,6 +45,36 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
         isEnabledByDefault: true,
         description: "A [GenerateResult] case factory carries at most one payload parameter, surfaced typed through Match. " +
                      "Declare a single payload parameter, or wrap multiple values in one type.");
+
+    /// <summary>
+    ///     A <c>[GenerateResult]</c> type with no case factories generates nothing, which is almost always
+    ///     an oversight (a forgotten case attribute, or a misspelled one). Flag the empty type so the cause
+    ///     is visible rather than silent.
+    /// </summary>
+    private static readonly DiagnosticDescriptor NoCasesRule = new(
+        id: "ORES003",
+        title: "[GenerateResult] type declares no case factories",
+        messageFormat: "[GenerateResult] type '{0}' declares no case factories; mark at least one static partial factory with [SuccessCase], [ErrorCase], or [GreyCase]",
+        category: "Usage",
+        defaultSeverity: DiagnosticSeverity.Warning,
+        isEnabledByDefault: true,
+        description: "A [GenerateResult] type with no case factories generates no result members. " +
+                     "Declare at least one static partial factory marked [SuccessCase], [ErrorCase], or [GreyCase].");
+
+    /// <summary>
+    ///     A case factory's body is emitted as a partial method implementation, so the declaration must be
+    ///     <c>static partial</c>. A factory that is not (e.g. missing <c>partial</c>, or an instance method)
+    ///     is silently ignored; this rule explains why nothing was generated for it.
+    /// </summary>
+    private static readonly DiagnosticDescriptor NotStaticPartialRule = new(
+        id: "ORES004",
+        title: "Result case factory must be declared 'static partial'",
+        messageFormat: "Result case factory '{0}' must be declared 'static partial'; it is otherwise ignored and no body is generated",
+        category: "Usage",
+        defaultSeverity: DiagnosticSeverity.Error,
+        isEnabledByDefault: true,
+        description: "A [GenerateResult] case factory's body is generated as a partial method implementation, " +
+                     "so the declaration must be 'static partial'.");
 
     /// <inheritdoc />
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -81,13 +112,27 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
 
         var cases = new List<CaseModel>();
         var diagnostics = new List<DiagnosticInfo>();
+        var sawCaseFactory = false;
         foreach (var method in type.GetMembers().OfType<IMethodSymbol>())
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             var kind = GetCaseKind(method);
-            if (kind is null || !method.IsStatic)
+            if (kind is null)
             {
+                continue;
+            }
+
+            sawCaseFactory = true;
+
+            if (!method.IsStatic || !method.IsPartialDefinition)
+            {
+                // The body is emitted as a partial implementation, so the factory must be static partial.
+                // Anything else is ignored (no body generated); flag why.
+                diagnostics.Add(new DiagnosticInfo(
+                    NotStaticPartialRule,
+                    LocationInfo.CreateFrom(method.Locations.FirstOrDefault()),
+                    new EquatableArray<string>(new[] { method.Name })));
                 continue;
             }
 
@@ -138,6 +183,15 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
                 payloadName,
                 isValueType,
                 errorPayloadKind));
+        }
+
+        if (!sawCaseFactory)
+        {
+            // Marked [GenerateResult] but no method carries a case attribute — nothing to generate.
+            diagnostics.Add(new DiagnosticInfo(
+                NoCasesRule,
+                LocationInfo.CreateFrom(type.Locations.FirstOrDefault()),
+                new EquatableArray<string>(new[] { type.Name })));
         }
 
         if (cases.Count == 0 && diagnostics.Count == 0)

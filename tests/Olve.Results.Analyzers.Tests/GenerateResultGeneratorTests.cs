@@ -68,6 +68,103 @@ public class GenerateResultGeneratorTests
     }
 
     [Test]
+    public async Task TypeWithNoCaseFactories_ReportsOres003()
+    {
+        var diagnostics = GeneratorRunner.GetGeneratorDiagnostics("""
+            namespace Sample
+            {
+                using Olve.Results;
+
+                [GenerateResult]
+                public readonly partial struct EmptyResult
+                {
+                }
+            }
+            """);
+
+        await Assert.That(diagnostics.Length).IsEqualTo(1);
+        await Assert.That(diagnostics[0].Id).IsEqualTo("ORES003");
+        await Assert.That(diagnostics[0].GetMessage()).Contains("EmptyResult");
+    }
+
+    [Test]
+    public async Task TypeWithCaseFactories_ReportsNoOres003()
+    {
+        var diagnostics = GeneratorRunner.GetGeneratorDiagnostics("""
+            namespace Sample
+            {
+                using Olve.Results;
+
+                [GenerateResult]
+                public readonly partial struct OneResult
+                {
+                    [SuccessCase] public static partial OneResult Ok();
+                }
+            }
+            """);
+
+        await Assert.That(diagnostics.Where(d => d.Id == "ORES003")).IsEmpty();
+    }
+
+    [Test]
+    public async Task NonPartialCaseFactory_ReportsOres004()
+    {
+        var diagnostics = GeneratorRunner.GetGeneratorDiagnostics("""
+            namespace Sample
+            {
+                using Olve.Results;
+
+                [GenerateResult]
+                public readonly partial struct BadResult
+                {
+                    [SuccessCase] public static BadResult Ok() => default;
+                }
+            }
+            """);
+
+        await Assert.That(diagnostics.Where(d => d.Id == "ORES004").Count()).IsEqualTo(1);
+        await Assert.That(diagnostics.First(d => d.Id == "ORES004").GetMessage()).Contains("Ok");
+    }
+
+    [Test]
+    public async Task InstanceCaseFactory_ReportsOres004()
+    {
+        var diagnostics = GeneratorRunner.GetGeneratorDiagnostics("""
+            namespace Sample
+            {
+                using Olve.Results;
+
+                [GenerateResult]
+                public readonly partial struct BadResult
+                {
+                    [SuccessCase] public partial BadResult Ok();
+                }
+            }
+            """);
+
+        await Assert.That(diagnostics.Where(d => d.Id == "ORES004").Count()).IsEqualTo(1);
+    }
+
+    [Test]
+    public async Task StaticPartialCaseFactory_ReportsNoOres004()
+    {
+        var diagnostics = GeneratorRunner.GetGeneratorDiagnostics("""
+            namespace Sample
+            {
+                using Olve.Results;
+
+                [GenerateResult]
+                public readonly partial struct GoodResult
+                {
+                    [SuccessCase] public static partial GoodResult Ok();
+                }
+            }
+            """);
+
+        await Assert.That(diagnostics.Where(d => d.Id == "ORES004")).IsEmpty();
+    }
+
+    [Test]
     public async Task EachMultiParameterFactory_ReportsItsOwnOres002()
     {
         var diagnostics = GeneratorRunner.GetGeneratorDiagnostics("""
