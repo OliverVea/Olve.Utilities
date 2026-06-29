@@ -199,4 +199,19 @@ public class GenerateResultTests
         await Assert.That(right.IsRight).IsTrue();
         await Assert.That(DualErrorResult.Ok().Succeeded).IsTrue();
     }
+
+    [Test]
+    public async Task ToString_NoPayloadCase_IsTheCaseName()
+    {
+        await Assert.That(SampleResult.Created().ToString()).IsEqualTo("Created");
+        await Assert.That(SampleResult.Missing().ToString()).IsEqualTo("Missing");
+    }
+
+    [Test]
+    public async Task ToString_PayloadCase_AppendsThePayload()
+    {
+        await Assert.That(LoadResult.Loaded("hello").ToString()).IsEqualTo("Loaded(hello)");
+        await Assert.That(LoadResult.Missing("/tmp/x").ToString()).IsEqualTo("Missing(/tmp/x)");
+        await Assert.That(ParseResult.Parsed(42).ToString()).IsEqualTo("Parsed(42)");
+    }
 }

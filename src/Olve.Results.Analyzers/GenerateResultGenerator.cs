@@ -17,8 +17,8 @@ namespace Olve.Results.Analyzers;
 ///     exhaustive <c>Match</c>, and <c>Problems</c>/<c>TryPickProblems</c>. Cases may carry a single
 ///     typed payload, surfaced typed through <c>Match</c>. When exactly one error case exists, implicit
 ///     conversions from <c>ResultProblem</c>/<c>ResultProblemCollection</c> are emitted, and the type is
-///     marked <c>[MustBeUsedWhenReturned]</c>. <c>ToString</c>, equality and diagnostics are layered in
-///     later slices.
+///     marked <c>[MustBeUsedWhenReturned]</c>. <c>ToString</c> renders the case name plus any payload;
+///     equality and diagnostics are layered in later slices.
 /// </remarks>
 [Generator(LanguageNames.CSharp)]
 public sealed class GenerateResultGenerator : IIncrementalGenerator
@@ -295,6 +295,26 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
         sb.AppendLine($"{member}public bool Succeeded => {StateCondition(cases, CaseKind.Success, state, stateEnum)};");
         sb.AppendLine($"{member}/// <summary>Whether this result is an error state. Grey states are neither succeeded nor failed.</summary>");
         sb.AppendLine($"{member}public bool Failed => {StateCondition(cases, CaseKind.Error, state, stateEnum)};");
+        sb.AppendLine();
+
+        // ToString — the case name, with the payload appended when present.
+        sb.AppendLine($"{member}/// <summary>Returns the case name, with the payload appended when present.</summary>");
+        sb.AppendLine($"{member}public override string ToString() => {state} switch");
+        sb.AppendLine($"{member}{{");
+        foreach (var c in cases)
+        {
+            if (!c.HasPayload)
+            {
+                sb.AppendLine($"{body}    {stateEnum}.{c.Name} => \"{c.Name}\",");
+            }
+            else
+            {
+                var payload = c.IsValueType ? c.FieldName : c.FieldName + "!";
+                sb.AppendLine($"{body}    {stateEnum}.{c.Name} => $\"{c.Name}({{{payload}}})\",");
+            }
+        }
+        sb.AppendLine($"{body}    _ => throw new System.InvalidOperationException(\"Unreachable result state.\"),");
+        sb.AppendLine($"{body}}};");
         sb.AppendLine();
 
         // Match.
