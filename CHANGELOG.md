@@ -1,3 +1,9 @@
+## v0.46.0 (2026-06-29)
+
+### Feat
+
+- promote EntityStore and Event into Olve.Utilities.Stores
+
 ## v0.45.0 (2026-06-28)
 
 ### Feat
