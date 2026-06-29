@@ -24,7 +24,7 @@ public class ReadOpenRasterFileTests
         await Assert.That(file!.Version).IsEqualTo("0.0.5");
         await Assert.That(file.Width).IsEqualTo(256);
         await Assert.That(file.Height).IsEqualTo(128);
-        await Assert.That(file.Layers).HasCount().EqualTo(1);
+        await Assert.That(file.Layers).Count().IsEqualTo(1);
 
         File.Delete(path);
     }
@@ -93,7 +93,7 @@ public class ReadOpenRasterFileTests
         var result = _sut.Execute(new ReadOpenRasterFile.Request(path));
 
         await Assert.That(result.TryPickValue(out var file, out _)).IsTrue();
-        await Assert.That(file!.Layers).HasCount().EqualTo(2);
+        await Assert.That(file!.Layers).Count().IsEqualTo(2);
 
         var top = file.Layers[0];
         await Assert.That(top.Name).IsEqualTo("Top");
@@ -135,20 +135,20 @@ public class ReadOpenRasterFileTests
         var result = _sut.Execute(new ReadOpenRasterFile.Request(path));
 
         await Assert.That(result.TryPickValue(out var file, out _)).IsTrue();
-        await Assert.That(file!.Groups).HasCount().EqualTo(1);
-        await Assert.That(file.Layers).HasCount().EqualTo(2);
+        await Assert.That(file!.Groups).Count().IsEqualTo(1);
+        await Assert.That(file.Layers).Count().IsEqualTo(2);
 
         var group = file.Groups[0];
         await Assert.That(group.Name).IsEqualTo("Group1");
         await Assert.That(group.CompositeOperation).IsEqualTo(CompositeOperation.Screen);
         await Assert.That(group.Opacity).IsEqualTo(0.8f);
         await Assert.That(group.Visibility).IsEqualTo(Visibility.Hidden);
-        await Assert.That(group.Layers).HasCount().EqualTo(1);
+        await Assert.That(group.Layers).Count().IsEqualTo(1);
         await Assert.That(group.Layers[0].Name).IsEqualTo("InGroup");
 
         // Verify bidirectional link
         var inGroup = file.Layers[0];
-        await Assert.That(inGroup.Groups).HasCount().EqualTo(1);
+        await Assert.That(inGroup.Groups).Count().IsEqualTo(1);
         await Assert.That(inGroup.Groups[0].Name).IsEqualTo("Group1");
 
         File.Delete(path);
@@ -175,12 +175,12 @@ public class ReadOpenRasterFileTests
         var result = _sut.Execute(new ReadOpenRasterFile.Request(path));
 
         await Assert.That(result.TryPickValue(out var file, out _)).IsTrue();
-        await Assert.That(file!.Groups).HasCount().EqualTo(2);
-        await Assert.That(file.Layers).HasCount().EqualTo(1);
+        await Assert.That(file!.Groups).Count().IsEqualTo(2);
+        await Assert.That(file.Layers).Count().IsEqualTo(1);
 
         var deep = file.Layers[0];
         await Assert.That(deep.Name).IsEqualTo("Deep");
-        await Assert.That(deep.Groups).HasCount().EqualTo(2);
+        await Assert.That(deep.Groups).Count().IsEqualTo(2);
 
         File.Delete(path);
     }

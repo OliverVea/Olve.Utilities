@@ -61,7 +61,7 @@ public class ReadmeDemo
         // Reverse lookup: which key owns this value?
         lookup.TryGet(1, out var owner); // "alice"
 
-        await Assert.That(aliceValues!).HasCount().EqualTo(2);
+        await Assert.That(aliceValues!).Count().IsEqualTo(2);
         await Assert.That(owner).IsEqualTo("alice");
     }
 
@@ -80,8 +80,8 @@ public class ReadmeDemo
         // Get all students in a course
         enrollment.TryGet(101, out var mathStudents); // { "alice", "bob" }
 
-        await Assert.That(aliceCourses!).HasCount().EqualTo(2);
-        await Assert.That(mathStudents!).HasCount().EqualTo(2);
+        await Assert.That(aliceCourses!).Count().IsEqualTo(2);
+        await Assert.That(mathStudents!).Count().IsEqualTo(2);
     }
 
     [Test]
@@ -163,8 +163,8 @@ public class ReadmeDemo
         // Query outgoing edges
         graph.TryGetOutgoingEdges(nodeA, out var edges); // 2 edges
 
-        await Assert.That(edges!).HasCount().EqualTo(2);
-        await Assert.That(graph.Nodes).HasCount().EqualTo(3);
+        await Assert.That(edges!).Count().IsEqualTo(2);
+        await Assert.That(graph.Nodes).Count().IsEqualTo(3);
     }
 
     [Test]
@@ -185,6 +185,6 @@ public class ReadmeDemo
         await Assert.That(same).IsSameReferenceAs(list);
         await Assert.That(updated).IsTrue();
         await Assert.That(missed).IsFalse();
-        await Assert.That(cache["scores"]).HasCount().EqualTo(2);
+        await Assert.That(cache["scores"]).Count().IsEqualTo(2);
     }
 }

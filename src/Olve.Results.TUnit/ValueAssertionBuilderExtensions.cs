@@ -9,6 +9,9 @@ namespace Olve.Results.TUnit;
 /// </summary>
 public static class ValueAssertionBuilderExtensions
 {
+    // TUnitAssertions0015 suggests IsTrue(), but it is only defined on IAssertionSource<bool>.
+    // HasProperty(...) returns PropertyAssertion<T, bool>, which only exposes IsEqualTo here.
+#pragma warning disable TUnitAssertions0015
     /// <summary>
     /// Asserts that the result represents success (<c>Succeeded == true</c>).
     /// </summary>
@@ -42,6 +45,7 @@ public static class ValueAssertionBuilderExtensions
     /// <returns>A property assertion result targeting the <c>Failed</c> property.</returns>
     public static PropertyAssertionResult<Result> Failed(this IAssertionSource<Result> source) =>
         source.HasProperty(x => x.Failed).IsEqualTo(true);
+#pragma warning restore TUnitAssertions0015
 
     /// <summary>
     /// Asserts the result is successful and runs an assertion against the unwrapped value.

@@ -165,7 +165,7 @@ public class PathTests
         // Assert
         await Assert.That(gotChildren).IsTrue();
         await Assert.That(childPaths).IsNotNull();
-        await Assert.That(childPaths).HasCount().EqualTo(expectedElements.Length);
+        await Assert.That(childPaths).Count().IsEqualTo(expectedElements.Length);
 
         foreach (var (actual, expected) in childPaths!.Order().Zip(expectedElements.Order()))
         {

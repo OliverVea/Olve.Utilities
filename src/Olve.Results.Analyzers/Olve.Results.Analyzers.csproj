@@ -15,6 +15,13 @@
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     </PropertyGroup>
 
+    <!--
+        Microsoft.CodeAnalysis.CSharp determines the minimum Roslyn host the analyzer can load into.
+        Since v0.47.0 this is pinned to 5.3.0, so consuming projects must build with a host that
+        ships Roslyn 5.3 or newer (the C# compiler in the .NET 10 SDK / matching Visual Studio).
+        Older SDKs will silently skip the analyzer. Lower this version only if broader SDK support
+        is needed again.
+    -->
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
     </ItemGroup>

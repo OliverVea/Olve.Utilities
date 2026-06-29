@@ -22,7 +22,7 @@ public class ReadmeDemo
         }
 
         await Assert.That(file!.Width).IsEqualTo(4);
-        await Assert.That(file.Layers).HasCount().EqualTo(2);
+        await Assert.That(file.Layers).Count().IsEqualTo(2);
 
         File.Delete(filePath);
     }
@@ -49,8 +49,8 @@ public class ReadmeDemo
             Console.WriteLine($"  Group: {group.Name} ({group.Layers.Count} layers)");
         }
 
-        await Assert.That(file.Layers).HasCount().EqualTo(2);
-        await Assert.That(file.Groups).HasCount().EqualTo(1);
+        await Assert.That(file.Layers).Count().IsEqualTo(2);
+        await Assert.That(file.Groups).Count().IsEqualTo(1);
 
         File.Delete(filePath);
     }

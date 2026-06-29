@@ -26,7 +26,7 @@ public class GlobTests
         // Assert
         await Assert.That(gotGlob).IsTrue();
         await Assert.That(matchPaths).IsNotNull();
-        await Assert.That(matchPaths).HasCount().EqualTo(expectedFiles.Length);
+        await Assert.That(matchPaths).Count().IsEqualTo(expectedFiles.Length);
 
         foreach (var (actual, expectedRaw) in matchPaths!.Order().Zip(expectedFiles.Order()))
         {
@@ -49,7 +49,7 @@ public class GlobTests
         // Assert
         await Assert.That(gotGlob).IsTrue();
         await Assert.That(matches).IsNotNull();
-        await Assert.That(matches).HasCount().EqualTo(elementCount);
+        await Assert.That(matches).Count().IsEqualTo(elementCount);
     }
 
     [Test]
@@ -104,7 +104,7 @@ public class GlobTests
         TryGlobTestData(patternWithIncorrectCasing, out var ignoreCaseMatches, ignoreCase);
 
         // Assert
-        await Assert.That(ignoreCaseMatches).HasCount().EqualTo(expected);
+        await Assert.That(ignoreCaseMatches).Count().IsEqualTo(expected);
     }
 
     private static bool TryGlobTestData(string pattern, out IEnumerable<IPath>? matches, bool ignoreCase = false)
