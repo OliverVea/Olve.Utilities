@@ -409,6 +409,29 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
         sb.AppendLine($"{member}/// <summary>Determines whether two results are unequal.</summary>");
         sb.AppendLine($"{member}public static bool operator !=({typeName} left, {typeName} right) => !left.Equals(right);");
 
+        // MapToResult — collapses onto the binary success/failure Result. Emitted only when there are no
+        // grey cases: a grey state maps onto neither success nor failure, so such types (e.g. DeletionResult)
+        // provide their own conversion that decides how grey is treated.
+        if (cases.All(c => c.Kind != CaseKind.Grey))
+        {
+            sb.AppendLine();
+            sb.AppendLine($"{member}/// <summary>Converts this result to a <c>Result</c>: success when succeeded, otherwise its problems.</summary>");
+            sb.AppendLine($"{member}public global::Olve.Results.Result MapToResult()");
+            sb.AppendLine($"{member}{{");
+            sb.AppendLine($"{body}if (Succeeded)");
+            sb.AppendLine($"{body}{{");
+            sb.AppendLine($"{body}    return global::Olve.Results.Result.Success();");
+            sb.AppendLine($"{body}}}");
+            sb.AppendLine();
+            sb.AppendLine($"{body}if (Problems is {{ }} __problems)");
+            sb.AppendLine($"{body}{{");
+            sb.AppendLine($"{body}    return __problems;");
+            sb.AppendLine($"{body}}}");
+            sb.AppendLine();
+            sb.AppendLine($"{body}return new global::Olve.Results.ResultProblem(\"{typeName} was in an error state without problem details.\");");
+            sb.AppendLine($"{member}}}");
+        }
+
         // Implicit conversions from problems — only when exactly one error case exists (otherwise the
         // conversion target would be ambiguous). Skipped silently for zero or multiple error cases.
         var errorCases = cases.Where(c => c.Kind == CaseKind.Error).ToList();

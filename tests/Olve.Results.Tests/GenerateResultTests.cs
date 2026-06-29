@@ -253,4 +253,45 @@ public class GenerateResultTests
         await Assert.That(SampleResult.Created().Equals(boxed)).IsTrue();
         await Assert.That(SampleResult.Created().Equals("not a result")).IsFalse();
     }
+
+    [Test]
+    public async Task MapToResult_SuccessCase_IsSuccess()
+    {
+        var mapped = ParseResult.Parsed(42).MapToResult();
+
+        await Assert.That(mapped.Succeeded).IsTrue();
+    }
+
+    [Test]
+    public async Task MapToResult_ErrorCase_CarriesProblems()
+    {
+        var problem = new ResultProblem("nope");
+
+        var mapped = ParseResult.Invalid(problem).MapToResult();
+
+        await Assert.That(mapped.Failed).IsTrue();
+        await Assert.That(mapped.TryPickProblems(out var problems)).IsTrue();
+        await Assert.That(problems!.Single()).IsSameReferenceAs(problem);
+    }
+
+    [Test]
+    public async Task MapToResult_MultipleErrorCases_MapEachToFailure()
+    {
+        var problem = new ResultProblem("boom");
+        var collection = new ResultProblemCollection(problem);
+
+        await Assert.That(DualErrorResult.Ok().MapToResult().Succeeded).IsTrue();
+        await Assert.That(DualErrorResult.Left(collection).MapToResult().Failed).IsTrue();
+        await Assert.That(DualErrorResult.Left(collection).MapToResult().Problems!.Single()).IsSameReferenceAs(problem);
+        await Assert.That(DualErrorResult.Right(collection).MapToResult().Problems!.Single()).IsSameReferenceAs(problem);
+    }
+
+    [Test]
+    public async Task MapToResult_IsNotEmittedForTypesWithGreyCases()
+    {
+        // Grey states have no unambiguous success/failure mapping, so the generator emits no MapToResult;
+        // such types provide their own (e.g. DeletionResult's hand-written extension with allowNotFound).
+        await Assert.That(typeof(SampleResult).GetMethod("MapToResult")).IsNull();
+        await Assert.That(typeof(LoadResult).GetMethod("MapToResult")).IsNull();
+    }
 }
