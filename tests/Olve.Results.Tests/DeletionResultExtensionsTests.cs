@@ -12,7 +12,7 @@ public class DeletionResultExtensionsTests
         var value = result.Match(
             onSuccess: () => "success",
             onNotFound: () => "not found",
-            onProblems: _ => "problems");
+            onError: _ => "problems");
 
         await Assert.That(value).IsEqualTo("success");
     }
@@ -25,7 +25,7 @@ public class DeletionResultExtensionsTests
         var value = result.Match(
             onSuccess: () => "success",
             onNotFound: () => "not found",
-            onProblems: _ => "problems");
+            onError: _ => "problems");
 
         await Assert.That(value).IsEqualTo("not found");
     }
@@ -38,7 +38,7 @@ public class DeletionResultExtensionsTests
         var value = result.Match(
             onSuccess: () => "success",
             onNotFound: () => "not found",
-            onProblems: _ => "problems");
+            onError: _ => "problems");
 
         await Assert.That(value).IsEqualTo("problems");
     }

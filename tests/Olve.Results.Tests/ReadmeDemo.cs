@@ -168,7 +168,7 @@ public class ReadmeDemo
         var message = result.Match(
             onSuccess: () => "Deleted",
             onNotFound: () => "Already gone",
-            onProblems: problems => $"Error: {problems.First().Message}");
+            onError: problems => $"Error: {problems.First().Message}");
 
         await Assert.That(message).IsEqualTo("Already gone");
     }
