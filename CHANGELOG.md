@@ -1,3 +1,9 @@
+## v0.47.1 (2026-06-29)
+
+### Fix
+
+- don't flag awaited fluent assertions in MustBeUsedWhenReturned (ORES001)
+
 ## v0.47.0 (2026-06-29)
 
 ### BREAKING CHANGE
