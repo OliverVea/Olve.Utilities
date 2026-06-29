@@ -214,4 +214,43 @@ public class GenerateResultTests
         await Assert.That(LoadResult.Missing("/tmp/x").ToString()).IsEqualTo("Missing(/tmp/x)");
         await Assert.That(ParseResult.Parsed(42).ToString()).IsEqualTo("Parsed(42)");
     }
+
+    [Test]
+    public async Task Equality_SameCase_NoPayload_AreEqual()
+    {
+        await Assert.That(SampleResult.Created()).IsEqualTo(SampleResult.Created());
+        await Assert.That(SampleResult.Created() == SampleResult.Created()).IsTrue();
+        await Assert.That(SampleResult.Created().GetHashCode()).IsEqualTo(SampleResult.Created().GetHashCode());
+    }
+
+    [Test]
+    public async Task Equality_DifferentCase_AreUnequal()
+    {
+        await Assert.That(SampleResult.Created()).IsNotEqualTo(SampleResult.Missing());
+        await Assert.That(SampleResult.Created() != SampleResult.Broke()).IsTrue();
+    }
+
+    [Test]
+    public async Task Equality_SameCase_SamePayload_AreEqual()
+    {
+        await Assert.That(LoadResult.Loaded("hello")).IsEqualTo(LoadResult.Loaded("hello"));
+        await Assert.That(LoadResult.Loaded("hello") == LoadResult.Loaded("hello")).IsTrue();
+        await Assert.That(LoadResult.Loaded("hello").GetHashCode()).IsEqualTo(LoadResult.Loaded("hello").GetHashCode());
+    }
+
+    [Test]
+    public async Task Equality_SameCase_DifferentPayload_AreUnequal()
+    {
+        await Assert.That(LoadResult.Loaded("hello")).IsNotEqualTo(LoadResult.Loaded("world"));
+        await Assert.That(LoadResult.Loaded("hello") != LoadResult.Loaded("world")).IsTrue();
+    }
+
+    [Test]
+    public async Task Equality_AgainstBoxedObject_AndOtherType()
+    {
+        object boxed = SampleResult.Created();
+
+        await Assert.That(SampleResult.Created().Equals(boxed)).IsTrue();
+        await Assert.That(SampleResult.Created().Equals("not a result")).IsFalse();
+    }
 }

@@ -214,7 +214,7 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
         var readonlyModifier = isReadOnly ? "readonly " : string.Empty;
 
         sb.AppendLine($"{indent}[global::Olve.Results.MustBeUsedWhenReturned]");
-        sb.AppendLine($"{indent}{readonlyModifier}partial struct {typeName}");
+        sb.AppendLine($"{indent}{readonlyModifier}partial struct {typeName} : global::System.IEquatable<{typeName}>");
         sb.AppendLine($"{indent}{{");
 
         // State discriminator.
@@ -361,6 +361,53 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
         sb.AppendLine($"{body}problems = Problems;");
         sb.AppendLine($"{body}return problems is not null;");
         sb.AppendLine($"{member}}}");
+        sb.AppendLine();
+
+        // Value equality — same state, and equal payloads on the active case. Inactive payload fields
+        // are default for both operands, so comparing every payload field is correct (and cheap).
+        sb.AppendLine($"{member}/// <summary>Determines whether this result equals another of the same type.</summary>");
+        sb.AppendLine($"{member}public bool Equals({typeName} other)");
+        sb.AppendLine($"{member}{{");
+        sb.AppendLine($"{body}if ({state} != other.{state})");
+        sb.AppendLine($"{body}{{");
+        sb.AppendLine($"{body}    return false;");
+        sb.AppendLine($"{body}}}");
+        sb.AppendLine();
+        if (payloadCases.Count == 0)
+        {
+            sb.AppendLine($"{body}return true;");
+        }
+        else
+        {
+            var checks = payloadCases
+                .Select(c => $"global::System.Collections.Generic.EqualityComparer<{c.FieldType}>.Default.Equals(this.{c.FieldName}, other.{c.FieldName})")
+                .ToList();
+            sb.AppendLine($"{body}return {string.Join(" && ", checks)};");
+        }
+        sb.AppendLine($"{member}}}");
+        sb.AppendLine();
+
+        sb.AppendLine($"{member}/// <summary>Determines whether this result equals another object.</summary>");
+        sb.AppendLine($"{member}public override bool Equals(object? obj) => obj is {typeName} other && Equals(other);");
+        sb.AppendLine();
+
+        sb.AppendLine($"{member}/// <summary>Returns a hash code incorporating the state and active payload.</summary>");
+        sb.AppendLine($"{member}public override int GetHashCode()");
+        sb.AppendLine($"{member}{{");
+        sb.AppendLine($"{body}var __hash = new global::System.HashCode();");
+        sb.AppendLine($"{body}__hash.Add({state});");
+        foreach (var c in payloadCases)
+        {
+            sb.AppendLine($"{body}__hash.Add(this.{c.FieldName});");
+        }
+        sb.AppendLine($"{body}return __hash.ToHashCode();");
+        sb.AppendLine($"{member}}}");
+        sb.AppendLine();
+
+        sb.AppendLine($"{member}/// <summary>Determines whether two results are equal.</summary>");
+        sb.AppendLine($"{member}public static bool operator ==({typeName} left, {typeName} right) => left.Equals(right);");
+        sb.AppendLine($"{member}/// <summary>Determines whether two results are unequal.</summary>");
+        sb.AppendLine($"{member}public static bool operator !=({typeName} left, {typeName} right) => !left.Equals(right);");
 
         // Implicit conversions from problems — only when exactly one error case exists (otherwise the
         // conversion target would be ambiguous). Skipped silently for zero or multiple error cases.
