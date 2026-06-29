@@ -1,3 +1,10 @@
+## v0.47.0 (2026-06-29)
+
+### BREAKING CHANGE
+
+- Olve.Results.Analyzers now requires a Roslyn 5.3+ host
+(.NET 10 SDK or matching Visual Studio); older SDKs skip the analyzer.
+
 ## v0.46.0 (2026-06-29)
 
 ### Feat
