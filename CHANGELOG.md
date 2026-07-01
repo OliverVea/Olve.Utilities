@@ -1,3 +1,17 @@
+## v0.48.0 (2026-07-01)
+
+### Feat
+
+- map grey cases via optional allow flags in generated MapToResult
+- flag empty and non-static-partial [GenerateResult] factories (ORES003/ORES004)
+- emit MapToResult() for grey-free [GenerateResult] types
+- emit value equality for [GenerateResult] types
+- emit ToString() for [GenerateResult] types
+- flag multi-parameter [GenerateResult] case factories (ORES002)
+- regenerate DeletionResult via [GenerateResult]
+- emit implicit problem conversions and [MustBeUsedWhenReturned] for [GenerateResult]
+- source-generate multi-state result types via [GenerateResult]
+
 ## v0.47.1 (2026-06-29)
 
 ### Fix
