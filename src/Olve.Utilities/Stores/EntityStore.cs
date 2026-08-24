@@ -13,25 +13,28 @@ namespace Olve.Utilities.Stores;
 /// compare-and-swap), and every change fires a synchronous <see cref="Event{T}"/> so secondary
 /// indexes stay consistent with the store.
 /// </summary>
-/// <typeparam name="T">The entity type, which must expose an <see cref="Id{T}"/>.</typeparam>
-public class EntityStore<T> where T : IHasId<Id<T>>
+/// <typeparam name="T">The entity type, which must expose a <typeparamref name="TId"/>.</typeparam>
+/// <typeparam name="TId">The identifier type.</typeparam>
+public class EntityStore<T, TId> : IEntityStore<T, TId>
+    where T : IHasId<TId>
+    where TId : notnull
 {
-    private readonly ConcurrentDictionary<Id<T>, T> _entities;
+    private readonly ConcurrentDictionary<TId, T> _entities;
 
     /// <summary>Creates a store seeded with <paramref name="initialEntities"/>.</summary>
     public EntityStore(IEnumerable<T> initialEntities)
     {
-        _entities = new(initialEntities.Select(e => new KeyValuePair<Id<T>, T>(e.Id, e)));
+        _entities = new(initialEntities.Select(e => new KeyValuePair<TId, T>(e.Id, e)));
     }
 
     /// <summary>Fires after an entity not previously present is added via <see cref="Set"/>.</summary>
-    public Event<Id<T>> OnAdded { get; } = new();
+    public Event<TId> OnAdded { get; } = new();
 
     /// <summary>Fires after an existing entity changes via <see cref="Set"/> or <see cref="Mutate"/>.</summary>
-    public Event<Id<T>> OnUpdated { get; } = new();
+    public Event<TId> OnUpdated { get; } = new();
 
     /// <summary>Fires after an entity is removed via <see cref="Delete"/>.</summary>
-    public Event<Id<T>> OnDeleted { get; } = new();
+    public Event<TId> OnDeleted { get; } = new();
 
     /// <summary>
     /// Inserts or replaces <paramref name="entity"/>, firing <see cref="OnAdded"/> when it is new or
@@ -66,7 +69,7 @@ public class EntityStore<T> where T : IHasId<Id<T>>
     /// MUST NOT change a value any index keys on — indexes track only <see cref="OnAdded"/>/
     /// <see cref="OnDeleted"/> by design. For a key change, use <see cref="Delete"/>+<see cref="Set"/>.
     /// </summary>
-    public Result Mutate(Id<T> id, Func<T, T> mutate)
+    public Result Mutate(TId id, Func<T, T> mutate)
     {
         for (var attempt = 0; attempt < MaxMutateAttempts; attempt++)
         {
@@ -91,13 +94,13 @@ public class EntityStore<T> where T : IHasId<Id<T>>
     }
 
     /// <summary>Gets the entity with <paramref name="id"/>, returning <see langword="false"/> if absent.</summary>
-    public bool TryGet(Id<T> id, [NotNullWhen(true)] out T? entity) => _entities.TryGetValue(id, out entity);
+    public bool TryGet(TId id, [NotNullWhen(true)] out T? entity) => _entities.TryGetValue(id, out entity);
 
     /// <summary>Returns a snapshot of all entities currently in the store.</summary>
     public IReadOnlyList<T> List() => _entities.Values.ToList();
 
     /// <summary>Removes the entity with <paramref name="id"/>, firing <see cref="OnDeleted"/> on success.</summary>
-    public DeletionResult Delete(Id<T> id)
+    public DeletionResult Delete(TId id)
     {
         if (!_entities.TryRemove(id, out _))
             return DeletionResult.NotFound();
@@ -107,8 +110,18 @@ public class EntityStore<T> where T : IHasId<Id<T>>
     }
 
     /// <summary>Returns whether an entity with <paramref name="id"/> is present.</summary>
-    public bool Contains(Id<T> id) => _entities.ContainsKey(id);
+    public bool Contains(TId id) => _entities.ContainsKey(id);
 
+}
+
+/// <summary>
+/// An <see cref="EntityStore{T,TId}"/> keyed by <see cref="Id{T}"/> — the default for durable,
+/// globally-identified entities. Secondary indexes hang off this shape.
+/// </summary>
+/// <typeparam name="T">The entity type, which must expose an <see cref="Id{T}"/>.</typeparam>
+public class EntityStore<T>(IEnumerable<T> initialEntities) : EntityStore<T, Id<T>>(initialEntities)
+    where T : IHasId<Id<T>>
+{
     /// <summary>Creates a secondary index grouping entity ids by <paramref name="keySelector"/>.</summary>
     public EntityStoreIndex<T, TKey> CreateIndex<TKey>(Func<T, TKey> keySelector) where TKey : notnull
         => new(this, keySelector);
