@@ -18,7 +18,7 @@ namespace Olve.Utilities.Stores;
 /// </para>
 /// <para>
 /// The index keys on a value that never changes for a given entity (e.g. a parent id), so it
-/// deliberately does not subscribe to <see cref="EntityStore{T}.OnUpdated"/>. If the key could
+/// deliberately does not subscribe to <see cref="IEntityStore{T,TId}.OnUpdated"/>. If the key could
 /// change on update, this would be incorrect.
 /// </para>
 /// </remarks>

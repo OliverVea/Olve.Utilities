@@ -9,8 +9,8 @@ namespace Olve.Utilities.Stores;
 /// <remarks>
 /// Thread-safe: all reads and writes are guarded by <see cref="_gate"/>. A reverse id→key map is
 /// kept so deletes can resolve the key (the entity is already gone from the store when
-/// <see cref="EntityStore{T}.OnDeleted"/> fires). The index keys on a value that never changes for
-/// a given entity, so it does not subscribe to <see cref="EntityStore{T}.OnUpdated"/>.
+/// <see cref="IEntityStore{T,TId}.OnDeleted"/> fires). The index keys on a value that never changes for
+/// a given entity, so it does not subscribe to <see cref="IEntityStore{T,TId}.OnUpdated"/>.
 /// </remarks>
 public sealed class EntityStoreUniqueIndex<T, TKey>
     where T : IHasId<Id<T>>
