@@ -1,3 +1,9 @@
+## v0.50.0 (2026-09-21)
+
+### Feat
+
+- **stores**: support collection expressions and enumeration on EntityStore
+
 ## v0.49.0 (2026-09-21)
 
 ### Feat
