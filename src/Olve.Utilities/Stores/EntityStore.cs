@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using Olve.Results;
 using Olve.Utilities.Ids;
 using Olve.Utilities.Lookup;
@@ -15,11 +17,17 @@ namespace Olve.Utilities.Stores;
 /// </summary>
 /// <typeparam name="T">The entity type, which must expose a <typeparamref name="TId"/>.</typeparam>
 /// <typeparam name="TId">The identifier type.</typeparam>
-public class EntityStore<T, TId> : IEntityStore<T, TId>
+[CollectionBuilder(typeof(EntityStoreBuilder), nameof(EntityStoreBuilder.Create))]
+public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
     where T : IHasId<TId>
     where TId : notnull
 {
     private readonly ConcurrentDictionary<TId, T> _entities;
+
+    /// <summary>Creates an empty store.</summary>
+    public EntityStore() : this([])
+    {
+    }
 
     /// <summary>Creates a store seeded with <paramref name="initialEntities"/>.</summary>
     public EntityStore(IEnumerable<T> initialEntities)
@@ -115,6 +123,14 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>
     /// <summary>Returns whether an entity with <paramref name="id"/> is present.</summary>
     public bool Contains(TId id) => _entities.ContainsKey(id);
 
+    /// <summary>
+    /// Enumerates the entities as a live view: no copy and no locks, safe while other threads write, but
+    /// not a moment-in-time snapshot — entities added or removed during enumeration may or may not appear.
+    /// Use <see cref="List"/> for a snapshot.
+    /// </summary>
+    public IEnumerator<T> GetEnumerator() => _entities.Select(entry => entry.Value).GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
 
 /// <summary>
@@ -122,9 +138,15 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>
 /// globally-identified entities. Secondary indexes hang off this shape.
 /// </summary>
 /// <typeparam name="T">The entity type, which must expose an <see cref="Id{T}"/>.</typeparam>
+[CollectionBuilder(typeof(EntityStoreBuilder), nameof(EntityStoreBuilder.Create))]
 public class EntityStore<T>(IEnumerable<T> initialEntities) : EntityStore<T, Id<T>>(initialEntities)
     where T : IHasId<Id<T>>
 {
+    /// <summary>Creates an empty store.</summary>
+    public EntityStore() : this([])
+    {
+    }
+
     /// <summary>Creates a secondary index grouping entity ids by <paramref name="keySelector"/>.</summary>
     public EntityStoreIndex<T, TKey> CreateIndex<TKey>(Func<T, TKey> keySelector) where TKey : notnull
         => new(this, keySelector);

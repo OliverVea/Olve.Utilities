@@ -168,4 +168,57 @@ public class EntityStoreTests
         await Assert.That(store.Delete(id).Succeeded).IsTrue();
         await Assert.That(store.Count).IsEqualTo(1);
     }
+
+    [Test]
+    public async Task CollectionExpression_Empty_CreatesEmptyStore()
+    {
+        EntityStore<Counter> store = [];
+
+        await Assert.That(store.Count).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task CollectionExpression_WithElements_SeedsStore()
+    {
+        var a = new Counter(Id.New<Counter>(), 1);
+        var b = new Counter(Id.New<Counter>(), 2);
+
+        EntityStore<Counter> store = [a, b];
+
+        await Assert.That(store.Count).IsEqualTo(2);
+        await Assert.That(store.Contains(a.Id)).IsTrue();
+        await Assert.That(store.Contains(b.Id)).IsTrue();
+    }
+
+    [Test]
+    public async Task ParameterlessConstructor_CreatesEmptyStore()
+    {
+        EntityStore<Counter> store = new();
+
+        await Assert.That(store.Count).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task Enumeration_YieldsEveryEntity()
+    {
+        var a = new Counter(Id.New<Counter>(), 1);
+        var b = new Counter(Id.New<Counter>(), 2);
+        EntityStore<Counter> store = [a, b];
+
+        await Assert.That(store.Select(c => c.Value).Order().ToArray()).IsEquivalentTo(new[] { 1, 2 });
+    }
+
+    [Test]
+    public async Task Enumeration_ToleratesWritesDuringEnumeration()
+    {
+        EntityStore<Counter> store = [new Counter(Id.New<Counter>(), 1), new Counter(Id.New<Counter>(), 2)];
+
+        foreach (var counter in store)
+        {
+            store.Delete(counter.Id);
+            store.Set(new Counter(Id.New<Counter>(), counter.Value + 10));
+        }
+
+        await Assert.That(store.Count).IsGreaterThanOrEqualTo(2);
+    }
 }
