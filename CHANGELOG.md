@@ -1,3 +1,10 @@
+## v0.49.0 (2026-09-21)
+
+### Feat
+
+- **stores**: add Count to IEntityStore and EntityStore
+- **stores**: add IEntityStore, generic id, and ShortId<T>
+
 ## v0.48.0 (2026-07-01)
 
 ### Feat
