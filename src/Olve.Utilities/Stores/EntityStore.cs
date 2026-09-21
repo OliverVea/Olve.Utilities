@@ -96,6 +96,9 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>
     /// <summary>Gets the entity with <paramref name="id"/>, returning <see langword="false"/> if absent.</summary>
     public bool TryGet(TId id, [NotNullWhen(true)] out T? entity) => _entities.TryGetValue(id, out entity);
 
+    /// <summary>Gets the number of entities currently in the store.</summary>
+    public int Count => _entities.Count;
+
     /// <summary>Returns a snapshot of all entities currently in the store.</summary>
     public IReadOnlyList<T> List() => _entities.Values.ToList();
 
