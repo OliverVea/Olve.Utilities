@@ -106,4 +106,17 @@ public class ShortIdEntityStoreTests
     }
 
     private record Message(Id<Message> Id, string Text) : IHasId<Id<Message>>;
+
+    [Test]
+    public async Task CollectionExpression_WithGenericId_SeedsStore()
+    {
+        var slime = new Slime(new ShortId<Slime>(1), 100);
+
+        EntityStore<Slime, ShortId<Slime>> store = [slime];
+        EntityStore<Slime, ShortId<Slime>> empty = [];
+
+        await Assert.That(store.Count).IsEqualTo(1);
+        await Assert.That(store.Contains(slime.Id)).IsTrue();
+        await Assert.That(empty.Count).IsEqualTo(0);
+    }
 }
