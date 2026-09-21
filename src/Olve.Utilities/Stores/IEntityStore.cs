@@ -39,6 +39,9 @@ public interface IEntityStore<T, TId>
     /// <summary>Gets the entity with <paramref name="id"/>, returning <see langword="false"/> if absent.</summary>
     bool TryGet(TId id, [NotNullWhen(true)] out T? entity);
 
+    /// <summary>Gets the number of entities currently in the store.</summary>
+    int Count { get; }
+
     /// <summary>Returns a snapshot of all entities currently in the store.</summary>
     IReadOnlyList<T> List();
 

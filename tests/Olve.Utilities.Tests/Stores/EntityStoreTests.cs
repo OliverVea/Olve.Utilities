@@ -154,4 +154,18 @@ public class EntityStoreTests
         store.TryGet(id, out var result);
         await Assert.That(result!.Value).IsEqualTo(threads * incrementsPerThread);
     }
+
+    [Test]
+    public async Task Count_TracksSetAndDelete()
+    {
+        var store = new EntityStore<Counter>([new Counter(Id.New<Counter>(), 0)]);
+        var id = Id.New<Counter>();
+
+        store.Set(new Counter(id, 0));
+        store.Set(new Counter(id, 1));
+        await Assert.That(store.Count).IsEqualTo(2);
+
+        await Assert.That(store.Delete(id).Succeeded).IsTrue();
+        await Assert.That(store.Count).IsEqualTo(1);
+    }
 }
