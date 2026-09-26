@@ -487,3 +487,5 @@ docs/_site/
 docs/api
 
 **/*.frozen
+# Claude Code agent worktrees
+.claude/worktrees/
