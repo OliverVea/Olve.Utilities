@@ -1,3 +1,21 @@
+## v0.51.0 (2026-09-26)
+
+### Feat
+
+- **paginations**: add offset/limit pagination
+- **results**: pick problems by type
+- **stores**: add EntityStoreOrderedView
+
+### Fix
+
+- **stores**: keep indexes consistent under concurrent writes
+- **stores**: shield event handlers from each other's exceptions
+- **stores**: make entity store indexes disposable
+
+### Refactor
+
+- **paginations**: require explicit pagination bounds
+
 ## v0.50.0 (2026-09-21)
 
 ### Feat
