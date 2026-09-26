@@ -190,7 +190,7 @@ This approach avoids constructing `Result<T>` entirely, ideal for inner loops.
 **Properties**
 
 * `Message`, `Args`, `Exception`
-* `Tags`, `Severity`, `Source`
+* `Tags`, `Severity`, `Source`, `IsRetryable`
 * `OriginInformation` (automatically populated)
 
 Example:
@@ -241,6 +241,31 @@ var all = result.PickProblems<InsufficientFundsProblem>(); // every match, in or
 ```
 
 `TryPickProblem<TProblem>()` returns the first problem assignable to `TProblem` (subclasses included), and `false` on success. `PickProblems<TProblem>()` returns every match. Both are available on `Result`, `Result<T>`, `ResultProblemCollection`, and `[GenerateResult]` types such as `DeletionResult`.
+
+### Retryable problems
+
+`IsRetryable` marks transient failures that may succeed if retried. Problems created from an exception (including `Result.Try`) default to `true`; all others default to `false`. A collection, `Result`, `Result<T>` or generated result is retryable only when it failed and every problem is retryable. `Prepend(message)` inherits the flag from the existing problems; pass a leading `bool` to set it explicitly.
+
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L274-L289
+
+var timeout = new ResultProblem(new TimeoutException(), "Request timed out"); // IsRetryable: true
+var invalid = new ResultProblem("Name is required"); // IsRetryable: false
+var transient = new ResultProblem("Service unavailable") { IsRetryable = true };
+
+Result result = new ResultProblemCollection(timeout, transient);
+var retry = result.IsRetryable; // true: every problem is retryable
+
+var mixed = new ResultProblemCollection(timeout, invalid).IsRetryable; // false: one problem is terminal
+
+var inherited = result.Problems!.Prepend("Sync failed"); // new problem inherits: retryable
+var terminal = result.Problems!.Prepend(false, "Sync failed"); // explicit: not retryable
+
+var attempt = Result.Try<IOException>(
+    () => File.ReadAllText("/nonexistent/path.txt"),
+    retryable: false,
+    "Config file is missing");
+```
 
 ---
 

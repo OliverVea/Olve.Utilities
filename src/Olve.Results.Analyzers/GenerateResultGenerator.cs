@@ -211,7 +211,11 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
             ? null
             : type.ContainingNamespace.ToDisplayString();
 
-        var source = Emit(ns, type.Name, type.IsReadOnly, cases);
+        // Skip IsRetryable when the type already has a member of that name (hand-written, or the
+        // Is{Case} predicate of a case named "Retryable") to avoid a duplicate-member error.
+        var emitIsRetryable = type.GetMembers("IsRetryable").IsEmpty && cases.All(c => c.Name != "Retryable");
+
+        var source = Emit(ns, type.Name, type.IsReadOnly, cases, emitIsRetryable);
         var hintName = (ns is null ? string.Empty : ns + ".") + type.Name + ".GenerateResult.g.cs";
         return new GenerationResult(hintName, source, diagnosticArray);
     }
@@ -247,7 +251,7 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
         return false;
     }
 
-    private static string Emit(string? ns, string typeName, bool isReadOnly, List<CaseModel> cases)
+    private static string Emit(string? ns, string typeName, bool isReadOnly, List<CaseModel> cases, bool emitIsRetryable)
     {
         const string state = "__state";
         const string stateEnum = "__CaseState";
@@ -432,6 +436,13 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
         sb.AppendLine($"{body}where TProblem : global::Olve.Results.ResultProblem");
         sb.AppendLine($"{body}=> Problems?.PickProblems<TProblem>() ?? global::System.Linq.Enumerable.Empty<TProblem>();");
         sb.AppendLine();
+
+        if (emitIsRetryable)
+        {
+            sb.AppendLine($"{member}/// <summary>Whether this is an error state whose problems are all retryable.</summary>");
+            sb.AppendLine($"{member}public bool IsRetryable => Problems?.IsRetryable ?? false;");
+            sb.AppendLine();
+        }
 
         // Value equality — same state, and equal payloads on the active case. Inactive payload fields
         // are default for both operands, so comparing every payload field is correct (and cheap).

@@ -31,6 +31,13 @@ public readonly partial struct Result : IResultType
     public ResultProblemCollection? Problems { get; }
 
     /// <summary>
+    ///     Gets a value indicating whether the failure may be resolved by retrying:
+    ///     <see langword="true" /> if the result failed and all of its problems are retryable
+    ///     (see <see cref="ResultProblemCollection.IsRetryable" />); <see langword="false" /> on success.
+    /// </summary>
+    public bool IsRetryable => Problems?.IsRetryable ?? false;
+
+    /// <summary>
     ///     Gets a result representing success.
     /// </summary>
     public static Result Success() => new(problems: null);
@@ -59,7 +66,7 @@ public readonly partial struct Result : IResultType
     /// <summary>
     ///     Attempts to execute the specified action and returns a <see cref="Result"/>.
     ///     If an exception of type <typeparamref name="TException"/> is thrown, it is captured
-    ///     as a problem in the result.
+    ///     as a retryable problem in the result.
     /// </summary>
     /// <typeparam name="TException">The type of exception to catch.</typeparam>
     /// <param name="action">The action to execute.</param>
@@ -89,9 +96,45 @@ public readonly partial struct Result : IResultType
     }
 
     /// <summary>
+    ///     Attempts to execute the specified action and returns a <see cref="Result"/>.
+    ///     If an exception of type <typeparamref name="TException"/> is thrown, it is captured
+    ///     as a problem in the result whose <see cref="ResultProblem.IsRetryable"/> is <paramref name="retryable"/>.
+    /// </summary>
+    /// <typeparam name="TException">The type of exception to catch.</typeparam>
+    /// <param name="action">The action to execute.</param>
+    /// <param name="retryable">Whether a captured problem is retryable.</param>
+    /// <param name="message">
+    ///     An optional message providing additional context if an exception is thrown.
+    ///     Supports composite formatting.
+    /// </param>
+    /// <param name="args">Optional arguments for formatting the message.</param>
+    /// <returns>
+    ///     A successful result if no exception is thrown; otherwise, a failure result
+    ///     containing details of the caught exception.
+    /// </returns>
+    [DebuggerHidden]
+    public static Result Try<TException>(Action action, bool retryable, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string? message = null, params object[] args) where TException : Exception
+    {
+        try
+        {
+            action();
+        }
+        catch (TException exception)
+        {
+            StackFrame stackFrame = new(1, true);
+            return new ResultProblem(exception, message ?? string.Empty, args: args, stackFrame)
+            {
+                IsRetryable = retryable,
+            };
+        }
+
+        return Success();
+    }
+
+    /// <summary>
     ///     Attempts to execute the specified function and returns a <see cref="Result{TValue}"/>.
     ///     If an exception of type <typeparamref name="TException"/> is thrown, it is captured
-    ///     as a problem in the result.
+    ///     as a retryable problem in the result.
     /// </summary>
     /// <typeparam name="TValue">The type of value returned by the function.</typeparam>
     /// <typeparam name="TException">The type of exception to catch.</typeparam>
@@ -117,6 +160,42 @@ public readonly partial struct Result : IResultType
         {
             StackFrame stackFrame = new(1, true);
             return new ResultProblem(exception, message ?? string.Empty, args: args, stackFrame);
+        }
+    }
+
+    /// <summary>
+    ///     Attempts to execute the specified function and returns a <see cref="Result{TValue}"/>.
+    ///     If an exception of type <typeparamref name="TException"/> is thrown, it is captured
+    ///     as a problem in the result whose <see cref="ResultProblem.IsRetryable"/> is <paramref name="retryable"/>.
+    /// </summary>
+    /// <typeparam name="TValue">The type of value returned by the function.</typeparam>
+    /// <typeparam name="TException">The type of exception to catch.</typeparam>
+    /// <param name="action">The function to execute.</param>
+    /// <param name="retryable">Whether a captured problem is retryable.</param>
+    /// <param name="message">
+    ///     An optional message providing additional context if an exception is thrown.
+    ///     Supports composite formatting.
+    /// </param>
+    /// <param name="args">Optional arguments for formatting the message.</param>
+    /// <returns>
+    ///     A successful result containing the function's return value if no exception is thrown;
+    ///     otherwise, a failure result containing details of the caught exception.
+    /// </returns>
+    [DebuggerHidden]
+    public static Result<TValue> Try<TValue, TException>(Func<TValue> action, bool retryable, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string? message = null, params object[] args) where TException : Exception
+    {
+        try
+        {
+            var value = action();
+            return value;
+        }
+        catch (TException exception)
+        {
+            StackFrame stackFrame = new(1, true);
+            return new ResultProblem(exception, message ?? string.Empty, args: args, stackFrame)
+            {
+                IsRetryable = retryable,
+            };
         }
     }
 

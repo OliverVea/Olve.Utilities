@@ -267,4 +267,31 @@ public class ReadmeDemo
         await Assert.That(funds!.Shortfall).IsEqualTo(30m);
         await Assert.That(all.Count()).IsEqualTo(1);
     }
+
+    [Test]
+    public async Task RetryableProblems()
+    {
+        var timeout = new ResultProblem(new TimeoutException(), "Request timed out"); // IsRetryable: true
+        var invalid = new ResultProblem("Name is required"); // IsRetryable: false
+        var transient = new ResultProblem("Service unavailable") { IsRetryable = true };
+
+        Result result = new ResultProblemCollection(timeout, transient);
+        var retry = result.IsRetryable; // true: every problem is retryable
+
+        var mixed = new ResultProblemCollection(timeout, invalid).IsRetryable; // false: one problem is terminal
+
+        var inherited = result.Problems!.Prepend("Sync failed"); // new problem inherits: retryable
+        var terminal = result.Problems!.Prepend(false, "Sync failed"); // explicit: not retryable
+
+        var attempt = Result.Try<IOException>(
+            () => File.ReadAllText("/nonexistent/path.txt"),
+            retryable: false,
+            "Config file is missing");
+
+        await Assert.That(retry).IsTrue();
+        await Assert.That(mixed).IsFalse();
+        await Assert.That(inherited.IsRetryable).IsTrue();
+        await Assert.That(terminal.IsRetryable).IsFalse();
+        await Assert.That(attempt.IsRetryable).IsFalse();
+    }
 }
