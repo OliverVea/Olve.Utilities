@@ -12,22 +12,12 @@ namespace Olve.Utilities.Paginations;
 public readonly record struct OffsetPagination(int Offset, int Limit)
 {
     /// <summary>
-    ///     The limit <see cref="Clamp" /> uses when none is given.
-    /// </summary>
-    public const int DefaultLimit = Pagination.DefaultPageSize;
-
-    /// <summary>
-    ///     The largest limit <see cref="Validate" /> and <see cref="Clamp" /> accept by default.
-    /// </summary>
-    public const int DefaultMaxLimit = Pagination.DefaultMaxPageSize;
-
-    /// <summary>
     ///     Validates that <see cref="Offset" /> is not negative and that <see cref="Limit" /> is between 1 and
     ///     <paramref name="maxLimit" /> inclusive.
     /// </summary>
     /// <param name="maxLimit">The largest allowed limit.</param>
     /// <returns>A successful <see cref="Result" />, or a failure listing every violated rule.</returns>
-    public Result Validate(int maxLimit = DefaultMaxLimit) =>
+    public Result Validate(int maxLimit) =>
         PaginationRules.Validate(Offset, nameof(Offset), Limit, nameof(Limit), maxLimit);
 
     /// <summary>
@@ -42,7 +32,7 @@ public readonly record struct OffsetPagination(int Offset, int Limit)
     ///     <paramref name="maxLimit" /> is less than 1, or <paramref name="defaultLimit" /> is not between 1
     ///     and <paramref name="maxLimit" />.
     /// </exception>
-    public OffsetPagination Clamp(int defaultLimit = DefaultLimit, int maxLimit = DefaultMaxLimit)
+    public OffsetPagination Clamp(int defaultLimit, int maxLimit)
     {
         var (offset, limit) = PaginationRules.Clamp(Offset, Limit, defaultLimit, maxLimit);
         return new OffsetPagination(offset, limit);

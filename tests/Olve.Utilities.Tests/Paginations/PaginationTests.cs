@@ -9,6 +9,9 @@ namespace Olve.Utilities.Tests.Paginations;
 
 public class PaginationTests
 {
+    private const int DefaultPageSize = 20;
+    private const int MaxPageSize = 100;
+
     [Test]
     [Arguments(0, 0, 0, false)]
     [Arguments(0, 0, 1, true)]
@@ -35,10 +38,10 @@ public class PaginationTests
     [Test]
     [Arguments(0, 1)]
     [Arguments(3, 20)]
-    [Arguments(0, Pagination.DefaultMaxPageSize)]
+    [Arguments(0, MaxPageSize)]
     public async Task Validate_ValidValues_Succeeds(int page, int pageSize)
     {
-        var result = new Pagination(page, pageSize).Validate();
+        var result = new Pagination(page, pageSize).Validate(MaxPageSize);
 
         await Assert.That(result).Succeeded();
     }
@@ -47,10 +50,10 @@ public class PaginationTests
     [Arguments(-1, 20)]
     [Arguments(0, 0)]
     [Arguments(0, -1)]
-    [Arguments(0, Pagination.DefaultMaxPageSize + 1)]
+    [Arguments(0, MaxPageSize + 1)]
     public async Task Validate_InvalidValues_Fails(int page, int pageSize)
     {
-        var result = new Pagination(page, pageSize).Validate();
+        var result = new Pagination(page, pageSize).Validate(MaxPageSize);
 
         await Assert.That(result).Failed();
     }
@@ -58,7 +61,7 @@ public class PaginationTests
     [Test]
     public async Task Validate_BothValuesInvalid_ReportsBothProblems()
     {
-        var result = new Pagination(-1, 0).Validate();
+        var result = new Pagination(-1, 0).Validate(MaxPageSize);
 
         await Assert.That(result.Problems).IsNotNull();
         await Assert.That(result.Problems!.Count()).IsEqualTo(2);
@@ -76,18 +79,18 @@ public class PaginationTests
     [Test]
     [Arguments(3, 20, 3, 20)]
     [Arguments(-5, 20, 0, 20)]
-    [Arguments(1, 0, 1, Pagination.DefaultPageSize)]
-    [Arguments(1, -3, 1, Pagination.DefaultPageSize)]
-    [Arguments(1, 1000, 1, Pagination.DefaultMaxPageSize)]
-    public async Task Clamp_DefaultBounds_ReturnsValidPagination(int page,
+    [Arguments(1, 0, 1, DefaultPageSize)]
+    [Arguments(1, -3, 1, DefaultPageSize)]
+    [Arguments(1, 1000, 1, MaxPageSize)]
+    public async Task Clamp_ReturnsValidPagination(int page,
         int pageSize,
         int expectedPage,
         int expectedPageSize)
     {
-        var clamped = new Pagination(page, pageSize).Clamp();
+        var clamped = new Pagination(page, pageSize).Clamp(DefaultPageSize, MaxPageSize);
 
         await Assert.That(clamped).IsEqualTo(new Pagination(expectedPage, expectedPageSize));
-        await Assert.That(clamped.Validate()).Succeeded();
+        await Assert.That(clamped.Validate(MaxPageSize)).Succeeded();
     }
 
     [Test]
