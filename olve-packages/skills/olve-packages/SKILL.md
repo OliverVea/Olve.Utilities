@@ -21,7 +21,7 @@ API docs: https://olivervea.github.io/Olve.Utilities/
 | **Olve.Paths** | Cross-platform path manipulation inspired by Python's pathlib |
 | **Olve.Paths.Glob** | Glob pattern matching extension for Olve.Paths |
 | **Olve.Validation** | Fluent validation framework returning `Result` |
-| **Olve.Utilities** | Meta-package: typed IDs, collections, graphs, pagination, datetime formatting |
+| **Olve.Utilities** | Meta-package: typed IDs, collections, entity stores, graphs, pagination, datetime formatting |
 | **Olve.MinimalApi** | ASP.NET Minimal API extensions for Result mapping and validation filters |
 | **Olve.OpenRaster** | Read-only access to OpenRaster (.ora) layered image files |
 | **Olve.TinyEXR** | P/Invoke bindings for tinyexr OpenEXR library |
