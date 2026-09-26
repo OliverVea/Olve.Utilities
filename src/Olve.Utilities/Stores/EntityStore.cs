@@ -123,6 +123,13 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
     /// <summary>Returns whether an entity with <paramref name="id"/> is present.</summary>
     public bool Contains(TId id) => _entities.ContainsKey(id);
 
+    /// <summary>Creates a view of the entities ordered by <paramref name="comparer"/>, re-sorted after each change.</summary>
+    /// <remarks>
+    /// The caller owns the view: keep it for the store's lifetime, or dispose it when done (see
+    /// <see cref="EntityStore{T}.CreateIndex{TKey}"/>).
+    /// </remarks>
+    public EntityStoreOrderedView<T, TId> CreateOrderedView(IComparer<T> comparer) => new(this, comparer);
+
     /// <summary>
     /// Enumerates the entities as a live view: no copy and no locks, safe while other threads write, but
     /// not a moment-in-time snapshot — entities added or removed during enumeration may or may not appear.
