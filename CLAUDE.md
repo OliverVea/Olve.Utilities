@@ -6,7 +6,7 @@
 - PR descriptions link the issues they resolve with `Closes #N`, so issues don't outlive their fix.
 
 ## GitHub CLI
-- `gh issue view N` fails with a Projects (classic) deprecation error. Use `gh issue view N --json title,body,comments`.
+- `gh issue view N` and `gh pr edit N` fail with a Projects (classic) deprecation error. Use `gh issue view N --json title,body,comments`, and `gh api -X PATCH repos/OliverVea/Olve.Utilities/pulls/N` for PR edits.
 - Before working an issue, check recent commits for an existing fix (`git log --oneline -20`); issues can lag behind the code.
 
 ## Tests
