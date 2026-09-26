@@ -1,3 +1,9 @@
+## v0.52.0 (2026-09-26)
+
+### Feat
+
+- **results**: add IsRetryable to problems
+
 ## v0.51.0 (2026-09-26)
 
 ### Feat
