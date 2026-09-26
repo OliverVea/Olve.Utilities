@@ -136,24 +136,38 @@ public class EntityStoreIndexTests
     }
 
     [Test]
-    public async Task Dispose_LetsIndexBeCollectedWhileStoreLives()
+    public async Task UndisposedIndex_IsCollectedWhileStoreLives()
     {
         var store = new EntityStore<Item>([]);
 
-        var disposed = CreateIndex(store, dispose: true);
-        var kept = CreateIndex(store, dispose: false);
+        var index = CreateUndisposedIndex(store, () => { });
         CollectGarbage();
 
-        await Assert.That(disposed.IsAlive).IsFalse();
-        await Assert.That(kept.IsAlive).IsTrue(); // the store's subscriptions keep an undisposed index alive
+        await Assert.That(index.IsAlive).IsFalse();
         GC.KeepAlive(store);
     }
 
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    private static WeakReference CreateIndex(EntityStore<Item> store, bool dispose)
+    [Test]
+    public async Task CollectedIndex_StopsRunningOnWrites()
     {
-        var index = store.CreateIndex(s => s.Group);
-        if (dispose) index.Dispose();
+        var store = new EntityStore<Item>([]);
+        var selectorCalls = 0;
+
+        CreateUndisposedIndex(store, () => selectorCalls++);
+        CollectGarbage();
+        store.Set(ItemIn("a"));
+
+        await Assert.That(selectorCalls).IsEqualTo(0);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static WeakReference CreateUndisposedIndex(EntityStore<Item> store, Action onSelect)
+    {
+        var index = store.CreateIndex(s =>
+        {
+            onSelect();
+            return s.Group;
+        });
         return new WeakReference(index);
     }
 
@@ -235,5 +249,68 @@ public class EntityStoreIndexTests
         await Assert.That(index.ContainsKey("a")).IsFalse();
         await Assert.That(index.GetForKey("b")).Contains(item.Id);
     }
-}
 
+    [Test]
+    public async Task Mutate_ChangingKey_MovesId()
+    {
+        var store = new EntityStore<Item>([]);
+        var index = store.CreateIndex(s => s.Group);
+        var item = ItemIn("a");
+        store.Set(item);
+
+        store.Mutate(item.Id, s => s with { Group = "b" });
+
+        await Assert.That(index.ContainsKey("a")).IsFalse();
+        await Assert.That(index.GetForKey("b")).Contains(item.Id);
+    }
+
+    [Test]
+    public async Task Mutate_KeepingKey_DoesNotReadTheStore()
+    {
+        var store = new EntityStore<Item>([]);
+        var item = ItemIn("a");
+        store.Set(item);
+        var selectorCalls = 0;
+        var index = store.CreateIndex(s =>
+        {
+            selectorCalls++;
+            return s.Group;
+        });
+        selectorCalls = 0;
+
+        store.Mutate(item.Id, s => s with { Name = "renamed" });
+
+        // Only the before/after filter ran; a reconcile would have called the selector a third time.
+        await Assert.That(selectorCalls).IsEqualTo(2);
+        await Assert.That(index.GetForKey("a")).Contains(item.Id);
+    }
+
+    [Test]
+    public async Task CreateIndex_OverIdStore_ReturnsShorthandTypes()
+    {
+        // Consumers declare index fields with the two-argument shorthand; this must keep compiling.
+        var store = new EntityStore<Item>([]);
+        EntityStoreIndex<Item, string> byGroup = store.CreateIndex(s => s.Group);
+        EntityStoreUniqueIndex<Item, string> byName = store.CreateUniqueIndex(s => s.Name);
+        var item = ItemIn("a");
+
+        store.Set(item);
+
+        await Assert.That(byGroup.GetForKey("a")).Contains(item.Id);
+        await Assert.That(byName.ContainsKey(item.Name)).IsTrue();
+    }
+
+    [Test]
+    public async Task CreateIndex_OverNonIdStore_Works()
+    {
+        var store = new EntityStore<Slime, ShortId<Slime>>([]);
+        var index = store.CreateIndex(s => s.Colour);
+        var slime = new Slime(new ShortId<Slime>(1), "green");
+
+        store.Set(slime);
+
+        await Assert.That(index.GetForKey("green")).Contains(slime.Id);
+    }
+
+    private record Slime(ShortId<Slime> Id, string Colour) : IHasId<ShortId<Slime>>;
+}

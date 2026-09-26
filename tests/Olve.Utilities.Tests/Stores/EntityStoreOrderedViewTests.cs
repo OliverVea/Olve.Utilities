@@ -102,11 +102,11 @@ public class EntityStoreOrderedViewTests
     }
 
     [Test]
-    public async Task Dispose_LetsViewBeCollectedWhileStoreLives()
+    public async Task UndisposedView_IsCollectedWhileStoreLives()
     {
         EntityStore<Item> store = [Ranked(1)];
 
-        var view = CreateDisposedView(store);
+        var view = CreateUndisposedView(store);
         GC.Collect();
         GC.WaitForPendingFinalizers();
         GC.Collect();
@@ -116,10 +116,10 @@ public class EntityStoreOrderedViewTests
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static WeakReference CreateDisposedView(EntityStore<Item> store)
+    private static WeakReference CreateUndisposedView(EntityStore<Item> store)
     {
         var view = store.CreateOrderedView(ByRank);
-        view.Dispose();
+        _ = view.Count;
         return new WeakReference(view);
     }
 }

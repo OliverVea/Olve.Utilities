@@ -12,9 +12,14 @@ namespace Olve.Utilities.Stores;
 /// A mutable, observable in-memory store of entities keyed by <see cref="Id{T}"/>. It is the
 /// mutable, eventful sibling of <see cref="IdFrozenLookup{T,TId}"/>: reads and writes are concurrent
 /// (a <see cref="ConcurrentDictionary{TKey,TValue}"/> backs it, and <see cref="Mutate"/> uses
-/// compare-and-swap), and every change fires a synchronous <see cref="Event{T}"/> so secondary
-/// indexes stay consistent with the store.
+/// compare-and-swap), and every change fires a synchronous <see cref="Event{T}"/> carrying the
+/// committed values, so secondary indexes stay consistent with the store.
 /// </summary>
+/// <remarks>
+/// Entities must be immutable values (records, changed with <c>with</c>): event payloads and readers share
+/// the stored instance. Events for the same id can arrive out of order across threads; see
+/// <see cref="IEntityStore{T,TId}"/>.
+/// </remarks>
 /// <typeparam name="T">The entity type, which must expose a <typeparamref name="TId"/>.</typeparam>
 /// <typeparam name="TId">The identifier type.</typeparam>
 [CollectionBuilder(typeof(EntityStoreBuilder), nameof(EntityStoreBuilder.Create))]
@@ -23,6 +28,9 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
     where TId : notnull
 {
     private readonly ConcurrentDictionary<TId, T> _entities;
+
+    // Kept alongside the dictionary: ConcurrentDictionary.Count takes every internal lock.
+    private int _count;
 
     /// <summary>Creates an empty store.</summary>
     public EntityStore() : this([])
@@ -33,20 +41,22 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
     public EntityStore(IEnumerable<T> initialEntities)
     {
         _entities = new(initialEntities.Select(e => new KeyValuePair<TId, T>(e.Id, e)));
+        _count = _entities.Count;
     }
 
     /// <summary>Fires after an entity not previously present is added via <see cref="Set"/> or <see cref="TryAdd"/>.</summary>
-    public Event<TId> OnAdded { get; } = new();
+    public Event<EntityAdded<T, TId>> OnAdded { get; } = new();
 
     /// <summary>Fires after an existing entity changes via <see cref="Set"/> or <see cref="Mutate"/>.</summary>
-    public Event<TId> OnUpdated { get; } = new();
+    public Event<EntityUpdated<T, TId>> OnUpdated { get; } = new();
 
     /// <summary>Fires after an entity is removed via <see cref="Delete"/>.</summary>
-    public Event<TId> OnDeleted { get; } = new();
+    public Event<EntityDeleted<T, TId>> OnDeleted { get; } = new();
 
     /// <summary>
     /// Inserts or replaces <paramref name="entity"/>, firing <see cref="OnAdded"/> when it is new or
-    /// <see cref="OnUpdated"/> when it replaces an existing entity.
+    /// <see cref="OnUpdated"/> when it replaces a different value. Writing a value equal to the current
+    /// one is a no-op and fires nothing, as with <see cref="Mutate"/>.
     /// </summary>
     public void Set(T entity)
     {
@@ -58,14 +68,20 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
         {
             if (_entities.TryAdd(id, entity))
             {
-                OnAdded.Invoke(id);
+                Interlocked.Increment(ref _count);
+                OnAdded.Invoke(new(id, entity));
                 return;
             }
 
-            if (_entities.TryGetValue(id, out var current) && _entities.TryUpdate(id, entity, current))
+            if (_entities.TryGetValue(id, out var current))
             {
-                OnUpdated.Invoke(id);
-                return;
+                if (EqualityComparer<T>.Default.Equals(current, entity)) return;
+
+                if (_entities.TryUpdate(id, entity, current))
+                {
+                    OnUpdated.Invoke(new(id, current, entity));
+                    return;
+                }
             }
             // removed or replaced between the two calls; retry
         }
@@ -80,7 +96,8 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
     {
         if (!_entities.TryAdd(entity.Id, entity)) return false;
 
-        OnAdded.Invoke(entity.Id);
+        Interlocked.Increment(ref _count);
+        OnAdded.Invoke(new(entity.Id, entity));
         return true;
     }
 
@@ -98,9 +115,6 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
     /// <see cref="OnUpdated"/> exactly once on a real change, never on a no-op or a missing entity.
     /// Fails if the entity does not exist, or if the CAS could not commit within
     /// <see cref="MaxMutateAttempts"/> attempts (the caller may retry the latter).
-    ///
-    /// MUST NOT change a value any index keys on — indexes track only <see cref="OnAdded"/>/
-    /// <see cref="OnDeleted"/> by design. For a key change, use <see cref="Delete"/>+<see cref="Set"/>.
     /// </summary>
     public Result Mutate(TId id, Func<T, T> mutate)
     {
@@ -115,7 +129,7 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
 
             if (_entities.TryUpdate(id, updated, current))
             {
-                OnUpdated.Invoke(id);
+                OnUpdated.Invoke(new(id, current, updated));
                 return Result.Success();
             }
             // lost the CAS race; another writer moved it — re-read and retry
@@ -129,40 +143,42 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
     /// <summary>Gets the entity with <paramref name="id"/>, returning <see langword="false"/> if absent.</summary>
     public bool TryGet(TId id, [NotNullWhen(true)] out T? entity) => _entities.TryGetValue(id, out entity);
 
-    /// <summary>Gets the number of entities currently in the store.</summary>
-    public int Count => _entities.Count;
+    /// <summary>
+    /// Gets the number of entities currently in the store. Lock-free; while other threads write it may
+    /// briefly lag a write that has already committed.
+    /// </summary>
+    // A delete can decrement before the matching add increments, so the raw counter may dip below zero.
+    public int Count => Math.Max(0, Volatile.Read(ref _count));
 
-    /// <summary>Returns a snapshot of all entities currently in the store.</summary>
-    public IReadOnlyList<T> List() => _entities.Values.ToList();
+    /// <summary>
+    /// Returns a copy of the entities currently in the store. Lock-free, so like enumeration it is not a
+    /// moment-in-time snapshot while other threads write.
+    /// </summary>
+    public IReadOnlyList<T> List()
+    {
+        var list = new List<T>(Count);
+        foreach (var entry in _entities) list.Add(entry.Value);
+        return list;
+    }
 
     /// <summary>Removes the entity with <paramref name="id"/>, firing <see cref="OnDeleted"/> on success.</summary>
     public DeletionResult Delete(TId id)
     {
-        if (!_entities.TryRemove(id, out _))
+        if (!_entities.TryRemove(id, out var removed))
             return DeletionResult.NotFound();
 
-        OnDeleted.Invoke(id);
+        Interlocked.Decrement(ref _count);
+        OnDeleted.Invoke(new(id, removed));
         return DeletionResult.Success();
     }
 
     /// <summary>Returns whether an entity with <paramref name="id"/> is present.</summary>
     public bool Contains(TId id) => _entities.ContainsKey(id);
 
-    /// <summary>Creates a view of the entities ordered by <paramref name="comparer"/>, re-sorted after each change.</summary>
-    /// <remarks>
-    /// The caller owns the view: keep it for the store's lifetime, or dispose it when done (see
-    /// <see cref="EntityStore{T}.CreateIndex{TKey}"/>).
-    /// </remarks>
-    public EntityStoreOrderedView<T, TId> CreateOrderedView(IComparer<T> comparer) => new(this, comparer);
-
-    /// <summary>Creates dense per-entity columns that follow this store's membership; see <see cref="EntityStoreColumns{T,TId}"/>.</summary>
-    /// <remarks>The caller owns the columns: keep them for the store's lifetime, or dispose them when done.</remarks>
-    public EntityStoreColumns<T, TId> CreateColumns() => new(this);
-
     /// <summary>
     /// Enumerates the entities as a live view: no copy and no locks, safe while other threads write, but
     /// not a moment-in-time snapshot — entities added or removed during enumeration may or may not appear.
-    /// Use <see cref="List"/> for a snapshot.
+    /// <see cref="List"/> copies it.
     /// </summary>
     public IEnumerator<T> GetEnumerator() => _entities.Select(entry => entry.Value).GetEnumerator();
 
@@ -171,7 +187,7 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
 
 /// <summary>
 /// An <see cref="EntityStore{T,TId}"/> keyed by <see cref="Id{T}"/> — the default for durable,
-/// globally-identified entities. Secondary indexes hang off this shape.
+/// globally-identified entities.
 /// </summary>
 /// <typeparam name="T">The entity type, which must expose an <see cref="Id{T}"/>.</typeparam>
 [CollectionBuilder(typeof(EntityStoreBuilder), nameof(EntityStoreBuilder.Create))]
@@ -182,21 +198,4 @@ public class EntityStore<T>(IEnumerable<T> initialEntities) : EntityStore<T, Id<
     public EntityStore() : this([])
     {
     }
-
-    /// <summary>Creates a secondary index grouping entity ids by <paramref name="keySelector"/>.</summary>
-    /// <remarks>
-    /// The index subscribes to this store's events, so the store keeps it alive. The caller owns it:
-    /// keep it for the store's lifetime, or dispose it when done. An index built per use and never
-    /// disposed leaks, and every stale index still runs on each add and delete.
-    /// </remarks>
-    public EntityStoreIndex<T, TKey> CreateIndex<TKey>(Func<T, TKey> keySelector) where TKey : notnull
-        => new(this, keySelector);
-
-    /// <summary>Creates a secondary unique index mapping each key to a single id.</summary>
-    /// <remarks>
-    /// The caller owns the index: keep it for the store's lifetime, or dispose it when done (see
-    /// <see cref="CreateIndex{TKey}"/>).
-    /// </remarks>
-    public EntityStoreUniqueIndex<T, TKey> CreateUniqueIndex<TKey>(Func<T, TKey> keySelector) where TKey : notnull
-        => new(this, keySelector);
 }

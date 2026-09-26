@@ -4,7 +4,7 @@ using Olve.Utilities.Lookup;
 namespace Olve.Utilities.Stores;
 
 /// <summary>
-/// A read-only view of an <see cref="EntityStore{T,TId}"/>'s entities, ordered by an
+/// A read-only view of an <see cref="IEntityStore{T,TId}"/>'s entities, ordered by an
 /// <see cref="IComparer{T}"/>. The sorted array is cached until the store changes; the next read
 /// after an add, update or delete re-sorts.
 /// </summary>
@@ -17,8 +17,9 @@ namespace Olve.Utilities.Stores;
 /// see different snapshots if the store changes in between.
 /// </para>
 /// <para>
-/// Lifetime: the view subscribes to the store's events, so the store keeps it alive. Dispose it to
-/// unsubscribe, or keep it for the store's lifetime.
+/// Lifetime: the store does not keep the view alive. Keep a reference for as long as you read it;
+/// once it is unreachable it is collected and stops tracking the store. Dispose it to stop tracking
+/// immediately.
 /// </para>
 /// </remarks>
 /// <typeparam name="T">The entity type.</typeparam>
@@ -29,20 +30,24 @@ public sealed class EntityStoreOrderedView<T, TId> : IReadOnlyList<T>, IDisposab
 {
     private sealed record Snapshot(T[] Values, long Version);
 
-    private readonly EntityStore<T, TId> _store;
+    private readonly IEntityStore<T, TId> _store;
     private readonly IComparer<T> _comparer;
+    private readonly IDisposable[] _subscriptions;
     private long _version;
     private Snapshot? _snapshot;
     private int _disposed;
 
-    internal EntityStoreOrderedView(EntityStore<T, TId> store, IComparer<T> comparer)
+    internal EntityStoreOrderedView(IEntityStore<T, TId> store, IComparer<T> comparer)
     {
         _store = store;
         _comparer = comparer;
 
-        store.OnAdded.Subscribe(Invalidate);
-        store.OnUpdated.Subscribe(Invalidate);
-        store.OnDeleted.Subscribe(Invalidate);
+        _subscriptions =
+        [
+            store.OnAdded.SubscribeWeak(this, static (view, _) => view.Invalidate()),
+            store.OnUpdated.SubscribeWeak(this, static (view, _) => view.Invalidate()),
+            store.OnDeleted.SubscribeWeak(this, static (view, _) => view.Invalidate()),
+        ];
     }
 
     /// <summary>
@@ -53,9 +58,7 @@ public sealed class EntityStoreOrderedView<T, TId> : IReadOnlyList<T>, IDisposab
     {
         if (Interlocked.Exchange(ref _disposed, 1) == 1) return;
 
-        _store.OnAdded.Unsubscribe(Invalidate);
-        _store.OnUpdated.Unsubscribe(Invalidate);
-        _store.OnDeleted.Unsubscribe(Invalidate);
+        foreach (var subscription in _subscriptions) subscription.Dispose();
     }
 
     /// <summary>Gets the number of entities in the current ordered snapshot.</summary>
@@ -69,7 +72,7 @@ public sealed class EntityStoreOrderedView<T, TId> : IReadOnlyList<T>, IDisposab
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    private void Invalidate(TId _) => Interlocked.Increment(ref _version);
+    private void Invalidate() => Interlocked.Increment(ref _version);
 
     private T[] GetOrderedValues()
     {

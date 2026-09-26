@@ -14,17 +14,14 @@ using Olve.Utilities.Stores;
 public record Train(Id<Train> Id, Id<Line> LineId, string Name) : IHasId<Id<Train>>;
 ```
 
-## Ownership rule: dispose indexes and views
+## Lifetime: keep indexes and views in a field
 
-`CreateIndex`, `CreateUniqueIndex` and `CreateOrderedView` subscribe to the store's events, so **the store keeps them alive**. The caller owns each one and must either:
+`CreateIndex`, `CreateUniqueIndex`, `CreateOrderedView` and `CreateColumns` (extension methods on any `IEntityStore<T, TId>`) subscribe to the store **weakly**: the store does not keep them alive. Keep a reference for as long as you read one, typically in a field next to the store. Once it is unreachable, it is garbage-collected and each of its subscriptions is dropped the next time that event fires. `Dispose()` unsubscribes immediately; afterwards it stays readable but frozen. `Dispose()` is idempotent.
 
-- keep it for the store's lifetime (create once, e.g. alongside a singleton store), or
-- `Dispose()` it when done (`using var view = ...`).
-
-Creating one per request/call and never disposing it leaks: every stale index stays reachable from the store, and all of them still run on every add/delete. This caused a production OOM. After `Dispose()` the index/view stays readable but frozen at its last state. `Dispose()` is idempotent.
+Creating one per call no longer leaks, but each one re-reads the whole store on creation and keeps running on every write until the next GC, so it is still wasteful.
 
 ```csharp
-// Good: built once, lives as long as the store
+// Good: built once, lives as long as the repository
 public sealed class TrainRepository
 {
     private readonly EntityStore<Train> _trains = [];
@@ -33,16 +30,27 @@ public sealed class TrainRepository
     public TrainRepository() => _byLine = _trains.CreateIndex(t => t.LineId);
 }
 
-// Good: short-lived, disposed
-using var ordered = trains.CreateOrderedView(Comparer<Train>.Create((a, b) => string.CompareOrdinal(a.Name, b.Name)));
-
-// BAD: new index per call, never disposed -> leak
+// Wasteful: rebuilt from the whole store on every call
 IReadOnlyCollection<Id<Train>> TrainsOn(Id<Line> line) => trains.CreateIndex(t => t.LineId).GetForKey(line);
 ```
 
-## Never change an indexed key in place
+## Entities are immutable; events carry committed values
 
-Indexes subscribe only to `OnAdded`/`OnDeleted`, not `OnUpdated`, by design. So neither `Mutate` nor a `Set` that replaces an existing entity may change a value an index keys on; the index would keep the stale key. To change an indexed key, `Delete` then `Set`. (Ordered views do re-sort on update.)
+Entities are immutable values: records, changed with `with`. Event payloads hand every subscriber the instance the store holds, so mutating one in place would change it for everyone.
+
+| Event | Payload | Fired by |
+|---|---|---|
+| `OnAdded` | `EntityAdded<T, TId>(Id, Entity)` | `Set` or `TryAdd` of a new id |
+| `OnUpdated` | `EntityUpdated<T, TId>(Id, Before, After)` | `Set` of a different value, or a `Mutate` that changed something |
+| `OnDeleted` | `EntityDeleted<T, TId>(Id, Entity)` | `Delete` that removed something; `Entity` is the removed value |
+
+- Events fire **after** the write. There is no pre-delete hook: decide whether to delete before calling `Delete`.
+- Each payload is exactly what that write committed, but events for the same id can arrive **out of order across threads**. State derived from the store should re-read it (as indexes, views and columns do) rather than apply payloads in arrival order.
+- Writing a value equal to the current one (`Set` or `Mutate`) is a no-op and fires nothing.
+
+## Indexes follow key changes
+
+Indexes subscribe to `OnUpdated` and skip updates whose `Before` and `After` share a key, without taking a lock; any other update moves the id. So `Mutate` and a replacing `Set` may change an indexed key. The key selector runs twice per update, so keep it pure and cheap.
 
 ## EntityStore\<T, TId\> / EntityStore\<T\>
 
@@ -53,21 +61,19 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
     public EntityStore();
     public EntityStore(IEnumerable<T> initialEntities);
 
-    public Event<TId> OnAdded { get; }     // Set or TryAdd of a new id
-    public Event<TId> OnUpdated { get; }   // Set of an existing id, or a Mutate that changed something
-    public Event<TId> OnDeleted { get; }   // Delete that removed something
+    public Event<EntityAdded<T, TId>> OnAdded { get; }
+    public Event<EntityUpdated<T, TId>> OnUpdated { get; }
+    public Event<EntityDeleted<T, TId>> OnDeleted { get; }
 
-    public void Set(T entity);                        // insert or replace
+    public void Set(T entity);                        // insert or replace; equal value is a no-op
     public bool TryAdd(T entity);                     // insert only if absent (atomic); OnAdded on success
     public Result Mutate(TId id, Func<T, T> mutate);  // atomic read-modify-write (compare-and-swap)
     public bool TryGet(TId id, [NotNullWhen(true)] out T? entity);
     public bool Contains(TId id);
-    public int Count { get; }
-    public IReadOnlyList<T> List();                   // snapshot copy
+    public int Count { get; }                         // lock-free counter
+    public IReadOnlyList<T> List();                   // lock-free copy; not a moment-in-time snapshot under concurrent writes
     public DeletionResult Delete(TId id);             // Success or NotFound
     public IEnumerator<T> GetEnumerator();            // live view: no copy, no lock, not a snapshot
-
-    public EntityStoreOrderedView<T, TId> CreateOrderedView(IComparer<T> comparer);
 }
 
 // Id<T>-keyed store: the default for durable, globally-identified entities
@@ -75,12 +81,18 @@ public class EntityStore<T>(IEnumerable<T> initialEntities) : EntityStore<T, Id<
     where T : IHasId<Id<T>>
 {
     public EntityStore();
-    public EntityStoreIndex<T, TKey> CreateIndex<TKey>(Func<T, TKey> keySelector) where TKey : notnull;
-    public EntityStoreUniqueIndex<T, TKey> CreateUniqueIndex<TKey>(Func<T, TKey> keySelector) where TKey : notnull;
+}
+
+// Factories, on any IEntityStore<T, TId>
+public static class EntityStoreExtensions
+{
+    CreateIndex(keySelector)        // EntityStoreIndex<T, TKey> for Id<T> stores, else EntityStoreIndex<T, TId, TKey>
+    CreateUniqueIndex(keySelector)  // EntityStoreUniqueIndex<T, TKey> / EntityStoreUniqueIndex<T, TId, TKey>
+    CreateOrderedView(comparer)     // EntityStoreOrderedView<T, TId>
+    CreateColumns()                 // EntityStoreColumns<T, TId>
 }
 ```
 
-- Indexes exist only on `EntityStore<T>` (keyed by `Id<T>`). `CreateOrderedView` works on any `EntityStore<T, TId>`.
 - Both support collection expressions: `EntityStore<Train> trains = [];` or `[train1, train2]`.
 - `Mutate`'s delegate may run more than once under contention, so it must be pure (use a `with` expression, no side effects). It returns a failure if the id is missing or the compare-and-swap loses 10 times in a row. A no-op mutation (result equals the current value) fires nothing.
 - `Mutate` returns `Result` and `Delete` returns `DeletionResult`; both are `[MustBeUsedWhenReturned]` (ORES001), so check them or discard explicitly.
@@ -106,20 +118,20 @@ if (trains.Delete(id).WasNotFound) { /* already gone */ }
 
 ## IEntityStore\<T, TId\>
 
-The entity-at-a-time surface: `OnAdded`/`OnUpdated`/`OnDeleted`, `Set`, `Mutate`, `TryGet`, `Count`, `List`, `Delete`, `Contains`. No enumeration and no index/view factories. `TId` is typically `Id<T>` or `ShortId<T>`.
+The entity-at-a-time surface: `OnAdded`/`OnUpdated`/`OnDeleted`, `Set`, `TryAdd`, `Mutate`, `TryGet`, `Count`, `List`, `Delete`, `Contains`. No enumeration. Index/view factories are extension methods on it. `TId` is typically `Id<T>` or `ShortId<T>`.
 
 ```csharp
 IEntityStore<Slime, ShortId<Slime>> slimes = new EntityStore<Slime, ShortId<Slime>>();
 ```
 
-## EntityStoreIndex\<T, TKey\>
+## EntityStoreIndex\<T, TId, TKey\> / EntityStoreIndex\<T, TKey\>
 
-Non-unique secondary index: key -> set of ids.
+Non-unique secondary index: key -> set of ids. `EntityStoreIndex<T, TKey>` is the `Id<T>` shorthand. Reads are lock-free.
 
 ```csharp
-public sealed class EntityStoreIndex<T, TKey> : IDisposable
+public class EntityStoreIndex<T, TId, TKey> : IDisposable
 {
-    public IReadOnlyCollection<Id<T>> GetForKey(TKey key);  // immutable snapshot, safe to enumerate lock-free
+    public IReadOnlyCollection<TId> GetForKey(TKey key);  // immutable snapshot, safe to enumerate lock-free
     public bool ContainsKey(TKey key);
     public void Dispose();
 }
@@ -134,14 +146,14 @@ foreach (var trainId in _byLine.GetForKey(lineId))
 }
 ```
 
-## EntityStoreUniqueIndex\<T, TKey\>
+## EntityStoreUniqueIndex\<T, TId, TKey\> / EntityStoreUniqueIndex\<T, TKey\>
 
-Key -> single id.
+Key -> single id. `EntityStoreUniqueIndex<T, TKey>` is the `Id<T>` shorthand. Reads are lock-free.
 
 ```csharp
-public sealed class EntityStoreUniqueIndex<T, TKey> : IDisposable
+public class EntityStoreUniqueIndex<T, TId, TKey> : IDisposable
 {
-    public bool TryGet(TKey key, out Id<T> id);
+    public bool TryGet(TKey key, out TId id);
     public bool ContainsKey(TKey key);
     public void Dispose();
 }
@@ -153,6 +165,18 @@ Does **not** enforce uniqueness: adding a second entity with the same key silent
 
 `IReadOnlyList<T>` over the store, sorted by the comparer. The sorted array is cached and rebuilt on the next read after any add, update or delete. Each read returns an immutable snapshot, so `foreach` is consistent, but separate `Count` and indexer calls may see different snapshots.
 
+## EntityStoreColumns\<T, TId\>
+
+Dense per-entity values for hot loops: one row per entity, one contiguous array per column. Rows follow store membership (added on add, swap-removed on delete); values are owned by the columns and ignore `OnUpdated`. Store events only queue ids; call `Sync()` on the owner thread (e.g. once per frame) to apply them.
+
+```csharp
+var columns = trains.CreateColumns();
+var position = columns.AddColumn(t => t.Position);   // initial value per row
+columns.Sync();
+var ids = columns.Ids;                               // ReadOnlySpan<TId>, row order
+foreach (ref var p in position.Values) p += 1f;     // Span<TValue>, valid until the next Sync
+```
+
 ## Event\<T\> and EventDispatch
 
 ```csharp
@@ -161,6 +185,13 @@ public class Event<T>
     public void Invoke(T message);             // synchronous, in registration order, never throws
     public void Subscribe(Action<T> handler);
     public void Unsubscribe(Action<T> handler);
+}
+
+public class Event                             // same semantics, Action handlers, no message
+{
+    public void Invoke();
+    public void Subscribe(Action handler);
+    public void Unsubscribe(Action handler);
 }
 
 public static class EventDispatch

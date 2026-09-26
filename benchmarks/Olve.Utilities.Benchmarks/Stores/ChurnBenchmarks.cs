@@ -40,16 +40,15 @@ public class ChurnBenchmarks
         _concurrentStore = new EntityStore<Train>();
         _concurrentPositions = new();
         _concurrentSpeeds = new();
-        _concurrentStore.OnAdded.Subscribe(id =>
+        _concurrentStore.OnAdded.Subscribe(e =>
         {
-            if (!_concurrentStore.TryGet(id, out var train)) return;
-            _concurrentPositions[id] = train.Position;
-            _concurrentSpeeds[id] = train.Speed;
+            _concurrentPositions[e.Id] = e.Entity.Position;
+            _concurrentSpeeds[e.Id] = e.Entity.Speed;
         });
-        _concurrentStore.OnDeleted.Subscribe(id =>
+        _concurrentStore.OnDeleted.Subscribe(e =>
         {
-            _concurrentPositions.TryRemove(id, out _);
-            _concurrentSpeeds.TryRemove(id, out _);
+            _concurrentPositions.TryRemove(e.Id, out _);
+            _concurrentSpeeds.TryRemove(e.Id, out _);
         });
         _concurrentLive = new Queue<Id<Train>>();
 

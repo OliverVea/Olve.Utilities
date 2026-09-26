@@ -35,7 +35,7 @@ Installing `Olve.Utilities` also brings in:
 | **Collections** | `BidirectionalDictionary<T1, T2>`, `FixedSizeQueue<T>`, `OneToManyLookup<TLeft, TRight>`, `ManyToManyLookup<TLeft, TRight>` | Specialized collection types with `TryGet` pattern lookups |
 | **DateTime** | `DateTimeFormatter` | Human-readable relative time formatting |
 | **Pagination** | `Pagination`, `Page<T>`, `OffsetPagination`, `Slice<T>` | Page-number and offset/limit pagination with result wrappers |
-| **Stores** | `EntityStore<T>`, `EntityStoreIndex<T, TKey>`, `EntityStoreUniqueIndex<T, TKey>`, `EntityStoreOrderedView<T, TId>`, `Event<T>` | Concurrent, observable in-memory entity store with secondary indexes and ordered views |
+| **Stores** | `EntityStore<T>`, `EntityStoreIndex<T, TKey>`, `EntityStoreUniqueIndex<T, TKey>`, `EntityStoreOrderedView<T, TId>`, `EntityStoreColumns<T, TId>`, `Event<T>`, `Event` | Concurrent, observable in-memory entity store with secondary indexes, ordered views and dense columns |
 | **Graphs** | `DirectedGraph`, `Node`, `DirectedEdge` | ID-based directed graph with node/edge management |
 | **Builders** | `IBuilder<T>`, `BuilderExtensions` | Builder pattern interface with validation integration |
 | **Sentinel types** | `NotFound`, `Success`, `AlreadyExists`, `Waiting`, `Skipped`, `Yes`, `Any` | Zero-size marker types for use with `OneOf<T>` discriminated unions |
@@ -225,28 +225,33 @@ fromPage.TryToPagination(out var pagination); // true, pagination == Pagination 
 
 ### EntityStore
 
-`EntityStore<T>` is a concurrent, observable in-memory store keyed by `Id<T>`. Every change fires `OnAdded`, `OnUpdated` or `OnDeleted`, which keeps secondary indexes (`CreateIndex`, `CreateUniqueIndex`) and ordered views (`CreateOrderedView`) in sync with the store.
+`EntityStore<T>` is a concurrent, observable in-memory store keyed by `Id<T>`. Every change fires `OnAdded`, `OnUpdated` or `OnDeleted` with the committed values (`EntityAdded`, `EntityUpdated` with `Before`/`After`, `EntityDeleted`), which keeps secondary indexes (`CreateIndex`, `CreateUniqueIndex`), ordered views (`CreateOrderedView`) and columns (`CreateColumns`) in sync with any `IEntityStore<T, TId>`.
 
-Indexes and views subscribe to the store's events, so the store keeps them alive. Dispose them when you're done, or keep them for the store's lifetime. One built per request and never disposed is a memory leak.
+Entities are immutable values: use records and change them with `with`. Events fire after the write, and events for the same id can arrive out of order across threads, so derived state should re-read the store rather than trust arrival order.
+
+The store doesn't keep indexes and views alive: hold them for as long as you read them. One that becomes unreachable is garbage-collected and stops tracking the store; `Dispose()` stops it immediately.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L225-L240
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L225-L243
 
 // record Train(Id<Train> Id, string Line, int Order) : IHasId<Id<Train>>;
 EntityStore<Train> trains = [];
 
-// Indexes and views subscribe to the store: dispose them, or keep them for the store's lifetime
-using var byLine = trains.CreateIndex(t => t.Line);
-using var byOrder = trains.CreateOrderedView(Comparer<Train>.Create((a, b) => a.Order.CompareTo(b.Order)));
+// Keep indexes and views as long as you read them, e.g. in a field next to the store
+var byLine = trains.CreateIndex(t => t.Line);
+var byOrder = trains.CreateOrderedView(Comparer<Train>.Create((a, b) => a.Order.CompareTo(b.Order)));
+
+// Events carry the committed values
+trains.OnDeleted.Subscribe(e => Console.WriteLine($"{e.Entity.Line} train removed"));
 
 var express = new Train(Id.New<Train>(), "red", 2);
 trains.Set(express);
 trains.Set(new Train(Id.New<Train>(), "red", 1));
 
-// Mutate is an atomic read-modify-write; it must not change a key an index uses (Line here)
-var mutated = trains.Mutate(express.Id, t => t with { Order = 3 });
+// Mutate is an atomic read-modify-write; indexes follow key changes
+var mutated = trains.Mutate(express.Id, t => t with { Line = "blue", Order = 3 });
 
-var redTrains = byLine.GetForKey("red"); // 2 ids
+var redTrains = byLine.GetForKey("red"); // 1 id
 var first = byOrder[0]; // the Order = 1 train
 ```
 

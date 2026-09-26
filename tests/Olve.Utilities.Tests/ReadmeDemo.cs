@@ -225,22 +225,25 @@ public class ReadmeDemo
         // record Train(Id<Train> Id, string Line, int Order) : IHasId<Id<Train>>;
         EntityStore<Train> trains = [];
 
-        // Indexes and views subscribe to the store: dispose them, or keep them for the store's lifetime
-        using var byLine = trains.CreateIndex(t => t.Line);
-        using var byOrder = trains.CreateOrderedView(Comparer<Train>.Create((a, b) => a.Order.CompareTo(b.Order)));
+        // Keep indexes and views as long as you read them, e.g. in a field next to the store
+        var byLine = trains.CreateIndex(t => t.Line);
+        var byOrder = trains.CreateOrderedView(Comparer<Train>.Create((a, b) => a.Order.CompareTo(b.Order)));
+
+        // Events carry the committed values
+        trains.OnDeleted.Subscribe(e => Console.WriteLine($"{e.Entity.Line} train removed"));
 
         var express = new Train(Id.New<Train>(), "red", 2);
         trains.Set(express);
         trains.Set(new Train(Id.New<Train>(), "red", 1));
 
-        // Mutate is an atomic read-modify-write; it must not change a key an index uses (Line here)
-        var mutated = trains.Mutate(express.Id, t => t with { Order = 3 });
+        // Mutate is an atomic read-modify-write; indexes follow key changes
+        var mutated = trains.Mutate(express.Id, t => t with { Line = "blue", Order = 3 });
 
-        var redTrains = byLine.GetForKey("red"); // 2 ids
+        var redTrains = byLine.GetForKey("red"); // 1 id
         var first = byOrder[0]; // the Order = 1 train
 
         await Assert.That(mutated.Succeeded).IsTrue();
-        await Assert.That(redTrains.Count).IsEqualTo(2);
+        await Assert.That(redTrains.Count).IsEqualTo(1);
         await Assert.That(first.Order).IsEqualTo(1);
     }
 }

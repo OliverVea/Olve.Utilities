@@ -14,6 +14,16 @@ namespace Olve.Utilities.Stores;
 /// one per call. Such an implementation should satisfy this interface for persistence, seeding and
 /// admin queries, and expose its columns directly for the hot path.
 /// </para>
+/// <para>
+/// Entities are immutable values: records, changed with <c>with</c> expressions. Events hand every
+/// subscriber the same instance the store holds, so mutating one in place would change it for all of them.
+/// </para>
+/// <para>
+/// Events fire after the write, outside any lock. Each payload is exactly what that write committed, but
+/// events for the same id can arrive out of order across threads. State derived from the store should
+/// reconcile against it (see <see cref="EntityStoreIndex{T,TId,TKey}"/>) rather than apply payloads in
+/// arrival order.
+/// </para>
 /// </summary>
 /// <typeparam name="T">The entity type.</typeparam>
 /// <typeparam name="TId">The identifier type, typically <see cref="Id{T}"/> or <see cref="ShortId{T}"/>.</typeparam>
@@ -21,14 +31,14 @@ public interface IEntityStore<T, TId>
     where T : IHasId<TId>
     where TId : notnull
 {
-    /// <summary>Fires after an entity not previously present is added.</summary>
-    Event<TId> OnAdded { get; }
+    /// <summary>Fires after an entity not previously present is added, with the added value.</summary>
+    Event<EntityAdded<T, TId>> OnAdded { get; }
 
-    /// <summary>Fires after an existing entity changes.</summary>
-    Event<TId> OnUpdated { get; }
+    /// <summary>Fires after an existing entity changes, with the replaced and the committed value.</summary>
+    Event<EntityUpdated<T, TId>> OnUpdated { get; }
 
-    /// <summary>Fires after an entity is removed.</summary>
-    Event<TId> OnDeleted { get; }
+    /// <summary>Fires after an entity is removed, with the removed value.</summary>
+    Event<EntityDeleted<T, TId>> OnDeleted { get; }
 
     /// <summary>Inserts or replaces <paramref name="entity"/>.</summary>
     void Set(T entity);
@@ -45,7 +55,7 @@ public interface IEntityStore<T, TId>
     /// <summary>Gets the number of entities currently in the store.</summary>
     int Count { get; }
 
-    /// <summary>Returns a snapshot of all entities currently in the store.</summary>
+    /// <summary>Returns a copy of all entities currently in the store.</summary>
     IReadOnlyList<T> List();
 
     /// <summary>Removes the entity with <paramref name="id"/>.</summary>
