@@ -29,4 +29,14 @@ public sealed record Page<T>(
     ///     <c>null</c> when this is the last page.
     /// </summary>
     public Pagination? Next => HasNextPage ? new Pagination(PageNumber + 1, PageSize) : null;
+
+    /// <summary>
+    ///     Converts this page to the equivalent <see cref="Slice{T}" />. This is always possible.
+    /// </summary>
+    /// <returns>
+    ///     A <see cref="Slice{T}" /> with the same items and total count, where <see cref="Slice{T}.Offset" /> =
+    ///     <see cref="PageNumber" /> * <see cref="PageSize" /> and <see cref="Slice{T}.Limit" /> =
+    ///     <see cref="PageSize" />.
+    /// </returns>
+    public Slice<T> ToSlice() => new(Items, PageNumber * PageSize, PageSize, TotalCount);
 }

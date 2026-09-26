@@ -187,4 +187,31 @@ public class ReadmeDemo
         await Assert.That(missed).IsFalse();
         await Assert.That(cache["scores"]).Count().IsEqualTo(2);
     }
+
+    [Test]
+    public async Task OffsetPaginationExample()
+    {
+        var users = new[] { "alice", "bob", "charlie", "dave", "eve" };
+
+        // e.g. bound from a request body like { "offset": 1, "limit": 2 }
+        var request = new OffsetPagination(Offset: 1, Limit: 2).Clamp(defaultLimit: 20, maxLimit: 100);
+
+        var slice = users.Paginate(request);
+        // slice.Items == ["bob", "charlie"], slice.TotalCount == 5
+        // slice.HasMore == true, slice.Next == OffsetPagination { Offset = 3, Limit = 2 }
+
+        // Page-based pagination always converts to offset/limit...
+        var fromPage = new Pagination(Page: 2, PageSize: 2).ToOffsetPagination(); // Offset = 4, Limit = 2
+
+        // ...but offset/limit only converts back when the offset is a multiple of the limit
+        request.TryToPagination(out _); // false
+        fromPage.TryToPagination(out var pagination); // true, pagination == Pagination { Page = 2, PageSize = 2 }
+
+        await Assert.That(slice.Items).IsEquivalentTo(["bob", "charlie"]);
+        await Assert.That(slice.TotalCount).IsEqualTo(5);
+        await Assert.That(slice.Next).IsEqualTo(new OffsetPagination(3, 2));
+        await Assert.That(fromPage).IsEqualTo(new OffsetPagination(4, 2));
+        await Assert.That(request.TryToPagination(out _)).IsFalse();
+        await Assert.That(pagination).IsEqualTo(new Pagination(2, 2));
+    }
 }

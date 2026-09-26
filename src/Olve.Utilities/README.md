@@ -34,7 +34,7 @@ Installing `Olve.Utilities` also brings in:
 | **IDs** | `Id`, `Id<T>`, `UnionId<T1, T2>` | GUID-backed typed identifiers with deterministic generation (UUIDv5) |
 | **Collections** | `BidirectionalDictionary<T1, T2>`, `FixedSizeQueue<T>`, `OneToManyLookup<TLeft, TRight>`, `ManyToManyLookup<TLeft, TRight>` | Specialized collection types with `TryGet` pattern lookups |
 | **DateTime** | `DateTimeFormatter` | Human-readable relative time formatting |
-| **Pagination** | `Pagination`, `Page<T>` | Page/offset calculation and paginated result wrapper |
+| **Pagination** | `Pagination`, `Page<T>`, `OffsetPagination`, `Slice<T>` | Page-number and offset/limit pagination with result wrappers |
 | **Graphs** | `DirectedGraph`, `Node`, `DirectedEdge` | ID-based directed graph with node/edge management |
 | **Builders** | `IBuilder<T>`, `BuilderExtensions` | Builder pattern interface with validation integration |
 | **Sentinel types** | `NotFound`, `Success`, `AlreadyExists`, `Waiting`, `Skipped`, `Yes`, `Any` | Zero-size marker types for use with `OneOf<T>` discriminated unions |
@@ -194,6 +194,30 @@ var page = new Page<string>(
     TotalCount: items.Length);
 
 // page.HasNextPage == true
+```
+
+#### Offset/limit pagination
+
+`OffsetPagination` and `Slice<T>` mirror `Pagination` and `Page<T>` for offset/limit APIs, where the offset need not be a multiple of the limit. Both request types have `Validate` (returns a `Result`) and `Clamp` (applies a default and a maximum size), and `.Paginate(...)` works on `IEnumerable<T>` and `IQueryable<T>` for either kind.
+
+```cs
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L194-L208
+
+var users = new[] { "alice", "bob", "charlie", "dave", "eve" };
+
+// e.g. bound from a request body like { "offset": 1, "limit": 2 }
+var request = new OffsetPagination(Offset: 1, Limit: 2).Clamp(defaultLimit: 20, maxLimit: 100);
+
+var slice = users.Paginate(request);
+// slice.Items == ["bob", "charlie"], slice.TotalCount == 5
+// slice.HasMore == true, slice.Next == OffsetPagination { Offset = 3, Limit = 2 }
+
+// Page-based pagination always converts to offset/limit...
+var fromPage = new Pagination(Page: 2, PageSize: 2).ToOffsetPagination(); // Offset = 4, Limit = 2
+
+// ...but offset/limit only converts back when the offset is a multiple of the limit
+request.TryToPagination(out _); // false
+fromPage.TryToPagination(out var pagination); // true, pagination == Pagination { Page = 2, PageSize = 2 }
 ```
 
 ---
