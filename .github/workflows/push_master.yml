@@ -63,9 +63,12 @@ jobs:
       changed: ${{ steps.version-changed.outputs.changed }}
 
     steps:
+      # Bump from the tip of master, not the triggering commit: a run queued behind another
+      # release must see that release's bump commit, or it re-bumps to the same version.
       - name: Check out
         uses: actions/checkout@v6
         with:
+          ref: master
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -118,6 +121,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: v${{ needs.bump-version.outputs.version }}
       - name: Get NuGet API key from OpenBao
         id: nuget-secret
         uses: ./.github/actions/openbao-secret
@@ -146,6 +151,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.bump-version.outputs.changed == 'true' && format('v{0}', needs.bump-version.outputs.version) || 'master' }}
 
       - name: Install .NET
         uses: actions/setup-dotnet@v5
