@@ -35,6 +35,7 @@ Installing `Olve.Utilities` also brings in:
 | **Collections** | `BidirectionalDictionary<T1, T2>`, `FixedSizeQueue<T>`, `OneToManyLookup<TLeft, TRight>`, `ManyToManyLookup<TLeft, TRight>` | Specialized collection types with `TryGet` pattern lookups |
 | **DateTime** | `DateTimeFormatter` | Human-readable relative time formatting |
 | **Pagination** | `Pagination`, `Page<T>`, `OffsetPagination`, `Slice<T>` | Page-number and offset/limit pagination with result wrappers |
+| **Stores** | `EntityStore<T>`, `EntityStoreIndex<T, TKey>`, `EntityStoreUniqueIndex<T, TKey>`, `EntityStoreOrderedView<T, TId>`, `Event<T>` | Concurrent, observable in-memory entity store with secondary indexes and ordered views |
 | **Graphs** | `DirectedGraph`, `Node`, `DirectedEdge` | ID-based directed graph with node/edge management |
 | **Builders** | `IBuilder<T>`, `BuilderExtensions` | Builder pattern interface with validation integration |
 | **Sentinel types** | `NotFound`, `Success`, `AlreadyExists`, `Waiting`, `Skipped`, `Yes`, `Any` | Zero-size marker types for use with `OneOf<T>` discriminated unions |
@@ -50,7 +51,7 @@ Installing `Olve.Utilities` also brings in:
 `Id<T>` provides compile-time safety so you can't accidentally pass a user ID where an order ID is expected. `Id.FromName()` generates deterministic UUIDv5 identifiers from strings.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L18-L26
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L20-L28
 
 // Create a random typed ID
 var userId = Id.New<User>();
@@ -70,7 +71,7 @@ Id.TryParse<User>(userId.Value.ToString(), out var parsed); // parsed == userId
 `BidirectionalDictionary<T1, T2>` maintains two-way lookups. Both directions use the `TryGet` pattern.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L35-L42
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L37-L44
 
 var dict = new BidirectionalDictionary<string, int>();
 
@@ -89,7 +90,7 @@ dict.TryGet(2, out var name);        // "bob"
 `OneToManyLookup<TLeft, TRight>` maps one key to many values. Reverse lookup returns the single owner of a value.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L51-L62
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L53-L64
 
 var lookup = new OneToManyLookup<string, int>();
 
@@ -112,7 +113,7 @@ lookup.TryGet(1, out var owner); // "alice"
 `ManyToManyLookup<TLeft, TRight>` maintains a bidirectional many-to-many relationship. Both directions use the `TryGet` pattern.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L71-L81
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L73-L83
 
 var enrollment = new ManyToManyLookup<string, int>();
 
@@ -134,7 +135,7 @@ enrollment.TryGet(101, out var mathStudents); // { "alice", "bob" }
 `FixedSizeQueue<T>` automatically manages items when the maximum size is exceeded. Configure the behavior with `FullQueueBehavior`: `DropOldest` (default), `DropNewest`, or `Throw`.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L90-L111
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L92-L113
 
 var queue = new FixedSizeQueue<string>(maxSize: 3);
 
@@ -167,7 +168,7 @@ var tried = strict.TryEnqueue("z"); // false — queue is at capacity
 `DateTimeFormatter.FormatTimeAgo()` produces human-readable relative time strings like "2 days ago" or "just now".
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L122-L125
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L124-L127
 
 var now = new DateTimeOffset(2025, 6, 15, 12, 0, 0, TimeSpan.Zero);
 var then = new DateTimeOffset(2025, 6, 13, 12, 0, 0, TimeSpan.Zero);
@@ -182,7 +183,7 @@ var text = DateTimeFormatter.FormatTimeAgo(now, then); // "2 days ago"
 `Pagination` computes offsets from page number and size. `Page<T>` wraps a page of items with total count and navigation metadata.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L132-L141
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L134-L143
 
 
 var items = new[] { "alice", "bob", "charlie" };
@@ -198,10 +199,10 @@ var page = new Page<string>(
 
 #### Offset/limit pagination
 
-`OffsetPagination` and `Slice<T>` mirror `Pagination` and `Page<T>` for offset/limit APIs, where the offset need not be a multiple of the limit. Both request types have `Validate` (returns a `Result`) and `Clamp` (applies a default and a maximum size), and `.Paginate(...)` works on `IEnumerable<T>` and `IQueryable<T>` for either kind.
+`OffsetPagination` and `Slice<T>` mirror `Pagination` and `Page<T>` for offset/limit APIs, where the offset need not be a multiple of the limit. Both request types have `Validate(max)` (returns a `Result`) and `Clamp(default, max)` (fixes up out-of-range values), with the bounds always passed explicitly, and `.Paginate(...)` works on `IEnumerable<T>` and `IQueryable<T>` for either kind.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L194-L208
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L196-L210
 
 var users = new[] { "alice", "bob", "charlie", "dave", "eve" };
 
@@ -222,12 +223,48 @@ fromPage.TryToPagination(out var pagination); // true, pagination == Pagination 
 
 ---
 
+### EntityStore
+
+`EntityStore<T>` is a concurrent, observable in-memory store keyed by `Id<T>`. Every change fires `OnAdded`, `OnUpdated` or `OnDeleted`, which keeps secondary indexes (`CreateIndex`, `CreateUniqueIndex`) and ordered views (`CreateOrderedView`) in sync with the store.
+
+Indexes and views subscribe to the store's events, so the store keeps them alive. Dispose them when you're done, or keep them for the store's lifetime. One built per request and never disposed is a memory leak.
+
+```cs
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L225-L240
+
+// record Train(Id<Train> Id, string Line, int Order) : IHasId<Id<Train>>;
+EntityStore<Train> trains = [];
+
+// Indexes and views subscribe to the store: dispose them, or keep them for the store's lifetime
+using var byLine = trains.CreateIndex(t => t.Line);
+using var byOrder = trains.CreateOrderedView(Comparer<Train>.Create((a, b) => a.Order.CompareTo(b.Order)));
+
+var express = new Train(Id.New<Train>(), "red", 2);
+trains.Set(express);
+trains.Set(new Train(Id.New<Train>(), "red", 1));
+
+// Mutate is an atomic read-modify-write; it must not change a key an index uses (Line here)
+var mutated = trains.Mutate(express.Id, t => t with { Order = 3 });
+
+var redTrains = byLine.GetForKey("red"); // 2 ids
+var first = byOrder[0]; // the Order = 1 train
+```
+
+Event handlers run synchronously and in isolation: a handler that throws doesn't stop the others and never fails the write that raised the event. The exception goes to `EventDispatch.OnHandlerException` instead, which is `null` (swallow) by default, so route it to your logger at startup:
+
+```cs
+EventDispatch.OnHandlerException = ex =>
+    logger.LogError(ex, "Unhandled exception in an event handler; other handlers still ran.");
+```
+
+---
+
 ### DirectedGraph
 
 `DirectedGraph` provides an ID-based directed graph with node and edge management.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L151-L163
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L153-L165
 
 
 var graph = new DirectedGraph();
@@ -251,7 +288,7 @@ graph.CreateEdge(nodeA, nodeC);
 High-performance `GetOrAdd` and `TryUpdate` extensions using `CollectionsMarshal` for zero-overhead dictionary operations.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L172-L182
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L174-L184
 
 
 var cache = new Dictionary<string, List<int>>();
