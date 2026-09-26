@@ -5,16 +5,18 @@ namespace Olve.Utilities.Tests.Stores;
 public class EventTests
 {
     [Test]
-    public async Task SubscriberCount_TracksSubscribeAndUnsubscribe()
+    public async Task Unsubscribe_StopsHandlerFromRunning()
     {
         var ev = new Event<int>();
-        Action<int> handler = _ => { };
+        var calls = 0;
+        Action<int> handler = _ => calls++;
 
         ev.Subscribe(handler);
-        await Assert.That(ev.SubscriberCount).IsEqualTo(1);
-
+        ev.Invoke(1);
         ev.Unsubscribe(handler);
-        await Assert.That(ev.SubscriberCount).IsEqualTo(0);
+        ev.Invoke(2);
+
+        await Assert.That(calls).IsEqualTo(1);
     }
 
     [Test]
@@ -22,6 +24,7 @@ public class EventTests
     {
         // Non-atomic `_handlers += handler` loses writes under contention; the CAS loop does not.
         var ev = new Event<int>();
+        var calls = 0;
         const int threadCount = 8;
         using var start = new Barrier(threadCount);
 
@@ -30,7 +33,8 @@ public class EventTests
             start.SignalAndWait();
             for (var i = 0; i < 20_000; i++)
             {
-                Action<int> handler = _ => { };
+                var n = i; // distinct closure per handler, so unsubscribe can't remove a sibling's
+                Action<int> handler = _ => calls += n + 1;
                 ev.Subscribe(handler);
                 ev.Unsubscribe(handler);
             }
@@ -39,7 +43,8 @@ public class EventTests
         threads.ForEach(t => t.Start());
         threads.ForEach(t => t.Join());
 
-        await Assert.That(ev.SubscriberCount).IsEqualTo(0);
+        ev.Invoke(0); // a lost unsubscribe leaves a handler behind, which runs here
+        await Assert.That(calls).IsEqualTo(0);
     }
 
     [Test]

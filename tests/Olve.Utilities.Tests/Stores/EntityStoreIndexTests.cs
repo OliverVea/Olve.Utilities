@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Olve.Utilities.Ids;
 using Olve.Utilities.Lookup;
 using Olve.Utilities.Stores;
@@ -135,19 +136,32 @@ public class EntityStoreIndexTests
     }
 
     [Test]
-    public async Task Dispose_RestoresStoreSubscriberCounts()
+    public async Task Dispose_LetsIndexBeCollectedWhileStoreLives()
     {
         var store = new EntityStore<Item>([]);
-        var added = store.OnAdded.SubscriberCount;
-        var deleted = store.OnDeleted.SubscriberCount;
 
-        for (var i = 0; i < 10; i++)
-        {
-            using var index = store.CreateIndex(s => s.Group);
-        }
+        var disposed = CreateIndex(store, dispose: true);
+        var kept = CreateIndex(store, dispose: false);
+        CollectGarbage();
 
-        await Assert.That(store.OnAdded.SubscriberCount).IsEqualTo(added);
-        await Assert.That(store.OnDeleted.SubscriberCount).IsEqualTo(deleted);
+        await Assert.That(disposed.IsAlive).IsFalse();
+        await Assert.That(kept.IsAlive).IsTrue(); // the store's subscriptions keep an undisposed index alive
+        GC.KeepAlive(store);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static WeakReference CreateIndex(EntityStore<Item> store, bool dispose)
+    {
+        var index = store.CreateIndex(s => s.Group);
+        if (dispose) index.Dispose();
+        return new WeakReference(index);
+    }
+
+    private static void CollectGarbage()
+    {
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
     }
 
     [Test]
