@@ -8,13 +8,16 @@ namespace Olve.Utilities.Tests.Paginations;
 
 public class OffsetPaginationTests
 {
+    private const int DefaultLimit = 20;
+    private const int MaxLimit = 100;
+
     [Test]
     [Arguments(0, 1)]
     [Arguments(37, 20)]
-    [Arguments(0, OffsetPagination.DefaultMaxLimit)]
+    [Arguments(0, MaxLimit)]
     public async Task Validate_ValidValues_Succeeds(int offset, int limit)
     {
-        var result = new OffsetPagination(offset, limit).Validate();
+        var result = new OffsetPagination(offset, limit).Validate(MaxLimit);
 
         await Assert.That(result).Succeeded();
     }
@@ -23,10 +26,10 @@ public class OffsetPaginationTests
     [Arguments(-1, 20)]
     [Arguments(0, 0)]
     [Arguments(0, -1)]
-    [Arguments(0, OffsetPagination.DefaultMaxLimit + 1)]
+    [Arguments(0, MaxLimit + 1)]
     public async Task Validate_InvalidValues_Fails(int offset, int limit)
     {
-        var result = new OffsetPagination(offset, limit).Validate();
+        var result = new OffsetPagination(offset, limit).Validate(MaxLimit);
 
         await Assert.That(result).Failed();
     }
@@ -34,7 +37,7 @@ public class OffsetPaginationTests
     [Test]
     public async Task Validate_BothValuesInvalid_ReportsBothProblems()
     {
-        var result = new OffsetPagination(-1, 0).Validate();
+        var result = new OffsetPagination(-1, 0).Validate(MaxLimit);
 
         await Assert.That(result.Problems).IsNotNull();
         await Assert.That(result.Problems!.Count()).IsEqualTo(2);
@@ -52,18 +55,18 @@ public class OffsetPaginationTests
     [Test]
     [Arguments(37, 20, 37, 20)]
     [Arguments(-5, 20, 0, 20)]
-    [Arguments(10, 0, 10, OffsetPagination.DefaultLimit)]
-    [Arguments(10, -3, 10, OffsetPagination.DefaultLimit)]
-    [Arguments(10, 1000, 10, OffsetPagination.DefaultMaxLimit)]
-    public async Task Clamp_DefaultBounds_ReturnsValidPagination(int offset,
+    [Arguments(10, 0, 10, DefaultLimit)]
+    [Arguments(10, -3, 10, DefaultLimit)]
+    [Arguments(10, 1000, 10, MaxLimit)]
+    public async Task Clamp_ReturnsValidPagination(int offset,
         int limit,
         int expectedOffset,
         int expectedLimit)
     {
-        var clamped = new OffsetPagination(offset, limit).Clamp();
+        var clamped = new OffsetPagination(offset, limit).Clamp(DefaultLimit, MaxLimit);
 
         await Assert.That(clamped).IsEqualTo(new OffsetPagination(expectedOffset, expectedLimit));
-        await Assert.That(clamped.Validate()).Succeeded();
+        await Assert.That(clamped.Validate(MaxLimit)).Succeeded();
     }
 
     [Test]

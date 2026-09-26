@@ -12,16 +12,6 @@ namespace Olve.Utilities.Paginations;
 public readonly record struct Pagination(int Page, int PageSize)
 {
     /// <summary>
-    ///     The page size <see cref="Clamp" /> uses when none is given.
-    /// </summary>
-    public const int DefaultPageSize = 20;
-
-    /// <summary>
-    ///     The largest page size <see cref="Validate" /> and <see cref="Clamp" /> accept by default.
-    /// </summary>
-    public const int DefaultMaxPageSize = 100;
-
-    /// <summary>
     ///     The offset of the pagination.
     /// </summary>
     public int Offset => Page * PageSize;
@@ -32,7 +22,7 @@ public readonly record struct Pagination(int Page, int PageSize)
     /// </summary>
     /// <param name="maxPageSize">The largest allowed page size.</param>
     /// <returns>A successful <see cref="Result" />, or a failure listing every violated rule.</returns>
-    public Result Validate(int maxPageSize = DefaultMaxPageSize) =>
+    public Result Validate(int maxPageSize) =>
         PaginationRules.Validate(Page, nameof(Page), PageSize, nameof(PageSize), maxPageSize);
 
     /// <summary>
@@ -47,7 +37,7 @@ public readonly record struct Pagination(int Page, int PageSize)
     ///     <paramref name="maxPageSize" /> is less than 1, or <paramref name="defaultPageSize" /> is not between 1
     ///     and <paramref name="maxPageSize" />.
     /// </exception>
-    public Pagination Clamp(int defaultPageSize = DefaultPageSize, int maxPageSize = DefaultMaxPageSize)
+    public Pagination Clamp(int defaultPageSize, int maxPageSize)
     {
         var (page, pageSize) = PaginationRules.Clamp(Page, PageSize, defaultPageSize, maxPageSize);
         return new Pagination(page, pageSize);
