@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Olve.Utilities.Ids;
 using Olve.Utilities.Lookup;
 using Olve.Utilities.Stores;
@@ -87,12 +88,9 @@ public class EntityStoreOrderedViewTests
     }
 
     [Test]
-    public async Task Dispose_UnsubscribesAndFreezesView()
+    public async Task Dispose_FreezesView()
     {
         EntityStore<Item> store = [Ranked(1)];
-        var added = store.OnAdded.SubscriberCount;
-        var updated = store.OnUpdated.SubscriberCount;
-        var deleted = store.OnDeleted.SubscriberCount;
         var view = store.CreateOrderedView(ByRank);
         _ = view.Count;
 
@@ -100,9 +98,28 @@ public class EntityStoreOrderedViewTests
         view.Dispose();
         store.Set(Ranked(2));
 
-        await Assert.That(store.OnAdded.SubscriberCount).IsEqualTo(added);
-        await Assert.That(store.OnUpdated.SubscriberCount).IsEqualTo(updated);
-        await Assert.That(store.OnDeleted.SubscriberCount).IsEqualTo(deleted);
         await Assert.That(Ranks(view)).IsEquivalentTo([1], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+    }
+
+    [Test]
+    public async Task Dispose_LetsViewBeCollectedWhileStoreLives()
+    {
+        EntityStore<Item> store = [Ranked(1)];
+
+        var view = CreateDisposedView(store);
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+
+        await Assert.That(view.IsAlive).IsFalse();
+        GC.KeepAlive(store);
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static WeakReference CreateDisposedView(EntityStore<Item> store)
+    {
+        var view = store.CreateOrderedView(ByRank);
+        view.Dispose();
+        return new WeakReference(view);
     }
 }

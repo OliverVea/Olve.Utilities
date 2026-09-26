@@ -23,9 +23,6 @@ public class Event<T>
 {
     private Action<T>? _handlers;
 
-    /// <summary>Gets the number of currently registered subscribers.</summary>
-    public int SubscriberCount => Volatile.Read(ref _handlers)?.GetInvocationList().Length ?? 0;
-
     /// <summary>
     /// Invokes every subscriber synchronously, in registration order. A subscriber that throws is reported
     /// to <see cref="EventDispatch.OnHandlerException"/> and does not stop the remaining subscribers.

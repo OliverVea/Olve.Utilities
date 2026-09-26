@@ -62,18 +62,18 @@ public class EntityStoreUniqueIndexTests
     }
 
     [Test]
-    public async Task Dispose_UnsubscribesAndStopsTracking()
+    public async Task Dispose_StopsTracking()
     {
         var store = new EntityStore<Item>([]);
-        var added = store.OnAdded.SubscriberCount;
-        var deleted = store.OnDeleted.SubscriberCount;
+        var kept = Named("kept");
+        store.Set(kept);
         var index = store.CreateUniqueIndex(s => s.Name);
 
         index.Dispose();
         store.Set(Named("build"));
+        store.Delete(kept.Id);
 
-        await Assert.That(store.OnAdded.SubscriberCount).IsEqualTo(added);
-        await Assert.That(store.OnDeleted.SubscriberCount).IsEqualTo(deleted);
         await Assert.That(index.ContainsKey("build")).IsFalse();
+        await Assert.That(index.ContainsKey("kept")).IsTrue();
     }
 }
