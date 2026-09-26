@@ -14,7 +14,8 @@ namespace Olve.Results.Analyzers;
 /// <remarks>
 ///     Emits a state discriminator, per-case <c>Is…</c> predicates, <c>Succeeded</c> (any success
 ///     case), <c>Failed</c> (any error case; grey cases are neither), the partial factory bodies, an
-///     exhaustive <c>Match</c>, and <c>Problems</c>/<c>TryPickProblems</c>. Cases may carry a single
+///     exhaustive <c>Match</c>, and <c>Problems</c>/<c>TryPickProblems</c> plus the catch-by-type
+///     <c>TryPickProblem&lt;TProblem&gt;</c>/<c>PickProblems&lt;TProblem&gt;</c>. Cases may carry a single
 ///     typed payload, surfaced typed through <c>Match</c>. When exactly one error case exists, implicit
 ///     conversions from <c>ResultProblem</c>/<c>ResultProblemCollection</c> are emitted, and the type is
 ///     marked <c>[MustBeUsedWhenReturned]</c>. <c>ToString</c> renders the case name plus any payload, and
@@ -416,6 +417,20 @@ public sealed class GenerateResultGenerator : IIncrementalGenerator
         sb.AppendLine($"{body}problems = Problems;");
         sb.AppendLine($"{body}return problems is not null;");
         sb.AppendLine($"{member}}}");
+        sb.AppendLine();
+        sb.AppendLine($"{member}/// <summary>Attempts to retrieve the first problem assignable to <typeparamref name=\"TProblem\"/>, in enumeration order.</summary>");
+        sb.AppendLine($"{member}public bool TryPickProblem<TProblem>([global::System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out TProblem? problem)");
+        sb.AppendLine($"{body}where TProblem : global::Olve.Results.ResultProblem");
+        sb.AppendLine($"{member}{{");
+        sb.AppendLine($"{body}problem = null;");
+        sb.AppendLine($"{body}return Problems is {{ }} __problems && __problems.TryPickProblem(out problem);");
+        sb.AppendLine($"{member}}}");
+        sb.AppendLine();
+
+        sb.AppendLine($"{member}/// <summary>Gets all problems assignable to <typeparamref name=\"TProblem\"/>, in enumeration order.</summary>");
+        sb.AppendLine($"{member}public global::System.Collections.Generic.IEnumerable<TProblem> PickProblems<TProblem>()");
+        sb.AppendLine($"{body}where TProblem : global::Olve.Results.ResultProblem");
+        sb.AppendLine($"{body}=> Problems?.PickProblems<TProblem>() ?? global::System.Linq.Enumerable.Empty<TProblem>();");
         sb.AppendLine();
 
         // Value equality — same state, and equal payloads on the active case. Inactive payload fields

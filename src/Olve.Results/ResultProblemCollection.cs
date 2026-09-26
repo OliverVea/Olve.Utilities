@@ -56,6 +56,30 @@ public class ResultProblemCollection(params IEnumerable<ResultProblem> problems)
         => Prepend(new ResultProblem(exception, message, args: args, stackFrame: new StackFrame(1, true)));
 
     /// <summary>
+    ///     Attempts to retrieve the first problem assignable to <typeparamref name="TProblem" />, in enumeration order.
+    /// </summary>
+    /// <typeparam name="TProblem">The problem type to look for, typically a subclass of <see cref="ResultProblem" />.</typeparam>
+    /// <param name="problem">
+    ///     When this method returns <see langword="true" />, contains the first matching problem. Otherwise, <see langword="null" />.
+    /// </param>
+    /// <returns><see langword="true" /> if a matching problem exists; otherwise, <see langword="false" />.</returns>
+    public bool TryPickProblem<TProblem>([NotNullWhen(true)] out TProblem? problem)
+        where TProblem : ResultProblem
+    {
+        problem = this.OfType<TProblem>().FirstOrDefault();
+        return problem is not null;
+    }
+
+    /// <summary>
+    ///     Gets all problems assignable to <typeparamref name="TProblem" />, in enumeration order.
+    /// </summary>
+    /// <typeparam name="TProblem">The problem type to look for, typically a subclass of <see cref="ResultProblem" />.</typeparam>
+    /// <returns>The matching problems, or an empty sequence if there are none.</returns>
+    public IEnumerable<TProblem> PickProblems<TProblem>()
+        where TProblem : ResultProblem
+        => this.OfType<TProblem>();
+
+    /// <summary>
     ///     Merges multiple problem collections together into a single collection.
     /// </summary>
     /// <param name="problemCollections">The problem collections to merge.</param>

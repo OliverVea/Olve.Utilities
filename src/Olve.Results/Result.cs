@@ -201,6 +201,31 @@ public readonly partial struct Result : IResultType
         return problems is not null;
     }
 
+    /// <summary>
+    ///     Attempts to retrieve the first problem assignable to <typeparamref name="TProblem" />, in enumeration order.
+    ///     Always returns <see langword="false" /> when the result has no problems.
+    /// </summary>
+    /// <typeparam name="TProblem">The problem type to look for, typically a subclass of <see cref="ResultProblem" />.</typeparam>
+    /// <param name="problem">
+    ///     When this method returns <see langword="true" />, contains the first matching problem. Otherwise, <see langword="null" />.
+    /// </param>
+    /// <returns><see langword="true" /> if a matching problem exists; otherwise, <see langword="false" />.</returns>
+    public bool TryPickProblem<TProblem>([NotNullWhen(true)] out TProblem? problem)
+        where TProblem : ResultProblem
+    {
+        problem = null;
+        return Problems is not null && Problems.TryPickProblem(out problem);
+    }
+
+    /// <summary>
+    ///     Gets all problems assignable to <typeparamref name="TProblem" />, in enumeration order.
+    /// </summary>
+    /// <typeparam name="TProblem">The problem type to look for, typically a subclass of <see cref="ResultProblem" />.</typeparam>
+    /// <returns>The matching problems, or an empty sequence if the result has none.</returns>
+    public IEnumerable<TProblem> PickProblems<TProblem>()
+        where TProblem : ResultProblem
+        => Problems?.PickProblems<TProblem>() ?? [];
+
     /// <inheritdoc />
     object? IResultType.BoxedValue => null;
 
