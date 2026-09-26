@@ -21,6 +21,7 @@ This file documents the design and usage of the **Olve.Results** project. Keep i
 - **Result.Concat** – invoke multiple functions and combine their values if all succeed.
 - **Result.Try** – execute actions/functions and turn caught exceptions into problems.
 - **IfProblem** – run an action when a result has problems.
+- **TryPickProblem<TProblem> / PickProblems<TProblem>** – catch-by-type recovery on `Result`, `Result<T>`, `ResultProblemCollection` and `[GenerateResult]` types. Matches the first (or every) problem assignable to `TProblem`, in enumeration order. Define domain problems by subclassing `ResultProblem`.
 - **ResultEnumerableExtensions** – utilities for enumerations of results: `HasProblems`, `TryPickProblems`, `GetValues` and `GetProblems`.
 - **ResultFuncExtensions** – converts `Action<T>` to `Func<T, Result>`.
 - **ResultExtensions** – instance extension methods for `Result` and `Result<T>`: `Map` (functor map), `Bind` (monadic bind), `ToEmptyResult` (discard value), `WithValueOnSuccess` (attach value to bare `Result`).

@@ -208,6 +208,40 @@ var problem = new ResultProblem("Database query failed: {0}", query)
 
 Automatic origin capture provides traceable, stacktrace-like context without throwing exceptions.
 
+### Typed problems
+
+Subclass `ResultProblem` to model domain-specific failures, then recover them by type — the result-world equivalent of `catch (SpecificException e)`:
+
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L244-L248
+
+public sealed class InsufficientFundsProblem(decimal shortfall)
+    : ResultProblem("Insufficient funds: short by {0}", shortfall)
+{
+    public decimal Shortfall => shortfall;
+}
+```
+
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L253-L265
+
+Result Withdraw(decimal balance, decimal amount)
+    => amount > balance
+        ? new InsufficientFundsProblem(amount - balance)
+        : Result.Success();
+
+var result = Withdraw(balance: 50, amount: 80);
+
+if (result.TryPickProblem<InsufficientFundsProblem>(out var funds))
+{
+    Console.WriteLine(funds.Shortfall); // 30
+}
+
+var all = result.PickProblems<InsufficientFundsProblem>(); // every match, in order
+```
+
+`TryPickProblem<TProblem>()` returns the first problem assignable to `TProblem` (subclasses included), and `false` on success. `PickProblems<TProblem>()` returns every match. Both are available on `Result`, `Result<T>`, `ResultProblemCollection`, and `[GenerateResult]` types such as `DeletionResult`.
+
 ---
 
 ## DeletionResult
@@ -336,7 +370,7 @@ var missing = readOnly.GetWithResult("unknown"); // Failure: key not found
 **Trade-offs**
 
 1. Slight performance overhead from struct wrapping and collection allocations
-2. No typed errors — all failures use the generic `ResultProblem` type
+2. Typed errors are opt-in — problems subclass `ResultProblem` rather than being fully generic error types
 
 These trade-offs prioritize clarity and composability over micro-optimizations or rigid typing.
 

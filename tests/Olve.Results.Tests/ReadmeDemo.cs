@@ -240,4 +240,31 @@ public class ReadmeDemo
         await Assert.That(getResult).SucceededAndValue(v => v.IsEqualTo(42));
         await Assert.That(missing).Failed();
     }
+
+    public sealed class InsufficientFundsProblem(decimal shortfall)
+        : ResultProblem("Insufficient funds: short by {0}", shortfall)
+    {
+        public decimal Shortfall => shortfall;
+    }
+
+    [Test]
+    public async Task TypedProblems()
+    {
+        Result Withdraw(decimal balance, decimal amount)
+            => amount > balance
+                ? new InsufficientFundsProblem(amount - balance)
+                : Result.Success();
+
+        var result = Withdraw(balance: 50, amount: 80);
+
+        if (result.TryPickProblem<InsufficientFundsProblem>(out var funds))
+        {
+            Console.WriteLine(funds.Shortfall); // 30
+        }
+
+        var all = result.PickProblems<InsufficientFundsProblem>(); // every match, in order
+
+        await Assert.That(funds!.Shortfall).IsEqualTo(30m);
+        await Assert.That(all.Count()).IsEqualTo(1);
+    }
 }
