@@ -6,10 +6,10 @@ Source: `src/Olve.Utilities/Ids/`
 
 ## Id
 
-Opaque, type-agnostic identifier backed by a `Guid`. Implements `IComparable<Id>`.
+Opaque, type-agnostic identifier backed by a `Guid`. Implements `IComparable<Id>` and `IParsable<Id>`.
 
 ```csharp
-public readonly record struct Id(Guid Value) : IComparable<Id>
+public readonly record struct Id(Guid Value) : IComparable<Id>, IParsable<Id>
 {
     public Guid Value { get; }
     public static Id New();
@@ -18,6 +18,8 @@ public readonly record struct Id(Guid Value) : IComparable<Id>
     public static Id<T> FromName<T>(string name, Id? namespaceId = null);
     public static bool TryParse(string text, out Id id);
     public static bool TryParse<T>(string text, out Id<T> id);
+    public static Id Parse(string s, IFormatProvider? provider);                       // IParsable
+    public static bool TryParse(string? s, IFormatProvider? provider, out Id result);  // IParsable
     public int CompareTo(Id other);
     public override string ToString();
     public string ToDisplayString();
@@ -32,16 +34,20 @@ public readonly record struct Id(Guid Value) : IComparable<Id>
 - `New()` / `New<T>()` -- random GUID-based ID.
 - `FromName` / `FromName<T>` -- deterministic UUIDv5 from a string name and optional namespace.
 - `TryParse` / `TryParse<T>` -- parse a GUID string into an Id.
+- `IParsable` lets ASP.NET bind `Id`/`Id<T>` from route and query values.
+- JSON: serialized as a plain GUID string via `[JsonConverter]` attributes (`IdJsonConverter`, `IdOfTJsonConverterFactory` / `IdOfTJsonConverter<T>`); no registration needed.
 
 ## Id\<T\>
 
 Lightweight, type-safe wrapper around `Id`. The type parameter `T` is used only for compile-time safety.
 
 ```csharp
-public readonly record struct Id<T> : IComparable<Id<T>>
+public readonly record struct Id<T> : IComparable<Id<T>>, IParsable<Id<T>>
 {
     public Id Value { get; }
     public Id(Id value);
+    public static Id<T> Parse(string s, IFormatProvider? provider);
+    public static bool TryParse(string? s, IFormatProvider? provider, out Id<T> result);
     public int CompareTo(Id<T> other);
     public override string ToString();
     public string ToDisplayString();
@@ -52,6 +58,26 @@ public readonly record struct Id<T> : IComparable<Id<T>>
     public static bool operator >=(Id<T> left, Id<T> right);
 }
 ```
+
+## ShortId\<T\>
+
+Dense 32-bit typed id (4 bytes vs 16). Use for local, hot identity: ids allocated by one store, iterated every frame, sent over a `uint32` wire field. Use `Id<T>` for durable, global identity (survives restarts, crosses services, appears in URLs).
+
+```csharp
+public readonly record struct ShortId<T>(uint Value) : IComparable<ShortId<T>>
+{
+    public static ShortId<T> None { get; }  // value 0, never issued
+    public bool IsSome { get; }              // Value != 0
+    public int CompareTo(ShortId<T> other);
+    public override string ToString();       // "7"
+    public string ToDisplayString();         // "ShortId<Slime>(7)"
+    // <, >, <=, >= operators
+}
+```
+
+- Unique only within the issuing store's sequence; meaningless elsewhere.
+- The issuing store allocates monotonically and must never recycle values (a reused id aliases stale client references onto a live entity). Persist the sequence, or recompute as `max + 1` on load.
+- No `New()`: the owner allocates, e.g. `new ShortId<Slime>(++_next)`.
 
 ## UnionId\<T1, T2\>
 
