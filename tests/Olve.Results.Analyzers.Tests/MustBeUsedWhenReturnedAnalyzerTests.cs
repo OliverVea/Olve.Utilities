@@ -109,4 +109,54 @@ public class MustBeUsedWhenReturnedAnalyzerTests
 
         await Assert.That(diagnostics.Length).IsEqualTo(0);
     }
+
+    // ----- Passed as an argument: handed off to the callee, which counts as a use (#72) -----
+
+    [Test]
+    public async Task InvocationPassedAsArgument_IsNotFlagged()
+    {
+        var diagnostics = await AnalyzerRunner.GetOres001Async("Api.Sink(Api.Sync());");
+
+        await Assert.That(diagnostics.Length).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task LocalPassedAsArgument_IsNotFlagged()
+    {
+        var diagnostics = await AnalyzerRunner.GetOres001Async("""
+            var result = Api.Sync();
+            Api.Sink(result);
+            """);
+
+        await Assert.That(diagnostics.Length).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task AwaitedFluentAssertionOnLocal_IsNotFlagged()
+    {
+        // The shape of `await Assert.That(result).Succeeded();` with TUnit.
+        var diagnostics = await AnalyzerRunner.GetOres001Async("""
+            var result = Api.Sync();
+            await Api.That(result).Succeeded();
+            """);
+
+        await Assert.That(diagnostics.Length).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task AwaitedFluentAssertionOnInvocation_IsNotFlagged()
+    {
+        var diagnostics = await AnalyzerRunner.GetOres001Async("await Api.That(Api.Sync()).Succeeded();");
+
+        await Assert.That(diagnostics.Length).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task BareInvocation_ForwardingArgument_IsFlagged()
+    {
+        // The inner result is handed off, but the one Forward returns is dropped on the floor.
+        var diagnostics = await AnalyzerRunner.GetOres001Async("Api.Forward(Api.Sync());");
+
+        await Assert.That(diagnostics.Length).IsEqualTo(1);
+    }
 }
