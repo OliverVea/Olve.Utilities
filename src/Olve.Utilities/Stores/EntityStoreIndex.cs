@@ -10,7 +10,9 @@ namespace Olve.Utilities.Stores;
 /// <remarks>
 /// <para>
 /// Thread-safety: each key is backed by an <see cref="ImmutableHashSet{T}"/>, and every write
-/// funnels through a locked read-modify-write under <see cref="_gate"/>. <see cref="GetForKey"/>
+/// funnels through a locked read-modify-write under <see cref="_gate"/>. Each store event re-reads the
+/// entity under that lock, so the index matches the store once concurrent writes to an id settle, even
+/// when events arrive out of order. The key selector runs under the lock, so keep it pure and cheap. <see cref="GetForKey"/>
 /// returns the immutable set reference directly (no copy), so callers can enumerate it lock-free
 /// and it will never mutate underneath them — even while a concurrent write adds or removes ids
 /// for the same key. The caller decides whether to snapshot for stability across an
@@ -46,13 +48,15 @@ public sealed class EntityStoreIndex<T, TKey> : IDisposable
         _store = store;
         _keySelector = keySelector;
 
+        // Subscribe before populating so a write landing in between is not lost; reconciling an id
+        // twice is harmless.
+        store.OnAdded.Subscribe(Reconcile);
+        store.OnDeleted.Subscribe(Reconcile);
+
         foreach (var entity in store.List())
         {
-            Add(entity.Id);
+            Reconcile(entity.Id);
         }
-
-        store.OnAdded.Subscribe(Add);
-        store.OnDeleted.Subscribe(Remove);
     }
 
     /// <summary>
@@ -63,37 +67,43 @@ public sealed class EntityStoreIndex<T, TKey> : IDisposable
     {
         if (Interlocked.Exchange(ref _disposed, 1) == 1) return;
 
-        _store.OnAdded.Unsubscribe(Add);
-        _store.OnDeleted.Unsubscribe(Remove);
+        _store.OnAdded.Unsubscribe(Reconcile);
+        _store.OnDeleted.Unsubscribe(Reconcile);
     }
 
-    private void Add(Id<T> id)
-    {
-        if (!_store.TryGet(id, out var entity)) return;
-
-        var key = _keySelector(entity);
-        lock (_gate)
-        {
-            var current = _index.TryGetValue(key, out var ids) ? ids : ImmutableHashSet<Id<T>>.Empty;
-            var next = current.Add(id);
-            if (ReferenceEquals(next, current)) return; // already present
-
-            _index[key] = next;
-            _keyById[id] = key;
-        }
-    }
-
-    private void Remove(Id<T> id)
+    // Events fire after the store write and outside any lock, so they can arrive out of order across
+    // threads. Rather than trusting which event fired, re-read the store under the lock: the reconcile
+    // for the last write to an id runs after that write, so the index converges on the store's state.
+    private void Reconcile(Id<T> id)
     {
         lock (_gate)
         {
-            if (!_keyById.Remove(id, out var key)) return;
-            if (!_index.TryGetValue(key, out var current)) return;
-
-            var next = current.Remove(id);
-            if (next.IsEmpty) _index.Remove(key);
-            else _index[key] = next;
+            if (_store.TryGet(id, out var entity)) AddLocked(id, _keySelector(entity));
+            else RemoveLocked(id);
         }
+    }
+
+    private void AddLocked(Id<T> id, TKey key)
+    {
+        if (_keyById.TryGetValue(id, out var existingKey))
+        {
+            if (EqualityComparer<TKey>.Default.Equals(existingKey, key)) return; // already indexed
+            RemoveLocked(id);
+        }
+
+        var current = _index.TryGetValue(key, out var ids) ? ids : ImmutableHashSet<Id<T>>.Empty;
+        _index[key] = current.Add(id);
+        _keyById[id] = key;
+    }
+
+    private void RemoveLocked(Id<T> id)
+    {
+        if (!_keyById.Remove(id, out var key)) return;
+        if (!_index.TryGetValue(key, out var current)) return;
+
+        var next = current.Remove(id);
+        if (next.IsEmpty) _index.Remove(key);
+        else _index[key] = next;
     }
 
     /// <summary>
