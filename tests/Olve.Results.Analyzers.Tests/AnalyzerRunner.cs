@@ -59,6 +59,18 @@ internal static class AnalyzerRunner
                 public static ValueTask<Result> AsyncValueTask() => new(default(Result));
                 public static Task PlainTask() => Task.CompletedTask;
                 public static AssertionResult Assertion() => default;
+
+                // Consumers that receive a result as an argument. Passing a result on hands it off: the
+                // analyzer can't see whether the callee observes it, so an argument counts as a use.
+                public static void Sink(Result result) { }
+                public static Result Forward(Result result) => result;
+                public static AssertionSource<T> That<T>(T value) => default;
+            }
+
+            // Models TUnit's `Assert.That(value)` builder: `Assert.That(result).Succeeded()`.
+            public readonly struct AssertionSource<T>
+            {
+                public AssertionResult Succeeded() => default;
             }
         }
         """;
