@@ -28,6 +28,35 @@ public class EntityStoreTests
     }
 
     [Test]
+    public async Task Set_HandlerThrows_WriteSucceeds()
+    {
+        var store = new EntityStore<Counter>([]);
+        var id = Id.New<Counter>();
+        store.Set(new Counter(id, 0));
+        store.OnUpdated.Subscribe(_ => throw new InvalidOperationException("boom"));
+
+        await Assert.That(() => store.Set(new Counter(id, 1))).ThrowsNothing();
+
+        store.TryGet(id, out var stored);
+        await Assert.That(stored!.Value).IsEqualTo(1);
+    }
+
+    [Test]
+    public async Task Mutate_Mutates_HandlerThrows_Succeeds()
+    {
+        var store = new EntityStore<Counter>([]);
+        var id = Id.New<Counter>();
+        store.Set(new Counter(id, 0));
+        store.OnUpdated.Subscribe(_ => throw new InvalidOperationException("boom"));
+
+        var result = store.Mutate(id, c => c with { Value = c.Value + 1 });
+
+        await Assert.That(result).Succeeded();
+        store.TryGet(id, out var stored);
+        await Assert.That(stored!.Value).IsEqualTo(1);
+    }
+
+    [Test]
     public async Task Mutate_NoOp_DoesNotFire()
     {
         var store = new EntityStore<Counter>([]);
