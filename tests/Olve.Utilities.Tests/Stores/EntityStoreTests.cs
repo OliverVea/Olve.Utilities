@@ -16,13 +16,13 @@ public class EntityStoreTests
         var id = Id.New<Counter>();
         store.Set(new Counter(id, 0));
 
-        var fires = 0;
-        store.OnUpdated.Subscribe(_ => fires++);
+        var updates = new List<EntityUpdated<Counter, Id<Counter>>>();
+        store.OnUpdated.Subscribe(updates.Add);
 
         var result = store.Mutate(id, c => c with { Value = c.Value + 1 });
 
         await Assert.That(result).Succeeded();
-        await Assert.That(fires).IsEqualTo(1);
+        await Assert.That(updates).IsEquivalentTo([new EntityUpdated<Counter, Id<Counter>>(id, new Counter(id, 0), new Counter(id, 1))]);
         store.TryGet(id, out var stored);
         await Assert.That(stored!.Value).IsEqualTo(1);
     }
@@ -93,14 +93,14 @@ public class EntityStoreTests
         var store = new EntityStore<Counter>([]);
         var id = Id.New<Counter>();
 
-        var added = 0;
+        var added = new List<EntityAdded<Counter, Id<Counter>>>();
         var updated = 0;
-        store.OnAdded.Subscribe(_ => added++);
+        store.OnAdded.Subscribe(added.Add);
         store.OnUpdated.Subscribe(_ => updated++);
 
         store.Set(new Counter(id, 0));
 
-        await Assert.That(added).IsEqualTo(1);
+        await Assert.That(added).IsEquivalentTo([new EntityAdded<Counter, Id<Counter>>(id, new Counter(id, 0))]);
         await Assert.That(updated).IsEqualTo(0);
     }
 
@@ -112,14 +112,29 @@ public class EntityStoreTests
         store.Set(new Counter(id, 0));
 
         var added = 0;
-        var updated = 0;
+        var updates = new List<EntityUpdated<Counter, Id<Counter>>>();
         store.OnAdded.Subscribe(_ => added++);
-        store.OnUpdated.Subscribe(_ => updated++);
+        store.OnUpdated.Subscribe(updates.Add);
 
         store.Set(new Counter(id, 1));
 
         await Assert.That(added).IsEqualTo(0);
-        await Assert.That(updated).IsEqualTo(1);
+        await Assert.That(updates).IsEquivalentTo([new EntityUpdated<Counter, Id<Counter>>(id, new Counter(id, 0), new Counter(id, 1))]);
+    }
+
+    [Test]
+    public async Task Set_EqualValue_DoesNotFire()
+    {
+        var store = new EntityStore<Counter>([]);
+        var id = Id.New<Counter>();
+        store.Set(new Counter(id, 0));
+
+        var fires = 0;
+        store.OnUpdated.Subscribe(_ => fires++);
+
+        store.Set(new Counter(id, 0));
+
+        await Assert.That(fires).IsEqualTo(0);
     }
 
     [Test]
@@ -129,13 +144,13 @@ public class EntityStoreTests
         var id = Id.New<Counter>();
         store.Set(new Counter(id, 0));
 
-        var deleted = 0;
-        store.OnDeleted.Subscribe(_ => deleted++);
+        var deleted = new List<EntityDeleted<Counter, Id<Counter>>>();
+        store.OnDeleted.Subscribe(deleted.Add);
 
         var result = store.Delete(id);
 
         await Assert.That(result.Succeeded).IsTrue();
-        await Assert.That(deleted).IsEqualTo(1);
+        await Assert.That(deleted).IsEquivalentTo([new EntityDeleted<Counter, Id<Counter>>(id, new Counter(id, 0))]);
         await Assert.That(store.Contains(id)).IsFalse();
     }
 
@@ -305,5 +320,48 @@ public class EntityStoreTests
         await Assert.That(wins).IsEqualTo(1);
         await Assert.That(added).IsEqualTo(1);
     }
-}
 
+    [Test]
+    public async Task Count_ConcurrentSetsAndDeletes_MatchesContents()
+    {
+        var store = new EntityStore<Counter>([]);
+        // One id keeps the store flipping between empty and one entity, where a lagging counter goes negative.
+        var ids = new[] { Id.New<Counter>() };
+        const int threadCount = 8;
+        using var start = new Barrier(threadCount + 1);
+        var writersDone = false;
+        Exception? readerFailure = null;
+
+        var writers = Enumerable.Range(0, threadCount).Select(t => new Thread(() =>
+        {
+            start.SignalAndWait();
+            for (var i = 0; i < 5_000; i++)
+            {
+                var id = ids[(i + t) % ids.Length];
+                if (i % 2 == 0) store.Delete(id);
+                else store.Set(new Counter(id, i));
+            }
+        })).ToList();
+        // Count and List() are read while writes are in flight, where the counter can momentarily lag.
+        var reader = new Thread(() =>
+        {
+            start.SignalAndWait();
+            try
+            {
+                while (!Volatile.Read(ref writersDone)) _ = store.List();
+            }
+            catch (Exception ex)
+            {
+                readerFailure = ex;
+            }
+        });
+        writers.ForEach(t => t.Start());
+        reader.Start();
+        writers.ForEach(t => t.Join());
+        Volatile.Write(ref writersDone, true);
+        reader.Join();
+
+        await Assert.That(readerFailure).IsNull();
+        await Assert.That(store.Count).IsEqualTo(store.List().Count);
+    }
+}

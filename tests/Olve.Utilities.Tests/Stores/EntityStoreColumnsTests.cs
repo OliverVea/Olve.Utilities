@@ -155,7 +155,7 @@ public class EntityStoreColumnsTests
     }
 
     [Test]
-    public async Task Dispose_FreezesAndLetsColumnsBeCollected()
+    public async Task Dispose_FreezesColumns()
     {
         EntityStore<Train> store = [At(1)];
         var columns = store.CreateColumns();
@@ -163,8 +163,14 @@ public class EntityStoreColumnsTests
         store.Set(At(2));
         columns.Sync();
         await Assert.That(columns.Count).IsEqualTo(1);
+    }
 
-        var weak = CreateDisposedColumns(store);
+    [Test]
+    public async Task UndisposedColumns_AreCollectedWhileStoreLives()
+    {
+        EntityStore<Train> store = [At(1)];
+
+        var weak = CreateUndisposedColumns(store);
         GC.Collect();
         GC.WaitForPendingFinalizers();
         GC.Collect();
@@ -174,10 +180,9 @@ public class EntityStoreColumnsTests
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    private static WeakReference CreateDisposedColumns(EntityStore<Train> store)
+    private static WeakReference CreateUndisposedColumns(EntityStore<Train> store)
     {
         var columns = store.CreateColumns();
-        columns.Dispose();
         return new WeakReference(columns);
     }
 }

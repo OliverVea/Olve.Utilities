@@ -148,4 +148,39 @@ public class EventTests
 
         await Assert.That(laterRan).IsTrue();
     }
+
+    [Test]
+    public async Task Invoke_StructPayload_DoesNotAllocate()
+    {
+        var ev = new Event<EntityUpdated<string, int>>();
+        var seen = 0;
+        ev.Subscribe(e => seen += e.Id);
+        ev.Subscribe(e => seen += e.After.Length);
+        var payload = new EntityUpdated<string, int>(1, "before", "after");
+        ev.Invoke(payload); // warm up
+
+        var before = GC.GetAllocatedBytesForCurrentThread();
+        for (var i = 0; i < 100; i++) ev.Invoke(payload);
+        var allocated = GC.GetAllocatedBytesForCurrentThread() - before;
+
+        await Assert.That(allocated).IsEqualTo(0);
+        await Assert.That(seen).IsGreaterThan(0);
+    }
+
+    [Test]
+    public async Task NonGeneric_Invoke_RunsHandlersInOrder_AndIsolatesThrows()
+    {
+        var ev = new Event();
+        var calls = new List<int>();
+        Action third = () => calls.Add(3);
+        ev.Subscribe(() => calls.Add(1));
+        ev.Subscribe(() => throw new InvalidOperationException("boom"));
+        ev.Subscribe(third);
+
+        ev.Invoke();
+        ev.Unsubscribe(third);
+        ev.Invoke();
+
+        await Assert.That(calls).IsEquivalentTo([1, 3, 1], TUnit.Assertions.Enums.CollectionOrdering.Matching);
+    }
 }

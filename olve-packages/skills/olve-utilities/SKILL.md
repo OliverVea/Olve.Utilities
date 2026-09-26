@@ -74,24 +74,26 @@ graph.TryGetOutgoingEdges(a, out var edges); // 1 edge
 
 ## EntityStore
 
-Thread-safe, observable in-memory store. Entities implement `IHasId<Id<T>>` (`Olve.Utilities.Lookup`).
+Thread-safe, observable in-memory store. Entities are immutable records implementing `IHasId<Id<T>>` (`Olve.Utilities.Lookup`).
 
 ```csharp
 EntityStore<Train> trains = [];
-trains.Set(train);                                                   // OnAdded / OnUpdated
+trains.Set(train);                                                   // OnAdded / OnUpdated (equal value: no-op)
 var result = trains.Mutate(id, t => t with { Name = "IC 2" });       // Result; pure delegate, may retry
 trains.TryGet(id, out var found);
 DeletionResult deleted = trains.Delete(id);                          // OnDeleted
+trains.OnDeleted.Subscribe(e => Log(e.Id, e.Entity));                // payloads: EntityAdded / EntityUpdated(Before, After) / EntityDeleted
 ```
 
-**Indexes and views are owned by the caller.** `CreateIndex`, `CreateUniqueIndex` and `CreateOrderedView` subscribe to the store, so the store keeps them alive. Create them once and keep them for the store's lifetime, or `Dispose()` them. One built per request and never disposed leaks (this caused a prod OOM).
+**Keep indexes and views in a field.** `CreateIndex`, `CreateUniqueIndex`, `CreateOrderedView` and `CreateColumns` work on any `IEntityStore<T, TId>`. The store holds them weakly: create them once and keep a reference while you read them. An unreachable one is collected and stops tracking after the next GC; `Dispose()` stops it immediately.
 
 ```csharp
 _byLine = _trains.CreateIndex(t => t.LineId);       // once, e.g. in the constructor
 _byLine.GetForKey(lineId);                          // IReadOnlyCollection<Id<Train>>
 ```
 
-- Never change an indexed key with `Mutate` or a replacing `Set`; indexes ignore updates. Use `Delete` + `Set`.
+- Indexes follow key changes from `Mutate` or a replacing `Set`. Keep key selectors pure and cheap: they run on every update.
+- Events fire after the write and can arrive out of order across threads; derived state should re-read the store, not trust arrival order.
 - Event handlers are isolated; their exceptions go to `EventDispatch.OnHandlerException`. Set it at startup, otherwise they are silently swallowed.
 
 ## Pagination

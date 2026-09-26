@@ -5,7 +5,7 @@ using Olve.Utilities.Lookup;
 namespace Olve.Utilities.Stores;
 
 /// <summary>
-/// Dense, column-wise per-entity values kept alongside an <see cref="EntityStore{T,TId}"/>: one row per
+/// Dense, column-wise per-entity values kept alongside an <see cref="IEntityStore{T,TId}"/>: one row per
 /// entity, one array per column. Hot loops walk <see cref="EntityStoreColumn{TValue}.Values"/> as a
 /// contiguous span, with no hashing and no allocation.
 /// </summary>
@@ -28,8 +28,9 @@ namespace Olve.Utilities.Stores;
 /// (e.g. once per frame), or the queue of pending ids grows.
 /// </para>
 /// <para>
-/// Lifetime: the columns subscribe to the store's events, so the store keeps them alive. Dispose them to
-/// unsubscribe, or keep them for the store's lifetime.
+/// Lifetime: the store does not keep the columns alive. Keep a reference for as long as you use them;
+/// once they are unreachable they are collected and stop tracking the store. Dispose them to stop
+/// tracking immediately.
 /// </para>
 /// </remarks>
 /// <typeparam name="T">The entity type.</typeparam>
@@ -40,7 +41,8 @@ public sealed class EntityStoreColumns<T, TId> : IDisposable, IRowCount
 {
     private const int InitialCapacity = 16;
 
-    private readonly EntityStore<T, TId> _store;
+    private readonly IEntityStore<T, TId> _store;
+    private readonly IDisposable[] _subscriptions;
     private readonly ConcurrentQueue<TId> _pending = new();
     private readonly Dictionary<TId, int> _rowById = new();
     private readonly List<IBinding> _bindings = [];
@@ -48,16 +50,19 @@ public sealed class EntityStoreColumns<T, TId> : IDisposable, IRowCount
     private int _count;
     private int _disposed;
 
-    internal EntityStoreColumns(EntityStore<T, TId> store)
+    internal EntityStoreColumns(IEntityStore<T, TId> store)
     {
         _store = store;
 
         // Subscribe before populating so a write landing in between is queued, not lost; reconciling
         // an id that already has a row is a no-op.
-        store.OnAdded.Subscribe(Enqueue);
-        store.OnDeleted.Subscribe(Enqueue);
+        _subscriptions =
+        [
+            store.OnAdded.SubscribeWeak(this, static (columns, e) => columns._pending.Enqueue(e.Id)),
+            store.OnDeleted.SubscribeWeak(this, static (columns, e) => columns._pending.Enqueue(e.Id)),
+        ];
 
-        foreach (var entity in store)
+        foreach (var entity in store.List())
         {
             Reconcile(entity.Id);
         }
@@ -112,12 +117,9 @@ public sealed class EntityStoreColumns<T, TId> : IDisposable, IRowCount
     {
         if (Interlocked.Exchange(ref _disposed, 1) == 1) return;
 
-        _store.OnAdded.Unsubscribe(Enqueue);
-        _store.OnDeleted.Unsubscribe(Enqueue);
+        foreach (var subscription in _subscriptions) subscription.Dispose();
         _pending.Clear();
     }
-
-    private void Enqueue(TId id) => _pending.Enqueue(id);
 
     // Converge on the store's current state rather than trusting which event fired, as the indexes do:
     // duplicate and reordered events are harmless.

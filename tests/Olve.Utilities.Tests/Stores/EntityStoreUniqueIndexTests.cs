@@ -98,5 +98,19 @@ public class EntityStoreUniqueIndexTests
         await Assert.That(index.TryGet("build", out var id)).IsTrue();
         await Assert.That(id).IsEqualTo(item.Id);
     }
-}
 
+    [Test]
+    public async Task Mutate_ChangingKey_MovesId()
+    {
+        var store = new EntityStore<Item>([]);
+        var index = store.CreateUniqueIndex(s => s.Name);
+        var item = new Item(Id.New<Item>(), "old");
+        store.Set(item);
+
+        store.Mutate(item.Id, s => s with { Name = "new" });
+
+        await Assert.That(index.ContainsKey("old")).IsFalse();
+        await Assert.That(index.TryGet("new", out var id)).IsTrue();
+        await Assert.That(id).IsEqualTo(item.Id);
+    }
+}
