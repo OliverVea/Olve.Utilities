@@ -21,8 +21,12 @@ namespace Olve.Utilities.Stores;
 /// deliberately does not subscribe to <see cref="IEntityStore{T,TId}.OnUpdated"/>. If the key could
 /// change on update, this would be incorrect.
 /// </para>
+/// <para>
+/// Lifetime: the index subscribes to the store's events, so the store keeps it alive. Dispose it to
+/// unsubscribe, or keep it for the store's lifetime.
+/// </para>
 /// </remarks>
-public sealed class EntityStoreIndex<T, TKey>
+public sealed class EntityStoreIndex<T, TKey> : IDisposable
     where T : IHasId<Id<T>>
     where TKey : notnull
 {
@@ -35,6 +39,7 @@ public sealed class EntityStoreIndex<T, TKey>
 
     private readonly EntityStore<T> _store;
     private readonly Func<T, TKey> _keySelector;
+    private int _disposed;
 
     internal EntityStoreIndex(EntityStore<T> store, Func<T, TKey> keySelector)
     {
@@ -48,6 +53,18 @@ public sealed class EntityStoreIndex<T, TKey>
 
         store.OnAdded.Subscribe(Add);
         store.OnDeleted.Subscribe(Remove);
+    }
+
+    /// <summary>
+    /// Unsubscribes from the store. The index stops tracking adds and deletes but stays readable,
+    /// frozen at its last state. Safe to call more than once.
+    /// </summary>
+    public void Dispose()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) == 1) return;
+
+        _store.OnAdded.Unsubscribe(Add);
+        _store.OnDeleted.Unsubscribe(Remove);
     }
 
     private void Add(Id<T> id)

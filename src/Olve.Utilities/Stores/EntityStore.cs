@@ -148,10 +148,19 @@ public class EntityStore<T>(IEnumerable<T> initialEntities) : EntityStore<T, Id<
     }
 
     /// <summary>Creates a secondary index grouping entity ids by <paramref name="keySelector"/>.</summary>
+    /// <remarks>
+    /// The index subscribes to this store's events, so the store keeps it alive. The caller owns it:
+    /// keep it for the store's lifetime, or dispose it when done. An index built per use and never
+    /// disposed leaks, and every stale index still runs on each add and delete.
+    /// </remarks>
     public EntityStoreIndex<T, TKey> CreateIndex<TKey>(Func<T, TKey> keySelector) where TKey : notnull
         => new(this, keySelector);
 
     /// <summary>Creates a secondary unique index mapping each key to a single id.</summary>
+    /// <remarks>
+    /// The caller owns the index: keep it for the store's lifetime, or dispose it when done (see
+    /// <see cref="CreateIndex{TKey}"/>).
+    /// </remarks>
     public EntityStoreUniqueIndex<T, TKey> CreateUniqueIndex<TKey>(Func<T, TKey> keySelector) where TKey : notnull
         => new(this, keySelector);
 }
