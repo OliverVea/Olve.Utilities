@@ -1,3 +1,14 @@
+## v0.53.0 (2026-09-26)
+
+### Feat
+
+- **stores**: add EntityStoreColumns for dense per-entity values
+- **stores**: add TryAdd to EntityStore
+
+### Perf
+
+- **stores**: add benchmarks for per-frame entity state
+
 ## v0.52.0 (2026-09-26)
 
 ### Feat
