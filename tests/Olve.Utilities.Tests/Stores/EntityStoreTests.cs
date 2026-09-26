@@ -250,4 +250,60 @@ public class EntityStoreTests
 
         await Assert.That(store.Count).IsGreaterThanOrEqualTo(2);
     }
+
+    [Test]
+    public async Task TryAdd_NewId_AddsAndFiresOnAdded()
+    {
+        var store = new EntityStore<Counter>([]);
+        var added = 0;
+        store.OnAdded.Subscribe(_ => added++);
+        var counter = new Counter(Id.New<Counter>(), 1);
+
+        var result = store.TryAdd(counter);
+
+        await Assert.That(result).IsTrue();
+        await Assert.That(added).IsEqualTo(1);
+        await Assert.That(store.Contains(counter.Id)).IsTrue();
+    }
+
+    [Test]
+    public async Task TryAdd_ExistingId_KeepsExistingAndFiresNothing()
+    {
+        var id = Id.New<Counter>();
+        var store = new EntityStore<Counter>([new Counter(id, 1)]);
+        var fired = 0;
+        store.OnAdded.Subscribe(_ => fired++);
+        store.OnUpdated.Subscribe(_ => fired++);
+
+        var result = store.TryAdd(new Counter(id, 2));
+
+        await Assert.That(result).IsFalse();
+        await Assert.That(fired).IsEqualTo(0);
+        store.TryGet(id, out var stored);
+        await Assert.That(stored!.Value).IsEqualTo(1);
+    }
+
+    [Test]
+    public async Task TryAdd_ConcurrentSameId_ExactlyOneWins()
+    {
+        var store = new EntityStore<Counter>([]);
+        var id = Id.New<Counter>();
+        var added = 0;
+        store.OnAdded.Subscribe(_ => Interlocked.Increment(ref added));
+        const int threadCount = 8;
+        using var start = new Barrier(threadCount);
+        var wins = 0;
+
+        var threads = Enumerable.Range(0, threadCount).Select(i => new Thread(() =>
+        {
+            start.SignalAndWait();
+            if (store.TryAdd(new Counter(id, i))) Interlocked.Increment(ref wins);
+        })).ToList();
+        threads.ForEach(t => t.Start());
+        threads.ForEach(t => t.Join());
+
+        await Assert.That(wins).IsEqualTo(1);
+        await Assert.That(added).IsEqualTo(1);
+    }
 }
+

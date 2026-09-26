@@ -35,7 +35,7 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
         _entities = new(initialEntities.Select(e => new KeyValuePair<TId, T>(e.Id, e)));
     }
 
-    /// <summary>Fires after an entity not previously present is added via <see cref="Set"/>.</summary>
+    /// <summary>Fires after an entity not previously present is added via <see cref="Set"/> or <see cref="TryAdd"/>.</summary>
     public Event<TId> OnAdded { get; } = new();
 
     /// <summary>Fires after an existing entity changes via <see cref="Set"/> or <see cref="Mutate"/>.</summary>
@@ -69,6 +69,19 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
             }
             // removed or replaced between the two calls; retry
         }
+    }
+
+    /// <summary>
+    /// Adds <paramref name="entity"/> only if no entity with its id is present, firing
+    /// <see cref="OnAdded"/> on success. Returns <see langword="false"/> and leaves the existing entity
+    /// untouched otherwise. The check and the insert are one atomic step.
+    /// </summary>
+    public bool TryAdd(T entity)
+    {
+        if (!_entities.TryAdd(entity.Id, entity)) return false;
+
+        OnAdded.Invoke(entity.Id);
+        return true;
     }
 
     /// <summary>

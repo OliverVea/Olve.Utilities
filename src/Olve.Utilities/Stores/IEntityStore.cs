@@ -33,6 +33,9 @@ public interface IEntityStore<T, TId>
     /// <summary>Inserts or replaces <paramref name="entity"/>.</summary>
     void Set(T entity);
 
+    /// <summary>Adds <paramref name="entity"/> only if its id is not present; returns whether it was added.</summary>
+    bool TryAdd(T entity);
+
     /// <summary>Atomically read-modify-write the entity with <paramref name="id"/>.</summary>
     Result Mutate(TId id, Func<T, T> mutate);
 

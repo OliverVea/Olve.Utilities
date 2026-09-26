@@ -53,11 +53,12 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
     public EntityStore();
     public EntityStore(IEnumerable<T> initialEntities);
 
-    public Event<TId> OnAdded { get; }     // Set of a new id
+    public Event<TId> OnAdded { get; }     // Set or TryAdd of a new id
     public Event<TId> OnUpdated { get; }   // Set of an existing id, or a Mutate that changed something
     public Event<TId> OnDeleted { get; }   // Delete that removed something
 
     public void Set(T entity);                        // insert or replace
+    public bool TryAdd(T entity);                     // insert only if absent (atomic); OnAdded on success
     public Result Mutate(TId id, Func<T, T> mutate);  // atomic read-modify-write (compare-and-swap)
     public bool TryGet(TId id, [NotNullWhen(true)] out T? entity);
     public bool Contains(TId id);
