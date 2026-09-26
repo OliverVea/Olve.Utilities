@@ -1,3 +1,9 @@
+## v0.54.0 (2026-09-26)
+
+### Feat
+
+- **stores**: carry committed values in store events and hold views weakly
+
 ## v0.53.0 (2026-09-26)
 
 ### Feat
