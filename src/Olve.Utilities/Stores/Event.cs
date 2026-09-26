@@ -11,6 +11,12 @@ namespace Olve.Utilities.Stores;
 /// should bridge to heavier machinery (a channel, a queue) at the subscription site, not here.
 /// <see cref="Subscribe"/> and <see cref="Unsubscribe"/> are atomic, so subscribers may come and go
 /// concurrently with each other and with <see cref="Invoke"/>.
+/// <para>
+/// Subscribers are isolated from each other: <see cref="Invoke"/> runs each one in its own try/catch,
+/// so a subscriber that throws does not prevent later subscribers from running, and the exception is
+/// routed to <see cref="EventDispatch.OnHandlerException"/> instead of the caller. <see cref="Invoke"/>
+/// never throws, so a store mutation that raises an event is never reported as failed after it committed.
+/// </para>
 /// </remarks>
 /// <typeparam name="T">The message type passed to subscribers.</typeparam>
 public class Event<T>
@@ -20,8 +26,32 @@ public class Event<T>
     /// <summary>Gets the number of currently registered subscribers.</summary>
     public int SubscriberCount => Volatile.Read(ref _handlers)?.GetInvocationList().Length ?? 0;
 
-    /// <summary>Invokes every subscriber synchronously, in registration order.</summary>
-    public void Invoke(T message) => Volatile.Read(ref _handlers)?.Invoke(message);
+    /// <summary>
+    /// Invokes every subscriber synchronously, in registration order. A subscriber that throws is reported
+    /// to <see cref="EventDispatch.OnHandlerException"/> and does not stop the remaining subscribers.
+    /// Never throws.
+    /// </summary>
+    /// <remarks>
+    /// Dispatches to the subscribers registered when the call starts; subscribers added or removed during
+    /// dispatch (including by a subscriber) take effect from the next <see cref="Invoke"/>.
+    /// </remarks>
+    public void Invoke(T message)
+    {
+        var handlers = Volatile.Read(ref _handlers);
+        if (handlers is null) return;
+
+        foreach (var handler in Delegate.EnumerateInvocationList(handlers))
+        {
+            try
+            {
+                handler(message);
+            }
+            catch (Exception ex)
+            {
+                EventDispatch.ReportHandlerException(ex);
+            }
+        }
+    }
 
     /// <summary>Registers <paramref name="handler"/> to be called on every <see cref="Invoke"/>.</summary>
     public void Subscribe(Action<T> handler) => Update(current => current + handler);
