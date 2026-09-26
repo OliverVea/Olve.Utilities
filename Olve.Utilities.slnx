@@ -26,6 +26,9 @@
     <File Path=".github/workflows/pr_to_master.yml" />
     <File Path=".github/workflows/push_master.yml" />
   </Folder>
+  <Folder Name="/benchmarks/">
+    <Project Path="benchmarks/Olve.Utilities.Benchmarks/Olve.Utilities.Benchmarks.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/Olve.Logging/Olve.Logging.csproj" />
     <Project Path="src/Olve.MinimalApi/Olve.MinimalApi.csproj" />
