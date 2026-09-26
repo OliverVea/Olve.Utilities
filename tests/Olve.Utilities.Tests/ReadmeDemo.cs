@@ -2,7 +2,9 @@ using Olve.Utilities.CollectionExtensions;
 using Olve.Utilities.Collections;
 using Olve.Utilities.Graphs;
 using Olve.Utilities.Ids;
+using Olve.Utilities.Lookup;
 using Olve.Utilities.Paginations;
+using Olve.Utilities.Stores;
 using Olve.Utilities.StringFormatting;
 
 namespace Olve.Utilities.Tests;
@@ -213,5 +215,32 @@ public class ReadmeDemo
         await Assert.That(fromPage).IsEqualTo(new OffsetPagination(4, 2));
         await Assert.That(request.TryToPagination(out _)).IsFalse();
         await Assert.That(pagination).IsEqualTo(new Pagination(2, 2));
+    }
+
+    private record Train(Id<Train> Id, string Line, int Order) : IHasId<Id<Train>>;
+
+    [Test]
+    public async Task EntityStoreExample()
+    {
+        // record Train(Id<Train> Id, string Line, int Order) : IHasId<Id<Train>>;
+        EntityStore<Train> trains = [];
+
+        // Indexes and views subscribe to the store: dispose them, or keep them for the store's lifetime
+        using var byLine = trains.CreateIndex(t => t.Line);
+        using var byOrder = trains.CreateOrderedView(Comparer<Train>.Create((a, b) => a.Order.CompareTo(b.Order)));
+
+        var express = new Train(Id.New<Train>(), "red", 2);
+        trains.Set(express);
+        trains.Set(new Train(Id.New<Train>(), "red", 1));
+
+        // Mutate is an atomic read-modify-write; it must not change a key an index uses (Line here)
+        var mutated = trains.Mutate(express.Id, t => t with { Order = 3 });
+
+        var redTrains = byLine.GetForKey("red"); // 2 ids
+        var first = byOrder[0]; // the Order = 1 train
+
+        await Assert.That(mutated.Succeeded).IsTrue();
+        await Assert.That(redTrains.Count).IsEqualTo(2);
+        await Assert.That(first.Order).IsEqualTo(1);
     }
 }
