@@ -133,4 +133,53 @@ public class EntityStoreIndexTests
         // No exception means the test passed; assert the index is back to the seeded state.
         await Assert.That(index.GetForKey(group).Count).IsEqualTo(seed.Length);
     }
+
+    [Test]
+    public async Task Dispose_RestoresStoreSubscriberCounts()
+    {
+        var store = new EntityStore<Item>([]);
+        var added = store.OnAdded.SubscriberCount;
+        var deleted = store.OnDeleted.SubscriberCount;
+
+        for (var i = 0; i < 10; i++)
+        {
+            using var index = store.CreateIndex(s => s.Group);
+        }
+
+        await Assert.That(store.OnAdded.SubscriberCount).IsEqualTo(added);
+        await Assert.That(store.OnDeleted.SubscriberCount).IsEqualTo(deleted);
+    }
+
+    [Test]
+    public async Task Dispose_StopsTrackingAddsAndDeletes()
+    {
+        var store = new EntityStore<Item>([]);
+        var index = store.CreateIndex(s => s.Group);
+        const string group = "a";
+
+        var kept = ItemIn(group);
+        store.Set(kept);
+        index.Dispose();
+
+        store.Set(ItemIn(group));
+        store.Delete(kept.Id);
+
+        await Assert.That(index.GetForKey(group).Count).IsEqualTo(1);
+        await Assert.That(index.GetForKey(group)).Contains(kept.Id);
+    }
+
+    [Test]
+    public async Task Dispose_Twice_IsSafe_AndLeavesOtherIndexesSubscribed()
+    {
+        var store = new EntityStore<Item>([]);
+        var other = store.CreateIndex(s => s.Group);
+        var index = store.CreateIndex(s => s.Group);
+        const string group = "a";
+
+        index.Dispose();
+        index.Dispose();
+        store.Set(ItemIn(group));
+
+        await Assert.That(other.GetForKey(group).Count).IsEqualTo(1);
+    }
 }

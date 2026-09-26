@@ -11,8 +11,10 @@ namespace Olve.Utilities.Stores;
 /// kept so deletes can resolve the key (the entity is already gone from the store when
 /// <see cref="IEntityStore{T,TId}.OnDeleted"/> fires). The index keys on a value that never changes for
 /// a given entity, so it does not subscribe to <see cref="IEntityStore{T,TId}.OnUpdated"/>.
+/// The store keeps the index alive through its subscriptions; dispose it to unsubscribe, or keep it
+/// for the store's lifetime.
 /// </remarks>
-public sealed class EntityStoreUniqueIndex<T, TKey>
+public sealed class EntityStoreUniqueIndex<T, TKey> : IDisposable
     where T : IHasId<Id<T>>
     where TKey : notnull
 {
@@ -21,6 +23,7 @@ public sealed class EntityStoreUniqueIndex<T, TKey>
     private readonly Dictionary<Id<T>, TKey> _keyById = new();
     private readonly EntityStore<T> _store;
     private readonly Func<T, TKey> _keySelector;
+    private int _disposed;
 
     internal EntityStoreUniqueIndex(EntityStore<T> store, Func<T, TKey> keySelector)
     {
@@ -34,6 +37,18 @@ public sealed class EntityStoreUniqueIndex<T, TKey>
 
         store.OnAdded.Subscribe(Add);
         store.OnDeleted.Subscribe(Remove);
+    }
+
+    /// <summary>
+    /// Unsubscribes from the store. The index stops tracking adds and deletes but stays readable,
+    /// frozen at its last state. Safe to call more than once.
+    /// </summary>
+    public void Dispose()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) == 1) return;
+
+        _store.OnAdded.Unsubscribe(Add);
+        _store.OnDeleted.Unsubscribe(Remove);
     }
 
     private void Add(Id<T> id)
