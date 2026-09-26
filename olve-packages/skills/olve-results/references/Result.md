@@ -8,6 +8,7 @@ Properties:
 - `bool Succeeded`
 - `bool Failed`
 - `ResultProblemCollection? Problems`
+- `bool IsRetryable` — `true` if failed and every problem is retryable; `false` on success
 
 Static methods:
 - `Result Success()`
@@ -16,6 +17,7 @@ Static methods:
 - `Result<T> Failure<T>(params IEnumerable<ResultProblem> problems)`
 - `Result Try<TException>(Action action, string? message = null, params object[] args)` — catches TException, returns as problems
 - `Result<TValue> Try<TValue, TException>(Func<TValue> action, string? message = null, params object[] args)`
+- `Try<TException>(Action action, bool retryable, string? message = null, params object[] args)` and `Try<TValue, TException>(Func<TValue> action, bool retryable, ...)` — set `IsRetryable` on the captured problem (default without it: `true`)
 
 Chain (sequential dependent steps, stops on first failure):
 - `Result Chain(params IEnumerable<Func<Result>> links)`

@@ -1,6 +1,6 @@
 ---
 name: olve-results
-description: Reference for Olve.Results — Result/Result<T>, TryPickProblems, ResultProblem and typed problems (TryPickProblem/PickProblems), DeletionResult and [GenerateResult], Chain/Concat/Map/Bind composition, and error propagation with Prepend. Use when writing or reading code that uses the Result pattern.
+description: Reference for Olve.Results — Result/Result<T>, TryPickProblems, ResultProblem and typed problems (TryPickProblem/PickProblems), DeletionResult and [GenerateResult], Chain/Concat/Map/Bind composition, error propagation with Prepend, and retryable problems (IsRetryable). Use when writing or reading code that uses the Result pattern.
 user-invocable: false
 ---
 
@@ -190,6 +190,20 @@ if (LoadMesh(path).TryPickProblems(out var problems, out var mesh))
 }
 
 // Result is: "Failed to load building mesh for collision" -> "File not found: '{0}'"
+```
+
+## Retryable problems
+
+`IsRetryable` separates transient failures (retry) from terminal ones (don't). Problems from an exception, including `Result.Try`, default to retryable; all others don't. A result or collection is retryable only if every problem is.
+
+```csharp
+if (result.IsRetryable) { /* back off and try again */ }
+
+new ResultProblem("Service unavailable") { IsRetryable = true };   // explicit
+problems.Prepend("Sync failed");          // context inherits retryability from the problems
+problems.Prepend(false, "Sync aborted");  // leading bool sets it explicitly
+
+Result.Try<IOException>(() => File.Delete(path), retryable: false, "Error deleting file");
 ```
 
 ## Collection Extensions

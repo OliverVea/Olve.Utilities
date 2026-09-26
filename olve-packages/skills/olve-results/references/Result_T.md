@@ -9,6 +9,7 @@ Properties:
 - `bool Failed`
 - `T? Value`
 - `ResultProblemCollection? Problems`
+- `bool IsRetryable` — `true` if failed and every problem is retryable; `false` on success
 
 Static methods:
 - `Result<T> Success(T value)` — prefer `Result.Success(value)` or implicit conversion

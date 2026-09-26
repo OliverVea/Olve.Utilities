@@ -21,6 +21,7 @@ Properties:
 - `object[] Args` — format arguments `[JsonIgnore]`
 - `string[] Tags` — categorization tags (init-settable)
 - `int Severity` — severity level, higher = more severe (init-settable)
+- `bool IsRetryable` — transient failure that may succeed if retried (init-settable). Defaults to `true` for problems created from an exception, `false` otherwise. Serialized; payloads without it infer `ExceptionSummary != null`
 - `string? Source` — problem source (init-settable)
 - `Exception? Exception` — causing exception `[JsonIgnore]`
 - `string? ExceptionSummary` — `"{ExceptionType}: {Message}"`, survives serialization
