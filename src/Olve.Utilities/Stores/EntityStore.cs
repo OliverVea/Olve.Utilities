@@ -142,6 +142,10 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
     /// </remarks>
     public EntityStoreOrderedView<T, TId> CreateOrderedView(IComparer<T> comparer) => new(this, comparer);
 
+    /// <summary>Creates dense per-entity columns that follow this store's membership; see <see cref="EntityStoreColumns{T,TId}"/>.</summary>
+    /// <remarks>The caller owns the columns: keep them for the store's lifetime, or dispose them when done.</remarks>
+    public EntityStoreColumns<T, TId> CreateColumns() => new(this);
+
     /// <summary>
     /// Enumerates the entities as a live view: no copy and no locks, safe while other threads write, but
     /// not a moment-in-time snapshot — entities added or removed during enumeration may or may not appear.
