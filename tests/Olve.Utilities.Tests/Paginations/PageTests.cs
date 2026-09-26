@@ -41,6 +41,18 @@ public class PageTests
     }
 
     [Test]
+    public async Task ToSlice_ReturnsSliceAtPageOffset()
+    {
+        IReadOnlyList<int> items = [5, 6];
+        var page = new Page<int>(items, PageNumber: 2, PageSize: 2, TotalCount: 10);
+
+        var slice = page.ToSlice();
+
+        await Assert.That(slice).IsEqualTo(new Slice<int>(items, Offset: 4, Limit: 2, TotalCount: 10));
+        await Assert.That(slice.Next).IsEqualTo(page.Next?.ToOffsetPagination());
+    }
+
+    [Test]
     public async Task Serialize_DefaultOptions_ProducesObjectWithItemsAndMetadata()
     {
         var page = new Page<string>(["a", "b"], PageNumber: 0, PageSize: 2, TotalCount: 5);
