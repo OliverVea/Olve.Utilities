@@ -67,6 +67,10 @@ public class ResultProblem
         Severity = severity;
         Source = source;
         ExceptionSummary = exceptionSummary;
+        // Payloads written before IsRetryable existed carry no flag. Infer it from the same rule the
+        // constructors use: problems created from an exception are retryable. A serialized IsRetryable
+        // value, when present, overrides this via the init setter.
+        IsRetryable = exceptionSummary is not null;
         Exception = null;
         OriginInformation = default;
     }
@@ -80,6 +84,7 @@ public class ResultProblem
         ExceptionSummary = exception is not null ? $"{exception.GetType().Name}: {exception.Message}" : null;
         Message = message;
         Args = args;
+        IsRetryable = exception is not null;
 
         var path = Paths.Path.Create(stackFrame.GetFileName() ?? string.Empty);
         var lineNumber = stackFrame.GetFileLineNumber();
@@ -111,6 +116,14 @@ public class ResultProblem
     ///     The default value can be set using <see cref="DefaultSeverity"/>.
     /// </summary>
     public int Severity { get; init; } = DefaultSeverity;
+
+    /// <summary>
+    ///     Gets a value indicating whether the operation that produced this problem may succeed if retried
+    ///     (a transient failure) as opposed to a terminal one (e.g. validation).
+    ///     Problems created from an <see cref="System.Exception"/> default to <see langword="true" />;
+    ///     all other problems default to <see langword="false" />.
+    /// </summary>
+    public bool IsRetryable { get; init; }
 
     /// <summary>
     ///     Gets the optional arguments providing additional details about the problem.

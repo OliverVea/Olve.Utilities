@@ -11,15 +11,15 @@ This file documents the design and usage of the **Olve.Results** project. Keep i
 - **Result** – value-less result representing success or failure. Use `Result.Success()` or `Result.Failure(IEnumerable<ResultProblem>)` to create instances.
 - **Result<T>** – result carrying a value. Create with `Result<T>.Success(value)` or `Result<T>.Failure(...)`.
 - **DeletionResult** – specialized result for delete operations. It distinguishes between success, not found, and error states.
-- **ResultProblem** – describes a single problem. Automatically captures file path and line number via stack traces. Supports optional tags, severity, source and args.
-- **ResultProblemCollection** – enumerable wrapper over multiple problems. Provides `Append`, `Prepend` and `Merge` helpers.
+- **ResultProblem** – describes a single problem. Automatically captures file path and line number via stack traces. Supports optional tags, severity, source and args. `IsRetryable` (init) marks transient failures; defaults to `true` for problems created from an exception, `false` otherwise. Round-trips through JSON (legacy payloads without the field infer it from `ExceptionSummary`).
+- **ResultProblemCollection** – enumerable wrapper over multiple problems. Provides `Append`, `Prepend` and `Merge` helpers. `IsRetryable` is true iff non-empty and every problem is retryable (also surfaced on `Result`, `Result<T>` and `[GenerateResult]` types; false on success). `Prepend(message, args)` / `Prepend(exception, message, args)` inherit retryability from the collection; `Prepend(bool retryable, ...)` sets it explicitly (the flag leads so it never binds to a format arg). Prepending/appending existing problems keeps their flags.
 - **ProblemOriginInformation** – stores origin file path and line number. `LinkString` returns a clickable link string via `Olve.Paths`.
 
 ## Helpers
 
 - **Result.Chain** – chain multiple result-returning functions, stopping on first failure.
 - **Result.Concat** – invoke multiple functions and combine their values if all succeed.
-- **Result.Try** – execute actions/functions and turn caught exceptions into problems.
+- **Result.Try** – execute actions/functions and turn caught exceptions into problems (retryable by default; `Try(action, bool retryable, message, args)` overrides).
 - **IfProblem** – run an action when a result has problems.
 - **TryPickProblem<TProblem> / PickProblems<TProblem>** – catch-by-type recovery on `Result`, `Result<T>`, `ResultProblemCollection` and `[GenerateResult]` types. Matches the first (or every) problem assignable to `TProblem`, in enumeration order. Define domain problems by subclassing `ResultProblem`.
 - **ResultEnumerableExtensions** – utilities for enumerations of results: `HasProblems`, `TryPickProblems`, `GetValues` and `GetProblems`.

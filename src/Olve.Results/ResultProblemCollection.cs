@@ -35,17 +35,44 @@ public class ResultProblemCollection(params IEnumerable<ResultProblem> problems)
         new(resultProblems.Concat(problems));
 
     /// <summary>
-    ///     Prepends a new problem to the collection using a formatted message.
+    ///     Gets a value indicating whether the problems in this collection may be resolved by retrying:
+    ///     <see langword="true" /> if the collection is non-empty and every problem is
+    ///     <see cref="ResultProblem.IsRetryable">retryable</see>; otherwise <see langword="false" />.
+    /// </summary>
+    public bool IsRetryable => problems.Any() && problems.All(p => p.IsRetryable);
+
+    /// <summary>
+    ///     Prepends a new problem to the collection using a formatted message, adding context to the existing problems.
+    ///     The new problem inherits <see cref="IsRetryable" /> from this collection.
     /// </summary>
     /// <param name="message">The format string for the problem message.</param>
     /// <param name="args">The arguments to format the message.</param>
     /// <returns>A new collection with the formatted problem prepended.</returns>
     public ResultProblemCollection Prepend([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
         params object[] args)
-        => Prepend(new ResultProblem(null, message, args: args, stackFrame: new StackFrame(1, true)));
+        => Prepend(new ResultProblem(null, message, args: args, stackFrame: new StackFrame(1, true))
+        {
+            IsRetryable = IsRetryable,
+        });
 
     /// <summary>
-    ///     Prepends a new problem from an exception to the collection using a formatted message.
+    ///     Prepends a new problem to the collection using a formatted message, adding context to the existing problems.
+    /// </summary>
+    /// <param name="retryable">Whether the new problem is <see cref="ResultProblem.IsRetryable">retryable</see>.</param>
+    /// <param name="message">The format string for the problem message.</param>
+    /// <param name="args">The arguments to format the message.</param>
+    /// <returns>A new collection with the formatted problem prepended.</returns>
+    public ResultProblemCollection Prepend(bool retryable,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
+        params object[] args)
+        => Prepend(new ResultProblem(null, message, args: args, stackFrame: new StackFrame(1, true))
+        {
+            IsRetryable = retryable,
+        });
+
+    /// <summary>
+    ///     Prepends a new problem from an exception to the collection using a formatted message, adding context to the
+    ///     existing problems. The new problem inherits <see cref="IsRetryable" /> from this collection.
     /// </summary>
     /// <param name="exception">The exception causing the problem.</param>
     /// <param name="message">The format string for the problem message.</param>
@@ -53,7 +80,27 @@ public class ResultProblemCollection(params IEnumerable<ResultProblem> problems)
     /// <returns>A new collection with the formatted problem prepended.</returns>
     public ResultProblemCollection Prepend(Exception exception, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
         params object[] args)
-        => Prepend(new ResultProblem(exception, message, args: args, stackFrame: new StackFrame(1, true)));
+        => Prepend(new ResultProblem(exception, message, args: args, stackFrame: new StackFrame(1, true))
+        {
+            IsRetryable = IsRetryable,
+        });
+
+    /// <summary>
+    ///     Prepends a new problem from an exception to the collection using a formatted message, adding context to the
+    ///     existing problems.
+    /// </summary>
+    /// <param name="retryable">Whether the new problem is <see cref="ResultProblem.IsRetryable">retryable</see>.</param>
+    /// <param name="exception">The exception causing the problem.</param>
+    /// <param name="message">The format string for the problem message.</param>
+    /// <param name="args">The arguments to format the message.</param>
+    /// <returns>A new collection with the formatted problem prepended.</returns>
+    public ResultProblemCollection Prepend(bool retryable, Exception exception,
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string message,
+        params object[] args)
+        => Prepend(new ResultProblem(exception, message, args: args, stackFrame: new StackFrame(1, true))
+        {
+            IsRetryable = retryable,
+        });
 
     /// <summary>
     ///     Attempts to retrieve the first problem assignable to <typeparamref name="TProblem" />, in enumeration order.

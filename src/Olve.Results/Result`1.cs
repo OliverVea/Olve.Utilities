@@ -32,6 +32,13 @@ public readonly struct Result<T> : IResultType
     public ResultProblemCollection? Problems { get; }
 
     /// <summary>
+    ///     Gets a value indicating whether the failure may be resolved by retrying:
+    ///     <see langword="true" /> if the result failed and all of its problems are retryable
+    ///     (see <see cref="ResultProblemCollection.IsRetryable" />); <see langword="false" /> on success.
+    /// </summary>
+    public bool IsRetryable => Problems?.IsRetryable ?? false;
+
+    /// <summary>
     ///     Gets the value associated with the result, if any.
     /// </summary>
     public T? Value { get; }
