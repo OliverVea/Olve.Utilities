@@ -76,4 +76,27 @@ public class EntityStoreUniqueIndexTests
         await Assert.That(index.ContainsKey("build")).IsFalse();
         await Assert.That(index.ContainsKey("kept")).IsTrue();
     }
+
+    [Test]
+    public async Task DeleteEventArrivingAfterReAdd_KeepsEntityIndexed()
+    {
+        // See EntityStoreIndexTests: a late OnDeleted must not drop an entity that is back in the store.
+        var store = new EntityStore<Item>([]);
+        var item = Named("build");
+        store.Set(item);
+        var reAdded = false;
+        store.OnDeleted.Subscribe(_ =>
+        {
+            if (reAdded) return;
+            reAdded = true;
+            store.Set(item);
+        });
+        using var index = store.CreateUniqueIndex(s => s.Name);
+
+        store.Delete(item.Id);
+
+        await Assert.That(index.TryGet("build", out var id)).IsTrue();
+        await Assert.That(id).IsEqualTo(item.Id);
+    }
 }
+

@@ -7,7 +7,9 @@ namespace Olve.Utilities.Stores;
 /// A secondary unique index over an <see cref="EntityStore{T}"/> mapping each key to a single id.
 /// </summary>
 /// <remarks>
-/// Thread-safe: all reads and writes are guarded by <see cref="_gate"/>. A reverse id→key map is
+/// Thread-safe: all reads and writes are guarded by <see cref="_gate"/>, and each store event re-reads
+/// the entity under it, so the index matches the store once concurrent writes to an id settle. The key
+/// selector runs under the lock, so keep it pure and cheap. A reverse id→key map is
 /// kept so deletes can resolve the key (the entity is already gone from the store when
 /// <see cref="IEntityStore{T,TId}.OnDeleted"/> fires). The index keys on a value that never changes for
 /// a given entity, so it does not subscribe to <see cref="IEntityStore{T,TId}.OnUpdated"/>.
@@ -30,13 +32,15 @@ public sealed class EntityStoreUniqueIndex<T, TKey> : IDisposable
         _store = store;
         _keySelector = keySelector;
 
+        // Subscribe before populating so a write landing in between is not lost; reconciling an id
+        // twice is harmless.
+        store.OnAdded.Subscribe(Reconcile);
+        store.OnDeleted.Subscribe(Reconcile);
+
         foreach (var entity in store.List())
         {
-            Add(entity.Id);
+            Reconcile(entity.Id);
         }
-
-        store.OnAdded.Subscribe(Add);
-        store.OnDeleted.Subscribe(Remove);
     }
 
     /// <summary>
@@ -47,33 +51,37 @@ public sealed class EntityStoreUniqueIndex<T, TKey> : IDisposable
     {
         if (Interlocked.Exchange(ref _disposed, 1) == 1) return;
 
-        _store.OnAdded.Unsubscribe(Add);
-        _store.OnDeleted.Unsubscribe(Remove);
+        _store.OnAdded.Unsubscribe(Reconcile);
+        _store.OnDeleted.Unsubscribe(Reconcile);
     }
 
-    private void Add(Id<T> id)
-    {
-        if (!_store.TryGet(id, out var entity)) return;
-
-        var key = _keySelector(entity);
-        lock (_gate)
-        {
-            _index[key] = id;
-            _keyById[id] = key;
-        }
-    }
-
-    private void Remove(Id<T> id)
+    // Re-read the store under the lock instead of trusting which event fired; see EntityStoreIndex.
+    private void Reconcile(Id<T> id)
     {
         lock (_gate)
         {
-            if (!_keyById.Remove(id, out var key)) return;
-
-            // Only drop the forward entry if it still points at this id; a later add under the same
-            // key may have rebound it to a different id.
-            if (_index.TryGetValue(key, out var current) && current.Equals(id))
-                _index.Remove(key);
+            if (_store.TryGet(id, out var entity)) AddLocked(id, _keySelector(entity));
+            else RemoveLocked(id);
         }
+    }
+
+    private void AddLocked(Id<T> id, TKey key)
+    {
+        if (_keyById.TryGetValue(id, out var existingKey) && !EqualityComparer<TKey>.Default.Equals(existingKey, key))
+            RemoveLocked(id);
+
+        _index[key] = id;
+        _keyById[id] = key;
+    }
+
+    private void RemoveLocked(Id<T> id)
+    {
+        if (!_keyById.Remove(id, out var key)) return;
+
+        // Only drop the forward entry if it still points at this id; a later add under the same
+        // key may have rebound it to a different id.
+        if (_index.TryGetValue(key, out var current) && current.Equals(id))
+            _index.Remove(key);
     }
 
     /// <summary>Resolves <paramref name="key"/> to its id, returning <see langword="false"/> if absent.</summary>

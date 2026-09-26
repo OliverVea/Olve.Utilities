@@ -196,4 +196,44 @@ public class EntityStoreIndexTests
 
         await Assert.That(other.GetForKey(group).Count).IsEqualTo(1);
     }
+
+    [Test]
+    public async Task DeleteEventArrivingAfterReAdd_KeepsEntityIndexed()
+    {
+        // Events fire outside any lock, so a Delete's OnDeleted can reach the index after a concurrent
+        // Set has re-added the entity. Simulated deterministically: a handler subscribed before the
+        // index re-adds the entity, so the index sees OnDeleted while the entity is back in the store.
+        var store = new EntityStore<Item>([]);
+        var item = ItemIn("a");
+        store.Set(item);
+        var reAdded = false;
+        store.OnDeleted.Subscribe(_ =>
+        {
+            if (reAdded) return;
+            reAdded = true;
+            store.Set(item);
+        });
+        using var index = store.CreateIndex(s => s.Group);
+
+        store.Delete(item.Id);
+
+        await Assert.That(store.Contains(item.Id)).IsTrue();
+        await Assert.That(index.GetForKey("a")).Contains(item.Id);
+    }
+
+    [Test]
+    public async Task ReplacingWithDifferentKey_MovesId()
+    {
+        var store = new EntityStore<Item>([]);
+        var item = ItemIn("a");
+        store.Set(item);
+        using var index = store.CreateIndex(s => s.Group);
+
+        store.Delete(item.Id);
+        store.Set(item with { Group = "b" });
+
+        await Assert.That(index.ContainsKey("a")).IsFalse();
+        await Assert.That(index.GetForKey("b")).Contains(item.Id);
+    }
 }
+

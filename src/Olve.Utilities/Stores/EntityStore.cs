@@ -50,13 +50,25 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
     /// </summary>
     public void Set(T entity)
     {
-        var isUpdate = _entities.ContainsKey(entity.Id);
-        _entities[entity.Id] = entity;
+        var id = entity.Id;
 
-        if (isUpdate)
-            OnUpdated.Invoke(entity.Id);
-        else
-            OnAdded.Invoke(entity.Id);
+        // Decide add vs. update by what the write actually did. Checking for the id first and then
+        // writing races a concurrent Delete: the write re-adds the entity but would report an update.
+        while (true)
+        {
+            if (_entities.TryAdd(id, entity))
+            {
+                OnAdded.Invoke(id);
+                return;
+            }
+
+            if (_entities.TryGetValue(id, out var current) && _entities.TryUpdate(id, entity, current))
+            {
+                OnUpdated.Invoke(id);
+                return;
+            }
+            // removed or replaced between the two calls; retry
+        }
     }
 
     /// <summary>
