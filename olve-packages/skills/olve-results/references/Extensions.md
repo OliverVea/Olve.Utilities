@@ -4,6 +4,7 @@
 
 https://olivervea.github.io/Olve.Utilities/api/Olve.Results.ResultExtensions.html
 
+- `void DiscardResult(this Result result)` / `void DiscardResult<T>(this Result<T> result)` — explicitly ignore a result (satisfies ORES001)
 - `Result ToEmptyResult<T>(this Result<T> result)` — discard value, keep success/failure
 - `Result<TDest> Map<TSource, TDest>(this Result<TSource> result, Func<TSource, TDest> map)` — transform value. Returns original problems on failure.
 - `Result<TDest> Bind<TSource, TDest>(this Result<TSource> result, Func<TSource, Result<TDest>> bind)` — transform with Result-returning func. Returns original problems on failure.
@@ -31,6 +32,14 @@ https://olivervea.github.io/Olve.Utilities/api/Olve.Results.DictionaryResultExte
 
 - `Result SetWithResult<TKey, TValue>(this IDictionary<TKey, TValue> dict, TKey key, TValue value)` — fails if key exists
 - `Result<TValue> GetWithResult<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dict, TKey key)` — fails if key missing
+
+## DeletionResultExtensions
+
+https://olivervea.github.io/Olve.Utilities/api/Olve.Results.DeletionResultExtensions.html
+
+- `void DiscardResult(this DeletionResult result)` — explicitly ignore a deletion result
+
+`MapToResult` and `Match` are generated instance members of `DeletionResult`; see [DeletionResult](DeletionResult.md).
 
 ## ResultFuncExtensions
 

@@ -99,14 +99,21 @@ public static class OneOfTryGetExtensions
 
 ## EnumerableOneOfExtensions
 
-Generated overloads for checking if any element in a sequence of `OneOf` values matches a specific variant. Methods follow the pattern `AnyT0`, `AnyT1`, etc. for `OneOf` types with up to 8 type parameters.
+Generated overloads over sequences of `OneOf` values (up to 8 type parameters), in three families:
 
 ```csharp
 public static class EnumerableOneOfExtensions
 {
-    public static bool AnyT0<T0>(this IEnumerable<OneOf<T0>> source);
+    // true if any element holds variant Tn
     public static bool AnyT0<T0, T1>(this IEnumerable<OneOf<T0, T1>> source);
     public static bool AnyT1<T0, T1>(this IEnumerable<OneOf<T0, T1>> source);
-    // ... overloads up to AnyT7 for OneOf with up to 8 type params
+
+    // true if every element holds variant Tn
+    public static bool AllT0<T0, T1>(this IEnumerable<OneOf<T0, T1>> source);
+
+    // the Tn values, skipping elements holding other variants
+    public static IEnumerable<T0> OfT0<T0, T1>(this IEnumerable<OneOf<T0, T1>> source);
+
+    // ... AnyT0..AnyT7, AllT0..AllT7, OfT0..OfT7 for OneOf with 1 to 8 type params
 }
 ```

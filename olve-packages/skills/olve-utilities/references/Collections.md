@@ -143,9 +143,10 @@ public class ManyToManyLookup<TLeft, TRight> : IManyToManyLookup<TLeft, TRight>
 ```csharp
 public interface IQueue<T> : IEnumerable<T>
 {
-    void Enqueue(T item);
-    bool TryDequeue(out T item);
-    bool TryPeek(out T item);
+    bool Enqueue(T item);      // false if the item was rejected (DropNewest when full)
+    bool TryEnqueue(T item);   // false when full, regardless of policy; never drops or throws
+    bool TryDequeue([MaybeNullWhen(false)] out T item);
+    bool TryPeek([MaybeNullWhen(false)] out T item);
     int Count { get; }
     void Clear();
 }
@@ -153,11 +154,18 @@ public interface IQueue<T> : IEnumerable<T>
 
 ## FixedSizeQueue\<T\>
 
-Implements `IQueue<T>`. Automatically drops oldest items when `maxSize` is exceeded.
+Implements `IQueue<T>`. Bounded queue; what `Enqueue` does when full is set by `FullQueueBehavior`.
 
 ```csharp
 public class FixedSizeQueue<T> : IQueue<T>
 {
-    public FixedSizeQueue(int maxSize);
+    public FixedSizeQueue(int maxSize, FullQueueBehavior fullBehavior = FullQueueBehavior.DropOldest);
+}
+
+public enum FullQueueBehavior
+{
+    DropOldest,   // default: evict the oldest item, accept the new one (Enqueue returns true)
+    DropNewest,   // reject the new item (Enqueue returns false)
+    Throw,        // Enqueue throws InvalidOperationException
 }
 ```

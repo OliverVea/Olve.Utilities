@@ -2,7 +2,7 @@
 
 https://olivervea.github.io/Olve.Utilities/api/Olve.Results.Result-1.html
 
-Readonly struct. Success with a value or failure.
+Readonly struct. Success with a value or failure. Implements `IResultType`. Marked `[MustBeUsedWhenReturned]` (ORES001).
 
 Properties:
 - `bool Succeeded`
@@ -10,9 +10,15 @@ Properties:
 - `T? Value`
 - `ResultProblemCollection? Problems`
 
+Static methods:
+- `Result<T> Success(T value)` — prefer `Result.Success(value)` or implicit conversion
+- `Result<T> Failure(...)` — `[Obsolete]`; use `Result.Failure<T>(...)`
+
 Instance methods:
 - `bool TryPickProblems(out ResultProblemCollection? problems)` — true if failed
 - `bool TryPickProblems(out ResultProblemCollection? problems, out T? value)` — true if failed; always populates both
+- `bool TryPickProblem<TProblem>(out TProblem? problem) where TProblem : ResultProblem` — first problem assignable to `TProblem`; false on success
+- `IEnumerable<TProblem> PickProblems<TProblem>() where TProblem : ResultProblem` — all matching problems; empty on success
 - `bool TryPickValue(out T? value)` — true if succeeded
 - `bool TryPickValue(out T? value, out ResultProblemCollection? problems)` — true if succeeded; always populates both
 - `T GetValueOrDefault(T defaultValue)`

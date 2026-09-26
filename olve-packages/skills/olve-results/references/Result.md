@@ -2,7 +2,7 @@
 
 https://olivervea.github.io/Olve.Utilities/api/Olve.Results.Result.html
 
-Readonly struct. Success or failure without a value.
+Readonly struct. Success or failure without a value. Implements `IResultType`. Marked `[MustBeUsedWhenReturned]` (ORES001).
 
 Properties:
 - `bool Succeeded`
@@ -31,7 +31,11 @@ Concat (independent steps, aggregates all problems):
 
 Instance methods:
 - `bool TryPickProblems(out ResultProblemCollection? problems)` — true if failed
+- `bool TryPickProblem<TProblem>(out TProblem? problem) where TProblem : ResultProblem` — true if a problem assignable to `TProblem` exists (first match; subclasses included); false on success
+- `IEnumerable<TProblem> PickProblems<TProblem>() where TProblem : ResultProblem` — all matching problems, in order; empty on success
 - `Result IfProblem(Action<ResultProblemCollection> action)` — execute on failure, returns self
 - `string ToString()` — returns "Success" or "Failure"
 
 Implicit conversions: `ResultProblem` -> `Result`, `ResultProblemCollection` -> `Result`
+
+`IResultType` (implemented by `Result` and `Result<T>`): `Succeeded`, `Failed`, `Problems`, `object? BoxedValue`, `bool HasValue` — for non-reflective handling of results of unknown type.
