@@ -1,3 +1,9 @@
+## v0.55.0 (2026-09-27)
+
+### Feat
+
+- **minimalapi**: answer 404 for NotFoundProblem failures
+
 ## v0.54.0 (2026-09-26)
 
 ### Feat
