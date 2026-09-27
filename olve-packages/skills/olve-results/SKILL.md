@@ -91,6 +91,7 @@ var all = result.PickProblems<InsufficientFundsProblem>(); // every match, in or
 - `TryPickProblem<TProblem>` returns the first problem assignable to `TProblem` (subclasses included); `false` on success.
 - `PickProblems<TProblem>` returns every match; empty on success.
 - Available on `Result`, `Result<T>`, `ResultProblemCollection`, and `[GenerateResult]` types like `DeletionResult`.
+- Built in: `NotFoundProblem` for an unknown id or key (`new NotFoundProblem("User {0} not found", id)`). `EntityStore.Mutate` and `GetWithResult` return it; Olve.MinimalApi maps a failure containing one to 404.
 
 ## DeletionResult
 

@@ -121,7 +121,7 @@ public class EntityStore<T, TId> : IEntityStore<T, TId>, IEnumerable<T>
         for (var attempt = 0; attempt < MaxMutateAttempts; attempt++)
         {
             if (!_entities.TryGetValue(id, out var current))
-                return new ResultProblem("Entity with id '{0}' not found.", id);
+                return new NotFoundProblem("Entity with id '{0}' not found.", id);
 
             var updated = mutate(current);
             if (EqualityComparer<T>.Default.Equals(updated, current))

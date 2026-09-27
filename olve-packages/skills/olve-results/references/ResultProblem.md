@@ -46,6 +46,8 @@ if (result.TryPickProblem<InsufficientFundsProblem>(out var funds)) { /* funds.S
 
 Matching is by assignability (`OfType`), so picking a base problem type also returns its subclasses.
 
+Built-in typed problem: `NotFoundProblem(string message, params object[] args)` (sealed) for an unknown id or key. Records the caller as its origin like any problem. `EntityStore.Mutate` and `GetWithResult` return it; Olve.MinimalApi maps a failure containing one to 404.
+
 ProblemOriginInformation:
 - `readonly record struct ProblemOriginInformation(IPath FilePath, int LineNumber)`
 - `string LinkString` — clickable link string for the current platform

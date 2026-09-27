@@ -94,7 +94,7 @@ public static class EntityStoreExtensions
 ```
 
 - Both support collection expressions: `EntityStore<Train> trains = [];` or `[train1, train2]`.
-- `Mutate`'s delegate may run more than once under contention, so it must be pure (use a `with` expression, no side effects). It returns a failure if the id is missing or the compare-and-swap loses 10 times in a row. A no-op mutation (result equals the current value) fires nothing.
+- `Mutate`'s delegate may run more than once under contention, so it must be pure (use a `with` expression, no side effects). It returns a failure if the id is missing (a `NotFoundProblem`) or the compare-and-swap loses 10 times in a row. A no-op mutation (result equals the current value) fires nothing.
 - `Mutate` returns `Result` and `Delete` returns `DeletionResult`; both are `[MustBeUsedWhenReturned]` (ORES001), so check them or discard explicitly.
 
 ```csharp

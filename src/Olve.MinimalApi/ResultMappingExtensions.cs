@@ -6,6 +6,8 @@ namespace Olve.MinimalApi;
 
 /// <summary>
 /// Provides extension methods to map <see cref="Result"/> and <see cref="Result{T}"/> to minimal API HTTP responses.
+/// A failure answers 404 Not Found when any of its problems is a <see cref="NotFoundProblem"/>, and 400 Bad Request
+/// otherwise; either way the body is the <see cref="ResultProblem"/> array.
 /// </summary>
 public static class ResultMappingExtensions
 {
@@ -62,7 +64,7 @@ public static class ResultMappingExtensions
 
                 if (r.Failed)
                 {
-                    return TypedResults.BadRequest(r.Problems?.ToArray());
+                    return ToFailure(r.Problems);
                 }
 
                 return r.HasValue
@@ -76,11 +78,11 @@ public static class ResultMappingExtensions
     /// Converts a <see cref="Result"/> into an <see cref="IResult"/> HTTP response.
     /// </summary>
     /// <param name="result">The <see cref="Result"/> to convert.</param>
-    /// <returns>An <see cref="IResult"/> representing the HTTP response, either OK or BadRequest with problems.</returns>
+    /// <returns>An <see cref="IResult"/> representing the HTTP response: OK, or NotFound/BadRequest with problems.</returns>
     public static IResult ToHttpResult(this Result result)
     {
         return result.TryPickProblems(out var problems)
-            ? TypedResults.BadRequest(problems.ToArray())
+            ? ToFailure(problems)
             : TypedResults.Ok();
     }
 
@@ -89,11 +91,21 @@ public static class ResultMappingExtensions
     /// </summary>
     /// <typeparam name="T">The type of the result value.</typeparam>
     /// <param name="result">The <see cref="Result{T}"/> to convert.</param>
-    /// <returns>An <see cref="IResult"/> representing the HTTP response, either OK with value or BadRequest with problems.</returns>
+    /// <returns>An <see cref="IResult"/> representing the HTTP response: OK with value, or NotFound/BadRequest with problems.</returns>
     public static IResult ToHttpResult<T>(this Result<T> result)
     {
         return result.TryPickProblems(out var problems, out var value)
-            ? TypedResults.BadRequest(problems.ToArray())
+            ? ToFailure(problems)
             : TypedResults.Ok(value);
+    }
+
+    // Any NotFoundProblem wins, so context a handler prepends (a plain ResultProblem) keeps the 404.
+    // The body stays ResultProblem[] whatever the status, so clients deserialize one shape.
+    private static IResult ToFailure(IEnumerable<ResultProblem>? problems)
+    {
+        var body = problems?.ToArray() ?? [];
+        return body.Any(p => p is NotFoundProblem)
+            ? TypedResults.NotFound(body)
+            : TypedResults.BadRequest(body);
     }
 }

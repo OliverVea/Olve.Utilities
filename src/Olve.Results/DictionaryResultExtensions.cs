@@ -43,6 +43,6 @@ public static class DictionaryResultExtensions
     {
         return dictionary.TryGetValue(key, out var value)
             ? Result.Success(value)
-            : new ResultProblem("Could not find value for key '{0}'", key);
+            : new NotFoundProblem("Could not find value for key '{0}'", key);
     }
 }

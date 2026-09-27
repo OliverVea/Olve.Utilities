@@ -17,7 +17,7 @@ Static class providing extension methods to map `Result` and `Result<T>` to Mini
 
 ## WithResultMapping (non-generic)
 
-Configures the endpoint to produce 200 OK (empty body) on success or 400 Bad Request with `ResultProblem[]` on failure. Used when the handler returns `Result`.
+Configures the endpoint to produce 200 OK (empty body) on success, or on failure 404 Not Found (any `NotFoundProblem`) or 400 Bad Request, with `ResultProblem[]` as body. Used when the handler returns `Result`.
 
 ```csharp
 app.MapDelete("/users/{id}", (int id, DeleteHandler handler, CancellationToken ct)
@@ -27,7 +27,7 @@ app.MapDelete("/users/{id}", (int id, DeleteHandler handler, CancellationToken c
 
 ## WithResultMapping\<TResult\>
 
-Configures the endpoint to produce 200 OK with `TResult` body on success or 400 Bad Request with `ResultProblem[]` on failure. Used when the handler returns `Result<TResult>`.
+Configures the endpoint to produce 200 OK with `TResult` body on success, or on failure 404 Not Found (any `NotFoundProblem`) or 400 Bad Request, with `ResultProblem[]` as body. Used when the handler returns `Result<TResult>`.
 
 ```csharp
 app.MapGet("/users/{id}", (int id, UserHandler handler, CancellationToken ct)
@@ -37,7 +37,7 @@ app.MapGet("/users/{id}", (int id, UserHandler handler, CancellationToken ct)
 
 ## ToHttpResult
 
-Converts a `Result` directly into an `IResult` HTTP response. Returns `TypedResults.Ok()` on success or `TypedResults.BadRequest(problems.ToArray())` on failure.
+Converts a `Result` directly into an `IResult` HTTP response. Returns `TypedResults.Ok()` on success; on failure `TypedResults.NotFound(problems)` if any problem is a `NotFoundProblem`, else `TypedResults.BadRequest(problems)` (both `ResultProblem[]`).
 
 ```csharp
 Result result = DoSomething();
@@ -46,7 +46,7 @@ return result.ToHttpResult();
 
 ## ToHttpResult\<T\>
 
-Converts a `Result<T>` directly into an `IResult` HTTP response. Returns `TypedResults.Ok(value)` on success or `TypedResults.BadRequest(problems.ToArray())` on failure.
+Converts a `Result<T>` directly into an `IResult` HTTP response. Returns `TypedResults.Ok(value)` on success; on failure `TypedResults.NotFound(problems)` if any problem is a `NotFoundProblem`, else `TypedResults.BadRequest(problems)` (both `ResultProblem[]`).
 
 ```csharp
 Result<string> result = GetValue();

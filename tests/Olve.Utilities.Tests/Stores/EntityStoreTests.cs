@@ -1,3 +1,4 @@
+using Olve.Results;
 using Olve.Results.TUnit;
 using Olve.Utilities.Ids;
 using Olve.Utilities.Lookup;
@@ -84,6 +85,7 @@ public class EntityStoreTests
         var result = store.Mutate(Id.New<Counter>(), c => c with { Value = c.Value + 1 });
 
         await Assert.That(result).Failed();
+        await Assert.That(result.TryPickProblem<NotFoundProblem>(out _)).IsTrue();
         await Assert.That(fires).IsEqualTo(0);
     }
 
