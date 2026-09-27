@@ -12,7 +12,7 @@ ASP.NET Core Minimal API extensions for Olve.Results. Maps `Result` and `Result<
 
 | Type | Description |
 | --- | --- |
-| `ResultMappingExtensions` | Maps `Result` / `Result<T>` to 200 OK or 400 Bad Request responses. |
+| `ResultMappingExtensions` | Maps `Result` / `Result<T>` to 200 OK, 404 Not Found or 400 Bad Request responses. |
 | `ValidationApiExtensions` | Adds endpoint validation filters using `IValidator<T>`. |
 | `IHandler<TRequest>` | Handler interface for operations returning `Result` (no value). |
 | `IHandler<TRequest, TResponse>` | Handler interface for operations returning `Result<TResponse>`. |

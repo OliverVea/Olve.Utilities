@@ -43,5 +43,6 @@ public class DictionaryResultExtensionsTests
         var result = dictionary.GetWithResult("key");
 
         await Assert.That(result).Failed();
+        await Assert.That(result.TryPickProblem<NotFoundProblem>(out _)).IsTrue();
     }
 }

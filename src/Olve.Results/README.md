@@ -242,12 +242,32 @@ var all = result.PickProblems<InsufficientFundsProblem>(); // every match, in or
 
 `TryPickProblem<TProblem>()` returns the first problem assignable to `TProblem` (subclasses included), and `false` on success. `PickProblems<TProblem>()` returns every match. Both are available on `Result`, `Result<T>`, `ResultProblemCollection`, and `[GenerateResult]` types such as `DeletionResult`.
 
+### Not-found problems
+
+`NotFoundProblem` is the built-in typed problem for "the thing you asked for doesn't exist": an unknown id or key. Return it instead of a plain `ResultProblem` so callers and transports can tell a missing resource from other failures. Olve.MinimalApi answers 404 Not Found when a failure contains one. `EntityStore.Mutate` and `GetWithResult` already use it.
+
+```cs
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L274-L284
+
+IReadOnlyDictionary<int, string> users = new Dictionary<int, string> { [1] = "alice" };
+
+Result<string> Rename(int id, string name)
+    => users.ContainsKey(id)
+        ? Result.Success(name)
+        : new NotFoundProblem("User {0} not found", id);
+
+var result = Rename(42, "bob");
+
+var missing = result.TryPickProblem<NotFoundProblem>(out _); // true
+var lookup = users.GetWithResult(7); // fails with a NotFoundProblem
+```
+
 ### Retryable problems
 
 `IsRetryable` marks transient failures that may succeed if retried. Problems created from an exception (including `Result.Try`) default to `true`; all others default to `false`. A collection, `Result`, `Result<T>` or generated result is retryable only when it failed and every problem is retryable. `Prepend(message)` inherits the flag from the existing problems; pass a leading `bool` to set it explicitly.
 
 ```cs
-// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L274-L289
+// ../../tests/Olve.Results.Tests/ReadmeDemo.cs#L293-L308
 
 var timeout = new ResultProblem(new TimeoutException(), "Request timed out"); // IsRetryable: true
 var invalid = new ResultProblem("Name is required"); // IsRetryable: false

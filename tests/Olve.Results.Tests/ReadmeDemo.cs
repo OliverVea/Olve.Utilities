@@ -269,6 +269,25 @@ public class ReadmeDemo
     }
 
     [Test]
+    public async Task NotFoundProblems()
+    {
+        IReadOnlyDictionary<int, string> users = new Dictionary<int, string> { [1] = "alice" };
+
+        Result<string> Rename(int id, string name)
+            => users.ContainsKey(id)
+                ? Result.Success(name)
+                : new NotFoundProblem("User {0} not found", id);
+
+        var result = Rename(42, "bob");
+
+        var missing = result.TryPickProblem<NotFoundProblem>(out _); // true
+        var lookup = users.GetWithResult(7); // fails with a NotFoundProblem
+
+        await Assert.That(missing).IsTrue();
+        await Assert.That(lookup.TryPickProblem<NotFoundProblem>(out _)).IsTrue();
+    }
+
+    [Test]
     public async Task RetryableProblems()
     {
         var timeout = new ResultProblem(new TimeoutException(), "Request timed out"); // IsRetryable: true

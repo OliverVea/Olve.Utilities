@@ -19,7 +19,7 @@ dotnet add package Olve.MinimalApi
 
 | Type | Description |
 | --- | --- |
-| `ResultMappingExtensions` | Maps `Result` / `Result<T>` to 200 OK or 400 Bad Request responses. |
+| `ResultMappingExtensions` | Maps `Result` / `Result<T>` to 200 OK, 404 Not Found or 400 Bad Request responses. |
 | `ValidationApiExtensions` | Adds endpoint validation filters using `IValidator<T>`. |
 | `IHandler<TRequest>` | Handler interface returning `Result`. |
 | `IHandler<TRequest, TResponse>` | Handler interface returning `Result<TResponse>`. |
@@ -44,7 +44,10 @@ app.MapGet("/users/{id}", (int id, UserHandler handler, CancellationToken ct)
 | --- | --- |
 | `Result` success | 200 OK (empty body) |
 | `Result<T>` success | 200 OK with `T` as body |
-| Any failure | 400 Bad Request with `ResultProblem[]` as body |
+| Failure containing a `NotFoundProblem` | 404 Not Found with `ResultProblem[]` as body |
+| Any other failure | 400 Bad Request with `ResultProblem[]` as body |
+
+A failure answers 404 when **any** of its problems is a `NotFoundProblem` (from Olve.Results), so context prepended with `Prepend(...)` keeps the 404. `WithResultMapping` only declares 400 in OpenAPI; an endpoint that can answer 404 declares it itself with `.Produces<ResultProblem[]>(StatusCodes.Status404NotFound)`.
 
 The non-generic `WithResultMapping()` is used when the handler returns `Result` (no value):
 

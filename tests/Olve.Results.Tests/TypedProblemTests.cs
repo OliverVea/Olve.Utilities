@@ -7,7 +7,7 @@ public class ValidationProblem(string fieldName) : ResultProblem("Validation fai
 
 public sealed class RequiredFieldProblem(string fieldName) : ValidationProblem(fieldName);
 
-public sealed class NotFoundProblem(string key) : ResultProblem("Not found: {0}", key)
+public sealed class MissingKeyProblem(string key) : ResultProblem("Not found: {0}", key)
 {
     public string Key => key;
 }
@@ -33,7 +33,7 @@ public class TypedProblemTests
     {
         var collection = new ResultProblemCollection(new ResultProblem("plain"), new ValidationProblem("name"));
 
-        var picked = collection.TryPickProblem<NotFoundProblem>(out var problem);
+        var picked = collection.TryPickProblem<MissingKeyProblem>(out var problem);
 
         await Assert.That(picked).IsFalse();
         await Assert.That(problem).IsNull();
@@ -43,7 +43,7 @@ public class TypedProblemTests
     public async Task Collection_TryPickProblem_MatchesSubclassesOfRequestedType()
     {
         var required = new RequiredFieldProblem("name");
-        var collection = new ResultProblemCollection(new NotFoundProblem("x"), required);
+        var collection = new ResultProblemCollection(new MissingKeyProblem("x"), required);
 
         await Assert.That(collection.TryPickProblem<ValidationProblem>(out var validation)).IsTrue();
         await Assert.That(validation).IsSameReferenceAs(required);
@@ -52,7 +52,7 @@ public class TypedProblemTests
     [Test]
     public async Task Collection_TryPickProblem_BaseTypeMatchesFirstProblem()
     {
-        var first = new NotFoundProblem("x");
+        var first = new MissingKeyProblem("x");
         var collection = new ResultProblemCollection(first, new ResultProblem("plain"));
 
         await Assert.That(collection.TryPickProblem<ResultProblem>(out var problem)).IsTrue();
@@ -64,14 +64,14 @@ public class TypedProblemTests
     {
         var a = new ValidationProblem("a");
         var b = new RequiredFieldProblem("b");
-        var collection = new ResultProblemCollection(a, new NotFoundProblem("x"), b, new ResultProblem("plain"));
+        var collection = new ResultProblemCollection(a, new MissingKeyProblem("x"), b, new ResultProblem("plain"));
 
         var picked = collection.PickProblems<ValidationProblem>().ToList();
 
         await Assert.That(picked.Count).IsEqualTo(2);
         await Assert.That(picked[0]).IsSameReferenceAs(a);
         await Assert.That(picked[1]).IsSameReferenceAs(b);
-        await Assert.That(collection.PickProblems<NotFoundProblem>().Count()).IsEqualTo(1);
+        await Assert.That(collection.PickProblems<MissingKeyProblem>().Count()).IsEqualTo(1);
     }
 
     [Test]
@@ -86,15 +86,15 @@ public class TypedProblemTests
     public async Task Collection_SubclassTypeSurvivesPrependAndMerge()
     {
         var validation = new ValidationProblem("name");
-        var notFound = new NotFoundProblem("x");
+        var notFound = new MissingKeyProblem("x");
 
         var prepended = new ResultProblemCollection(validation).Prepend("Context");
         var merged = ResultProblemCollection.Merge(prepended, new ResultProblemCollection(notFound));
 
         await Assert.That(merged.TryPickProblem<ValidationProblem>(out var pickedValidation)).IsTrue();
         await Assert.That(pickedValidation).IsSameReferenceAs(validation);
-        await Assert.That(merged.TryPickProblem<NotFoundProblem>(out var pickedNotFound)).IsTrue();
-        await Assert.That(pickedNotFound).IsSameReferenceAs(notFound);
+        await Assert.That(merged.TryPickProblem<MissingKeyProblem>(out var pickedMissingKey)).IsTrue();
+        await Assert.That(pickedMissingKey).IsSameReferenceAs(notFound);
     }
 
     [Test]
@@ -113,7 +113,7 @@ public class TypedProblemTests
 
         await Assert.That(result.TryPickProblem<ValidationProblem>(out var problem)).IsTrue();
         await Assert.That(problem).IsSameReferenceAs(validation);
-        await Assert.That(result.TryPickProblem<NotFoundProblem>(out _)).IsFalse();
+        await Assert.That(result.TryPickProblem<MissingKeyProblem>(out _)).IsFalse();
         await Assert.That(result.PickProblems<ValidationProblem>().Single()).IsSameReferenceAs(validation);
     }
 
@@ -139,14 +139,14 @@ public class TypedProblemTests
     [Test]
     public async Task ResultOfT_TryPickProblem_ReturnsFirstMatch()
     {
-        var notFound = new NotFoundProblem("user:1");
+        var notFound = new MissingKeyProblem("user:1");
         Result<int> result = notFound;
 
-        await Assert.That(result.TryPickProblem<NotFoundProblem>(out var problem)).IsTrue();
+        await Assert.That(result.TryPickProblem<MissingKeyProblem>(out var problem)).IsTrue();
         await Assert.That(problem).IsSameReferenceAs(notFound);
         await Assert.That(problem!.Key).IsEqualTo("user:1");
         await Assert.That(result.TryPickProblem<ValidationProblem>(out _)).IsFalse();
-        await Assert.That(result.PickProblems<NotFoundProblem>().Single()).IsSameReferenceAs(notFound);
+        await Assert.That(result.PickProblems<MissingKeyProblem>().Single()).IsSameReferenceAs(notFound);
     }
 
     [Test]
@@ -171,12 +171,12 @@ public class TypedProblemTests
     [Test]
     public async Task DeletionResult_TryPickProblem_PicksFromErrorState()
     {
-        var notFound = new NotFoundProblem("row");
+        var notFound = new MissingKeyProblem("row");
         var error = DeletionResult.Error(new ResultProblem("plain"), notFound);
 
-        await Assert.That(error.TryPickProblem<NotFoundProblem>(out var problem)).IsTrue();
+        await Assert.That(error.TryPickProblem<MissingKeyProblem>(out var problem)).IsTrue();
         await Assert.That(problem).IsSameReferenceAs(notFound);
-        await Assert.That(error.PickProblems<NotFoundProblem>().Single()).IsSameReferenceAs(notFound);
+        await Assert.That(error.PickProblems<MissingKeyProblem>().Single()).IsSameReferenceAs(notFound);
 
         await Assert.That(DeletionResult.Success().TryPickProblem<ResultProblem>(out _)).IsFalse();
         await Assert.That(DeletionResult.NotFound().TryPickProblem<ResultProblem>(out _)).IsFalse();

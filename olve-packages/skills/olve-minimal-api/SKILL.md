@@ -15,12 +15,12 @@ Reference docs: [README](references/README.md) | [Handlers](references/Handlers.
 Map `Result` / `Result<T>` return values to HTTP responses automatically:
 
 ```csharp
-// Generic — 200 OK with body or 400 Bad Request
+// Generic — 200 OK with body, or 404/400 with problems
 app.MapGet("/users/{id}", (int id, UserHandler handler, CancellationToken ct)
         => handler.HandleAsync(new GetUser(id), ct))
     .WithResultMapping<UserDto>();
 
-// Non-generic — 200 OK (empty) or 400 Bad Request
+// Non-generic — 200 OK (empty), or 404/400 with problems
 app.MapDelete("/users/{id}", (int id, DeleteHandler handler, CancellationToken ct)
         => handler.RunAsync(new DeleteUser(id), ct))
     .WithResultMapping();
@@ -30,7 +30,10 @@ app.MapDelete("/users/{id}", (int id, DeleteHandler handler, CancellationToken c
 | --- | --- |
 | `Result` success | 200 OK (empty body) |
 | `Result<T>` success | 200 OK with `T` as body |
-| Any failure | 400 Bad Request with `ResultProblem[]` as body |
+| Failure containing a `NotFoundProblem` | 404 Not Found with `ResultProblem[]` as body |
+| Any other failure | 400 Bad Request with `ResultProblem[]` as body |
+
+A failure answers 404 when **any** of its problems is a `NotFoundProblem` (from Olve.Results), so context prepended with `Prepend(...)` keeps the 404. `WithResultMapping` only declares 400 in OpenAPI; an endpoint that can answer 404 declares it itself with `.Produces<ResultProblem[]>(StatusCodes.Status404NotFound)`.
 
 ## Validation
 
