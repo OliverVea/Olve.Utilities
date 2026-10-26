@@ -1,3 +1,14 @@
+## v0.56.0 (2026-10-26)
+
+### Feat
+
+- **paths**: add IsWithin for lexical containment checks
+
+### Fix
+
+- **paths**: evaluate . and .. in the left path before appending a relative path
+- **paths**: treat any . or .. segment as navigation, so appended strings can't escape the base
+
 ## v0.55.0 (2026-09-27)
 
 ### Feat
