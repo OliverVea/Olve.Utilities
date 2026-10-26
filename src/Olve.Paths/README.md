@@ -74,6 +74,23 @@ var unixPlatform = unixPath.Platform; // PathPlatform.Unix
 var windowsPlatform = windowsPath.Platform; // PathPlatform.Windows
 ```
 
+### Staying inside a directory
+
+A string appended with `/` must be plain names: `.` and `..` segments throw an `ArgumentException`. A relative path (`./x`, `../x`, `a/../x`) is evaluated and can leave the left-hand path, so when a path is built from untrusted input, check it with `IsWithin`. The check is lexical and does not resolve symbolic links.
+
+```cs
+// ../../tests/Olve.Paths.Tests/ReadmeDemo.cs#L107-L114
+
+// Staying inside a directory
+var root = Path.CreatePure("/srv/uploads", PathPlatform.Unix);
+
+var file = root / "user/photo.png"; // /srv/uploads/user/photo.png
+var isInside = file.IsWithin(root); // true
+
+var escaped = root / Path.CreatePure("../etc/passwd", PathPlatform.Unix); // /srv/etc/passwd
+var escapedIsInside = escaped.IsWithin(root); // false
+```
+
 ### Filesystem operations
 
 `IPath` provides methods for querying and manipulating the filesystem: `Exists()`, `ElementType`, `TryGetChildren()`, and `EnsurePathExists()`.

@@ -21,7 +21,7 @@ This file documents the design and usage of the **Olve.Paths** project. Keep it 
 ## Usage Notes
 
 1. Use `Path.Create()` to obtain an `IPath` resolved to the current platform. `CreatePure()` returns an `IPurePath` without environment binding.
-2. Paths can be combined using the `/` operator or the `Append`/`AppendPath` methods.
+2. Paths can be combined using the `/` operator or the `Append`/`AppendPath` methods. An appended string must be a stub (no `.`/`..` segment anywhere, else `ArgumentException`); a relative path is evaluated and may leave the left-hand path. A path is `Relative` when any segment is `.` or `..`; `...` is an ordinary name. `IsWithin(root)` is the lexical containment check for paths built from untrusted input.
 3. `TryGetParent`, `TryGetChildren`, `TryGetAbsolute` and related helpers return success flags rather than throwing on failure.
 4. `GetLinkString()` builds a clickable URL string pointing to the path, optionally with line and column numbers. It is used by `Olve.Results` problem origins.
 5. When implementing new path environments or platforms, ensure they implement `IPathEnvironment` and update this document.
