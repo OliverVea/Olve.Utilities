@@ -100,4 +100,23 @@ public class ReadmeDemo
         Directory.Delete(tempSubDir.Path, true);
         File.Delete(tempFile.Path);
     }
+
+    [Test]
+    public async Task Snippet5()
+    {
+        // Staying inside a directory
+        var root = Path.CreatePure("/srv/uploads", PathPlatform.Unix);
+
+        var file = root / "user/photo.png"; // /srv/uploads/user/photo.png
+        var isInside = file.IsWithin(root); // true
+
+        var escaped = root / Path.CreatePure("../etc/passwd", PathPlatform.Unix); // /srv/etc/passwd
+        var escapedIsInside = escaped.IsWithin(root); // false
+
+        // Assert
+        await Assert.That(file.Path).IsEqualTo("/srv/uploads/user/photo.png");
+        await Assert.That(isInside).IsTrue();
+        await Assert.That(escaped.Path).IsEqualTo("/srv/etc/passwd");
+        await Assert.That(escapedIsInside).IsFalse();
+    }
 }
