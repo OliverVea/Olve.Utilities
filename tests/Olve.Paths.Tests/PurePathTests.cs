@@ -151,6 +151,12 @@ public class PurePathTests
     [Test]
     [Arguments("/srv/runs", "a/../../x", "/srv/x", PathPlatform.Unix)]
     [Arguments("/srv/runs", "a/./b", "/srv/runs/a/b", PathPlatform.Unix)]
+    [Arguments("/srv/runs/..", "../a", "/a", PathPlatform.Unix)]
+    [Arguments("/../x", "./y", "/x/y", PathPlatform.Unix)]
+    [Arguments("../base", "../../x", "../../x", PathPlatform.Unix)]
+    [Arguments("./a", "./b", "./a/b", PathPlatform.Unix)]
+    [Arguments("./a", "../../x", "../x", PathPlatform.Unix)]
+    [Arguments(@"C:\srv\runs\..", @"..\a", @"C:\a", PathPlatform.Windows)]
     [Arguments(@"C:\srv\runs", @"a\..\..\x", @"C:\srv\x", PathPlatform.Windows)]
     public async Task DivisionOperator_WithRelativePathContainingNavigation_EvaluatesIt(string left, string right, string expected, PathPlatform platform)
     {
