@@ -114,4 +114,74 @@ public class PurePathTests
         // Assert
         await Assert.That(pathString).IsEqualTo(expected);
     }
+
+    [Test]
+    [Arguments("/srv/runs", "a/../../x", PathPlatform.Unix)]
+    [Arguments("/srv/runs", "a/..", PathPlatform.Unix)]
+    [Arguments("/srv/runs", "a/./b", PathPlatform.Unix)]
+    [Arguments(@"C:\srv\runs", @"a\..\..\x", PathPlatform.Windows)]
+    [Arguments(@"C:\srv\runs", "a/../../x", PathPlatform.Windows)]
+    [Arguments(@"C:\srv\runs", @"a\ .. \x", PathPlatform.Windows)]
+    public async Task DivisionOperator_WithNavigationInsideAppendedString_Throws(string left, string right, PathPlatform platform)
+    {
+        // Arrange
+        var leftPath = Path.CreatePure(left, platform);
+
+        // Act & Assert
+        await Assert.That(() => leftPath / right).Throws<ArgumentException>();
+    }
+
+    [Test]
+    [Arguments("a/../x", PathPlatform.Unix)]
+    [Arguments("a/./x", PathPlatform.Unix)]
+    [Arguments("a/..", PathPlatform.Unix)]
+    [Arguments(@"a\..\x", PathPlatform.Windows)]
+    public async Task PathType_WithNavigationAfterFirstSegment_IsRelative(string input, PathPlatform platform)
+    {
+        // Arrange
+        var path = Path.CreatePure(input, platform);
+
+        // Act
+        var actualType = path.Type;
+
+        // Assert
+        await Assert.That(actualType).IsEqualTo(PathType.Relative);
+    }
+
+    [Test]
+    [Arguments("/srv/runs", "a/../../x", "/srv/x", PathPlatform.Unix)]
+    [Arguments("/srv/runs", "a/./b", "/srv/runs/a/b", PathPlatform.Unix)]
+    [Arguments(@"C:\srv\runs", @"a\..\..\x", @"C:\srv\x", PathPlatform.Windows)]
+    public async Task DivisionOperator_WithRelativePathContainingNavigation_EvaluatesIt(string left, string right, string expected, PathPlatform platform)
+    {
+        // Arrange
+        var leftPath = Path.CreatePure(left, platform);
+        var rightPath = Path.CreatePure(right, platform);
+
+        // Act
+        var actual = (leftPath / rightPath).Path;
+
+        // Assert
+        await Assert.That(actual).IsEqualTo(expected);
+    }
+
+    [Test]
+    [Arguments("...", PathPlatform.Unix, "/srv/runs/...")]
+    [Arguments(".../x", PathPlatform.Unix, "/srv/runs/.../x")]
+    [Arguments("...", PathPlatform.Windows, @"C:\srv\runs\...")]
+    public async Task DivisionOperator_WithThreeDotSegment_TreatsItAsAName(string right, PathPlatform platform, string expected)
+    {
+        // Arrange
+        var leftPath = Path.CreatePure(platform == PathPlatform.Unix ? "/srv/runs" : @"C:\srv\runs", platform);
+
+        // Act
+        var stringType = Path.CreatePure(right, platform).Type;
+        var viaString = (leftPath / right).Path;
+        var viaPath = (leftPath / Path.CreatePure(right, platform)).Path;
+
+        // Assert
+        await Assert.That(stringType).IsEqualTo(PathType.Stub);
+        await Assert.That(viaString).IsEqualTo(expected);
+        await Assert.That(viaPath).IsEqualTo(expected);
+    }
 }

@@ -106,15 +106,13 @@ internal class WindowsPurePath : IPurePath
             throw new ArgumentException("Can only append stub strings (not absolute or relative paths).", nameof(right));
         }
 
-        var segments = SegmentsHelper.EvaluateAndConcatenateSegments(Segments, rightPath.Segments);
-        
-        return new WindowsPurePath(DriveLetter, segments, Type);
+        var combinedSegments = Segments.Concat(rightPath.Segments).ToArray();
+        return new WindowsPurePath(DriveLetter, combinedSegments, Type);
     }
 
     private const char PathSeparator = '\\';
     private const char AltPathSeparator = '/';
     private const char DriveSeparator = ':';
-    private const char RelativeStart = '.';
     private static readonly char[] PathSegmentSeparators = [PathSeparator, AltPathSeparator];
     
     private static void ParsePath(string path, out char? driveLetter, out PathType pathType, out IReadOnlyList<string> segments)
@@ -139,7 +137,7 @@ internal class WindowsPurePath : IPurePath
             return;
         }
 
-        var isRelative = firstSegment.All(c => c == RelativeStart);
+        var isRelative = segments.Any(SegmentsHelper.IsNavigation);
 
         driveLetter = null;
         pathType = isRelative ? PathType.Relative : PathType.Stub;
