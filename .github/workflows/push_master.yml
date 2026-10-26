@@ -65,18 +65,19 @@ jobs:
     steps:
       # Bump from the tip of master, not the triggering commit: a run queued behind another
       # release must see that release's bump commit, or it re-bumps to the same version.
+      # master requires pull requests; the release deploy key is the ruleset's bypass for the bump commit.
       - name: Check out
         uses: actions/checkout@v6
         with:
           ref: master
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          ssh-key: ${{ secrets.RELEASE_DEPLOY_KEY }}
 
       - id: cz
         name: Create bump and changelog
         uses: commitizen-tools/commitizen-action@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          push: false
 
       - id: version-changed
         name: Check if version changed
@@ -84,6 +85,10 @@ jobs:
           [[ $REVISION = $PREVIOUS_REVISION ]] && CHANGED="false" || CHANGED="true"
           echo "changed=$CHANGED" >> "$GITHUB_OUTPUT"
           [[ $CHANGED = "true" ]] && echo "::notice::Version changed ($PREVIOUS_REVISION -> $REVISION)" || echo "::notice::Version did not change"
+
+      - name: Push bump commit and tag
+        if: "${{ steps.version-changed.outputs.changed == 'true' }}"
+        run: git push --atomic origin HEAD:master "v${{ steps.cz.outputs.version }}"
 
       - name: Release
         id: release
