@@ -9,7 +9,7 @@ internal class UnixPurePath : IPurePath
 {
     private const char Divider = '/';
     
-    private IReadOnlyList<string> Segments { get; }
+    internal IReadOnlyList<string> Segments { get; }
 
     private UnixPurePath(IReadOnlyList<string> segments, PathType pathType)
     {
@@ -98,21 +98,16 @@ internal class UnixPurePath : IPurePath
 
 
     private const char AbsoluteStart = Divider;
-    private const char RelativeStart = '.';
-    
+
     private static PathType GetPathType(string path)
     {
         if (path.Length == 0) return PathType.Stub;
 
-        var firstDivider = path.IndexOf(Divider);
-        if (firstDivider == 0) return PathType.Absolute;
-        
-        if (firstDivider < 0) firstDivider = path.Length;
+        if (path[0] == AbsoluteStart) return PathType.Absolute;
 
-        var pathIsRelative = path.Take(firstDivider).All(ch => ch == '.');
-        if (pathIsRelative) return PathType.Relative;
+        var hasNavigation = path.Split(Divider, StringSplitOptions.RemoveEmptyEntries).Any(SegmentsHelper.IsNavigation);
 
-        return PathType.Stub;
+        return hasNavigation ? PathType.Relative : PathType.Stub;
     }
 
     private static string PathJoin(IEnumerable<string> pathSegments, bool startWithDivider = false)
