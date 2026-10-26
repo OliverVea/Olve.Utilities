@@ -92,7 +92,7 @@ internal class WindowsPurePath : IPurePath
             throw new NotSupportedException("Absolute paths cannot be on the right hand side of a path concatenation");
         }
 
-        var segments = SegmentsHelper.EvaluateAndConcatenateSegments(Segments, right.Segments);
+        var segments = SegmentsHelper.EvaluateAndConcatenateSegments(Segments, Type == PathType.Absolute, right.Segments);
 
         return new WindowsPurePath(DriveLetter, segments, Type);
     }
