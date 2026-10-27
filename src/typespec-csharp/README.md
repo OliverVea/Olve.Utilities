@@ -6,11 +6,11 @@ A [TypeSpec](https://typespec.io) emitter: an HTTP contract → its C# minimal-A
 
 `tsp compile` writes three files, named after the service namespace (`namespace Widgets;` below; the `prefix` option overrides it):
 
-| File | Contents |
-| --- | --- |
-| `WidgetsModels.g.cs` | Records (request shapes split by `@visibility`), enums, `@discriminated` unions, `@events` unions (`IServerSentEvent`), and an `IValidator<T>` per request body with constraints (`@minLength`, `@maxValue`, …). |
-| `WidgetsApi.g.cs` | Per operation: a request record, a response union with one variant per declared status, and `I…Handler : IOperationHandler<…>`. Plus `WidgetsOperations` (declared statuses), `WidgetsApi.HandlerTypes`, `AddWidgetsApi()`, `UseWidgetsApi()`, `MapWidgetsApi()`. |
-| `WidgetsJsonContext.g.cs` | A System.Text.Json source-generation context for every DTO (Native AOT ready). |
+| File                      | Contents                                                                                                                                                                                                                                                          |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `WidgetsModels.g.cs`      | Records (request shapes split by `@visibility`), enums, `@discriminated` unions, `@events` unions (`IServerSentEvent`), and an `IValidator<T>` per request body with constraints (`@minLength`, `@maxValue`, …).                                                  |
+| `WidgetsApi.g.cs`         | Per operation: a request record, a response union with one variant per declared status, and `I…Handler : IOperationHandler<…>`. Plus `WidgetsOperations` (declared statuses), `WidgetsApi.HandlerTypes`, `AddWidgetsApi()`, `UseWidgetsApi()`, `MapWidgetsApi()`. |
+| `WidgetsJsonContext.g.cs` | A System.Text.Json source-generation context for every DTO (Native AOT ready).                                                                                                                                                                                    |
 
 ## Install
 
@@ -30,9 +30,9 @@ emit:
 options:
   "@olivervea/typespec-csharp":
     emitter-output-dir: "{project-root}/artifacts/generated"
-    namespace: "MyService.Api"        # default: Generated.Api
-    prefix: "MyService"               # default: the service namespace's name → MyServiceApi, AddMyServiceApi, …
-    external-types:                   # spec models the app already has a C# type for
+    namespace: "MyService.Api" # default: Generated.Api
+    prefix: "MyService" # default: the service namespace's name → MyServiceApi, AddMyServiceApi, …
+    external-types: # spec models the app already has a C# type for
       ErrorEnvelope: "MyService.Api.ErrorEnvelope"
 ```
 

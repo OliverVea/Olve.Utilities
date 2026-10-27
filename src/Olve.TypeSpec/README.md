@@ -36,7 +36,7 @@ npm install --save-dev @olivervea/typespec-csharp @typespec/compiler @typespec/h
 The examples below are the conformance suite's fixture (`tests/Olve.TypeSpec.Conformance`), which the emitter's tests keep current. The contract is a `.tsp` file:
 
 ```ts
-// ../typespec-csharp/test/fixtures/widgets.tsp#L25-L40
+// ../typespec-csharp/test/fixtures/widgets.tsp#L28-L43
 
 model Circle {
   kind: "circle";
@@ -57,7 +57,7 @@ union Shape {
 ```
 
 ```ts
-// ../typespec-csharp/test/fixtures/widgets.tsp#L126-L129
+// ../typespec-csharp/test/fixtures/widgets.tsp#L137-L140
 
 @route("/shapes")
 interface Shapes {
@@ -79,10 +79,10 @@ options:
       ErrorEnvelope: "Fixture.FixtureErrorEnvelope"   # a spec model the app already has a type for
 ```
 
-A handler implements the generated interface and returns one of the declared responses. A success body converts implicitly; errors are named:
+A handler implements the generated interface and returns one of the declared responses. A success body converts implicitly; errors are named. The fixture's ids are plain strings, so its tests can address a variant by name (`missing`, `circle`); a real contract would type them (`@format("uuid")` binds as `Guid`):
 
 ```cs
-// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L186-L195
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L205-L214
 
 private sealed class GetShape : IShapesGetHandler
 {
@@ -99,8 +99,13 @@ private sealed class GetShape : IShapesGetHandler
 The error writer decides the body of a binding or validation failure. This one answers its envelope when the operation declares the status and the bare status otherwise:
 
 ```cs
-// ../../tests/Olve.TypeSpec.Conformance/FixtureErrors.cs#L48-L61
+// ../../tests/Olve.TypeSpec.Conformance/FixtureErrors.cs#L44-L62
 
+/// <summary>
+/// Answers binding and validation failures with the envelope when the operation declares the
+/// status, else with the status alone: the first problem is the message, every problem goes in
+/// <c>details.problems</c> when there are several.
+/// </summary>
 public sealed class FixtureErrorWriter : IApiErrorWriter
 {
     public IResult InvalidRequest(IReadOnlyList<ResultProblem> problems, int status, ApiOperation? operation)
@@ -120,8 +125,9 @@ public sealed class FixtureErrorWriter : IApiErrorWriter
 Wiring: the generated `Add…Api` registers the JSON context and makes binding failures reach the middleware; the app registers its handlers and its `IApiErrorWriter`; the generated `Use…Api` checks every handler is registered (fail fast, not a runtime 500), adds the middleware and maps every operation. It returns the route builders, for app-side conventions such as authorization (`endpoints.ShapesGet.RequireAuthorization("read")`).
 
 ```cs
-// ../../tests/Olve.TypeSpec.Conformance/FixtureApp.cs#L36-L47
+// ../../tests/Olve.TypeSpec.Conformance/FixtureApp.cs#L36-L48
 
+/// <summary>Builds (but doesn't start) the fixture app with the given handler registrations.</summary>
 public static WebApplication Build(Action<IServiceCollection> registerHandlers)
 {
     var builder = WebApplication.CreateSlimBuilder(new WebApplicationOptions { EnvironmentName = "Testing" });
@@ -138,7 +144,34 @@ public static WebApplication Build(Action<IServiceCollection> registerHandlers)
 
 ### Server-sent events
 
-An operation returning `SSEStream<Events>` of an `@events` union (every variant a JSON model whose `type` literal is its event name) gets a response union whose `Ok` carries `IAsyncEnumerable<ServerSentEvent<Events>>`. Each item's `Id` becomes the SSE id (`null` for heartbeats, so `Last-Event-ID` never points at one). The stream ends quietly on disconnect or shutdown.
+An operation returning `SSEStream<Events>` of an `@events` union (every variant a JSON model whose `type` literal is its event name) gets a response union whose `Ok` carries `IAsyncEnumerable<ServerSentEvent<Events>>`:
+
+```ts
+// ../typespec-csharp/test/fixtures/widgets.tsp#L177-L192
+
+/** The widget event stream. */
+@TypeSpec.Events.events
+union WidgetEvent {
+  @TypeSpec.Events.contentType("application/json") ping: Ping,
+  @TypeSpec.Events.contentType("application/json") `widget.changed`: WidgetChanged,
+  @TypeSpec.Events.contentType("application/json") `widget.removed`: WidgetRemoved,
+}
+
+@route("/widget-events")
+interface WidgetEvents {
+  /** Streams widget events; `type` limits them to these event names. */
+  @get stream(
+    @query(#{ explode: false }) type?: string[],
+    @header("Last-Event-ID") lastEventId?: string,
+  ): SSEStream<WidgetEvent> | BadRequest;
+}
+```
+
+The handler yields events; the runtime writes each one as a frame named by the variant's `type`, with the item's `Id` as the SSE id (`null` for heartbeats, so `Last-Event-ID` never points at one). Nothing is kept per connection: `Last-Event-ID` is an ordinary header parameter the handler reads to decide where to resume, reconnecting is the client's job, and the stream ends quietly when the client disconnects or the app stops.
+
+```cs
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L161-L192
+```
 
 ### Performance and AOT
 

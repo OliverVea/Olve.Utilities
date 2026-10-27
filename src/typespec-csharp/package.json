@@ -2,13 +2,16 @@
   "name": "@olivervea/typespec-csharp",
   "version": "0.0.0",
   "type": "module",
-  "description": "TypeSpec emitter: an HTTP contract \u2192 its C# minimal-API surface (records, response unions, handler interfaces, route mapping, validators, JSON source-gen context) on the Olve.TypeSpec runtime.",
+  "description": "TypeSpec emitter: an HTTP contract → its C# minimal-API surface (records, response unions, handler interfaces, route mapping, validators, JSON source-gen context) on the Olve.TypeSpec runtime.",
   "license": "MIT",
   "author": "Oliver Vea",
   "repository": {
     "type": "git",
     "url": "https://github.com/OliverVea/Olve.Utilities.git",
     "directory": "src/typespec-csharp"
+  },
+  "engines": {
+    "node": ">=22"
   },
   "main": "src/index.js",
   "exports": {
@@ -18,7 +21,14 @@
     "src",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
+    "check": "npm run lint && npm run format:check && npm test",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "node --test \"test/*.test.js\"",
     "test:update": "UPDATE_SNAPSHOTS=1 node --test \"test/*.test.js\""
   },
@@ -29,12 +39,16 @@
     "@typespec/streams": "^0.86.0"
   },
   "devDependencies": {
+    "@eslint/js": "9.39.1",
     "@typespec/compiler": "1.16.0",
     "@typespec/events": "0.86.0",
     "@typespec/http": "1.16.0",
     "@typespec/openapi": "1.16.0",
     "@typespec/openapi3": "1.16.0",
     "@typespec/sse": "0.86.0",
-    "@typespec/streams": "0.86.0"
+    "@typespec/streams": "0.86.0",
+    "eslint": "9.39.1",
+    "globals": "16.5.0",
+    "prettier": "3.6.2"
   }
 }

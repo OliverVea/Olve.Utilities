@@ -43,6 +43,7 @@ public static class FixtureHandlers
         Labels = labels,
     };
 
+    #region list
     private sealed class ListWidgets : IWidgetsListHandler
     {
         public Task<WidgetsListResponse> HandleAsync(WidgetsListRequest request, CancellationToken cancellationToken)
@@ -67,6 +68,9 @@ public static class FixtureHandlers
         }
     }
 
+    #endregion
+
+    #region create
     private sealed class CreateWidget : IWidgetsCreateHandler
     {
         public Task<WidgetsCreateResponse> HandleAsync(WidgetsCreateRequest request, CancellationToken cancellationToken)
@@ -98,6 +102,9 @@ public static class FixtureHandlers
         }
     }
 
+    #endregion
+
+    #region update
     private sealed class UpdateWidget : IWidgetsUpdateHandler
     {
         public Task<WidgetsUpdateResponse> HandleAsync(WidgetsUpdateRequest request, CancellationToken cancellationToken)
@@ -137,6 +144,9 @@ public static class FixtureHandlers
         }
     }
 
+    #endregion
+
+    #region delete
     private sealed class DeleteWidget : IWidgetsDeleteHandler
     {
         public Task<WidgetsDeleteResponse> HandleAsync(WidgetsDeleteRequest request, CancellationToken cancellationToken) =>
@@ -145,6 +155,9 @@ public static class FixtureHandlers
                 : new WidgetsDeleteResponse.NoContent());
     }
 
+    #endregion
+
+    #region sse
     /// <summary>
     /// A finite stream: a ping (no id), then <c>widget.changed</c> (id 1) and <c>widget.removed</c>
     /// (id 2). <c>type</c> keeps only the named events (an unknown name is a 400 before streaming);
@@ -177,12 +190,18 @@ public static class FixtureHandlers
         }
     }
 
+    #endregion
+
+    #region parameters
     private sealed class EchoTags : ITagsEchoHandler
     {
         public Task<TagsEchoResponse> HandleAsync(TagsEchoRequest request, CancellationToken cancellationToken) =>
             Task.FromResult<TagsEchoResponse>(new TagsEchoResponse.Ok(request.Names));
     }
 
+    #endregion
+
+    #region shapes
     private sealed class GetShape : IShapesGetHandler
     {
         public Task<ShapesGetResponse> HandleAsync(ShapesGetRequest request, CancellationToken cancellationToken) =>
@@ -193,4 +212,5 @@ public static class FixtureHandlers
                 _ => new ShapesGetResponse.NotFound(Error("SHAPE_NOT_FOUND", request.Id)),
             });
     }
+    #endregion
 }
