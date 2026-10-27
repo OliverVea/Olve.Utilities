@@ -15,7 +15,13 @@ spec/main.tsp ── tsp compile ──► artifacts/generated/<Prefix>{Models,A
                             └──► openapi.json ──► clients (Hey API, …)
 ```
 
-The generated code relies on `Olve.TypeSpec`: `IOperationHandler<TRequest, TResponse>`, `IOperationResponse`, `ApiOperation`, `IApiErrorWriter`, `RequestValidation`, the binding-failure middleware, `IServerSentEvent` / `ServerSentEvent<T>` / `ServerSentEventsResult<T>`, `TypeSpecApiExtensions`.
+`<Prefix>` is the service namespace's name (`namespace Widgets;` → `WidgetsApi`, `AddWidgetsApi`, …) unless `prefix` is set. The generated code relies on `Olve.TypeSpec`: `IOperationHandler<TRequest, TResponse>`, `IOperationResponse`, `ApiOperation`, `IApiErrorWriter`, `RequestValidation`, the binding-failure middleware, `IServerSentEvent` / `ServerSentEvent<T>` / `ServerSentEventsResult<T>`, `TypeSpecApiExtensions`.
+
+## Examples
+
+[references/contract/widgets.tsp](references/contract/widgets.tsp) is a contract that uses every supported shape (visibility splits, enums, a discriminated union, nullables and optionals, path/query/header parameters, an `explode: false` list, several success statuses, an error envelope, an SSE stream), and [references/generated/](references/generated/) is exactly what the emitter writes for it: `FixtureModels.g.cs`, `FixtureApi.g.cs`, `FixtureJsonContext.g.cs`. The emitter's snapshot test fails when these copies differ from the emitter's output, so they are always current (`UPDATE_SNAPSHOTS=1 npm test` in `src/typespec-csharp` refreshes them).
+
+Hand-written code against that contract is in `Olve.Utilities/tests/Olve.TypeSpec.Conformance/`: `FixtureHandlers.cs` (one handler per operation), `FixtureErrors.cs` (an error envelope and its `IApiErrorWriter`), `FixtureApp.cs` (the wiring). The runtime README embeds them.
 
 ## Rules
 
@@ -31,11 +37,11 @@ The generated code relies on `Olve.TypeSpec`: `IOperationHandler<TRequest, TResp
 | Option | Meaning |
 | --- | --- |
 | `namespace` | C# namespace of the generated code (default `Generated.Api`). |
-| `prefix` | Prefix of generated file and type names: `<prefix>Models.g.cs`, `<prefix>Api`, `<prefix>Operations`, `<prefix>Endpoints`, `<prefix>JsonContext`, `Add<prefix>Api`, `Use<prefix>Api`, `Map<prefix>Api` (default `Api`). |
+| `prefix` | Prefix of generated file and type names: `<prefix>Models.g.cs`, `<prefix>Api`, `<prefix>Operations`, `<prefix>Endpoints`, `<prefix>JsonContext`, `Add<prefix>Api`, `Use<prefix>Api`, `Map<prefix>Api` (default: the service namespace's name). |
 | `external-types` | Spec model name → existing C# type, not generated (the error envelope, shared models). |
 
 ## Supported / reported
 
-Supported: models with `@visibility` splits, enums (string by wire value, numeric), `@discriminated(#{ envelope: "none" })` unions, arrays, `Record<T>`, nullables and optionals, path/query/header parameters, `@query(#{ explode: false })` string lists, several success statuses, SSE streams of an `@events` union whose variants carry `type: "<event name>"`, request-body constraints (`@minLength`, `@maxLength`, `@minItems`, `@maxItems`, `@minValue`, `@maxValue`).
+Supported (all exercised by the example contract above): models with `@visibility` splits, enums (string by wire value, numeric), `@discriminated(#{ envelope: "none" })` unions, arrays, `Record<T>`, nullables and optionals, path/query/header parameters, `@query(#{ explode: false })` string lists, several success statuses, SSE streams of an `@events` union whose variants carry `type: "<event name>"`, request-body constraints (`@minLength`, `@maxLength`, `@minItems`, `@maxItems`, `@minValue`, `@maxValue`).
 
-Reported as `unsupported-*` warnings (emitted as `JsonElement` or skipped): untagged unions, enveloped discriminated unions, cookie and multipart parameters, status ranges and default responses, other array parameters. Validation covers the top-level request body only; `@pattern` is not enforced.
+Reported as `unsupported-*` warnings, emitted as `JsonElement` or skipped, never silently mistyped: untagged unions, enveloped discriminated unions, cookie parameters, multipart bodies, status code ranges, array parameters other than `explode: false` string lists in the query. `src/typespec-csharp/test/fixtures/unsupported.tsp` holds one operation per shape and the snapshot test asserts each diagnostic. None is blocked by the design; each can be added when a contract needs it. Validation covers the top-level request body only; `@pattern` is not enforced.

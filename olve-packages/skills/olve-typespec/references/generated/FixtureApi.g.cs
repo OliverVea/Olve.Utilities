@@ -307,7 +307,7 @@ public abstract record WidgetsUpdateResponse : IOperationResponse
 public interface IWidgetsUpdateHandler : IOperationHandler<WidgetsUpdateRequest, WidgetsUpdateResponse>;
 
 /// <summary>Every operation's id, success statuses and declared error statuses.</summary>
-public static class ApiOperations
+public static class FixtureOperations
 {
     public static readonly ApiOperation ShapesGet = new("Shapes_get", [200], [404]);
     public static readonly ApiOperation TagsEcho = new("Tags_echo", [200], []);
@@ -319,7 +319,7 @@ public static class ApiOperations
 }
 
 /// <summary>The route builder of each mapped operation, for app-side conventions (auth, rate limits, …).</summary>
-public sealed class ApiEndpoints
+public sealed class FixtureEndpoints
 {
     public required RouteHandlerBuilder ShapesGet { get; init; }
     public required RouteHandlerBuilder TagsEcho { get; init; }
@@ -330,7 +330,7 @@ public sealed class ApiEndpoints
     public required RouteHandlerBuilder WidgetsUpdate { get; init; }
 }
 
-public static class ApiApi
+public static class FixtureApi
 {
     /// <summary>Every operation's handler interface; each must have a registered implementation.</summary>
     public static IReadOnlyList<Type> HandlerTypes { get; } =
@@ -345,13 +345,13 @@ public static class ApiApi
     ];
 
     /// <summary>Registers the generated JSON context and the runtime's request handling (the app registers its <see cref="IApiErrorWriter"/> and handlers).</summary>
-    public static IServiceCollection AddApiApi(this IServiceCollection services) => services.AddTypeSpecApi(ApiJsonContext.Default);
+    public static IServiceCollection AddFixtureApi(this IServiceCollection services) => services.AddTypeSpecApi(FixtureJsonContext.Default);
 
     /// <summary>Checks every handler is registered, adds the runtime's middleware and maps every contract operation.</summary>
-    public static ApiEndpoints UseApiApi(this WebApplication app) => app.UseTypeSpecApi(HandlerTypes).MapApiApi();
+    public static FixtureEndpoints UseFixtureApi(this WebApplication app) => app.UseTypeSpecApi(HandlerTypes).MapFixtureApi();
 
     /// <summary>Maps every contract operation onto its handler interface.</summary>
-    public static ApiEndpoints MapApiApi(this IEndpointRouteBuilder app) => new()
+    public static FixtureEndpoints MapFixtureApi(this IEndpointRouteBuilder app) => new()
     {
         ShapesGet = app.MapGet("/api/shapes/{id}", async (
                 [FromServices] IShapesGetHandler handler,
@@ -359,7 +359,7 @@ public static class ApiApi
                 CancellationToken ct) =>
                 (await handler.HandleAsync(new ShapesGetRequest(id), ct)).ToHttpResult())
             .WithName("Shapes_get")
-            .WithMetadata(ApiOperations.ShapesGet)
+            .WithMetadata(FixtureOperations.ShapesGet)
             .Produces<Shape>(200)
             .Produces<FixtureErrorEnvelope>(404),
         TagsEcho = app.MapGet("/api/tags", async (
@@ -368,7 +368,7 @@ public static class ApiApi
                 CancellationToken ct) =>
                 (await handler.HandleAsync(new TagsEchoRequest(QueryParameters.List(names)), ct)).ToHttpResult())
             .WithName("Tags_echo")
-            .WithMetadata(ApiOperations.TagsEcho)
+            .WithMetadata(FixtureOperations.TagsEcho)
             .Produces<IReadOnlyList<string>>(200),
         WidgetEventsStream = app.MapGet("/api/widget-events", async (
                 [FromServices] IWidgetEventsStreamHandler handler,
@@ -377,7 +377,7 @@ public static class ApiApi
                 CancellationToken ct) =>
                 (await handler.HandleAsync(new WidgetEventsStreamRequest(QueryParameters.List(type), lastEventId), ct)).ToHttpResult())
             .WithName("WidgetEvents_stream")
-            .WithMetadata(ApiOperations.WidgetEventsStream)
+            .WithMetadata(FixtureOperations.WidgetEventsStream)
             .Produces<WidgetEvent>(200, "text/event-stream")
             .Produces<FixtureErrorEnvelope>(400),
         WidgetsCreate = app.MapPost("/api/widgets", async (
@@ -386,8 +386,8 @@ public static class ApiApi
                 CancellationToken ct) =>
                 (await handler.HandleAsync(new WidgetsCreateRequest(body), ct)).ToHttpResult())
             .WithName("Widgets_create")
-            .WithMetadata(ApiOperations.WidgetsCreate)
-            .WithRequestValidation<WidgetCreate, WidgetCreateValidator>(ApiOperations.WidgetsCreate)
+            .WithMetadata(FixtureOperations.WidgetsCreate)
+            .WithRequestValidation<WidgetCreate, WidgetCreateValidator>(FixtureOperations.WidgetsCreate)
             .Produces<Widget>(201)
             .Produces<Widget>(202)
             .Produces<FixtureErrorEnvelope>(400),
@@ -397,7 +397,7 @@ public static class ApiApi
                 CancellationToken ct) =>
                 (await handler.HandleAsync(new WidgetsDeleteRequest(id), ct)).ToHttpResult())
             .WithName("Widgets_delete")
-            .WithMetadata(ApiOperations.WidgetsDelete)
+            .WithMetadata(FixtureOperations.WidgetsDelete)
             .Produces(204)
             .Produces<FixtureErrorEnvelope>(404),
         WidgetsList = app.MapGet("/api/widgets", async (
@@ -406,9 +406,9 @@ public static class ApiApi
                 [FromQuery(Name = "limit")] int? limit,
                 [FromHeader(Name = "x-request-id")] string? requestId,
                 CancellationToken ct) =>
-                (await handler.HandleAsync(new WidgetsListRequest(color is null ? null : ApiParameters.ParseColor(color, "color"), limit, requestId), ct)).ToHttpResult())
+                (await handler.HandleAsync(new WidgetsListRequest(color is null ? null : FixtureParameters.ParseColor(color, "color"), limit, requestId), ct)).ToHttpResult())
             .WithName("Widgets_list")
-            .WithMetadata(ApiOperations.WidgetsList)
+            .WithMetadata(FixtureOperations.WidgetsList)
             .Produces<IReadOnlyList<Widget>>(200),
         WidgetsUpdate = app.MapPut("/api/widgets/{id}", async (
                 [FromServices] IWidgetsUpdateHandler handler,
@@ -418,8 +418,8 @@ public static class ApiApi
                 CancellationToken ct) =>
                 (await handler.HandleAsync(new WidgetsUpdateRequest(id, dryRun, body), ct)).ToHttpResult())
             .WithName("Widgets_update")
-            .WithMetadata(ApiOperations.WidgetsUpdate)
-            .WithRequestValidation<WidgetWritable, WidgetWritableValidator>(ApiOperations.WidgetsUpdate)
+            .WithMetadata(FixtureOperations.WidgetsUpdate)
+            .WithRequestValidation<WidgetWritable, WidgetWritableValidator>(FixtureOperations.WidgetsUpdate)
             .Produces<Widget>(200)
             .Produces<FixtureErrorEnvelope>(400)
             .Produces<FixtureErrorEnvelope>(404)
@@ -428,7 +428,7 @@ public static class ApiApi
 }
 
 /// <summary>Parses string-enum parameters by their wire values (minimal APIs only know member names).</summary>
-internal static class ApiParameters
+internal static class FixtureParameters
 {
     public static Color ParseColor(string value, string parameter) => value switch
     {
