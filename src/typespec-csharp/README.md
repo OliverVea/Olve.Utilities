@@ -21,8 +21,9 @@ dotnet add package Olve.TypeSpec
 
 ## Configure
 
+In `tspconfig.yaml`:
+
 ```yaml
-# tspconfig.yaml
 emit:
   - "@typespec/openapi3"
   - "@olivervea/typespec-csharp"

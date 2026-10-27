@@ -4,7 +4,7 @@
 // Invoked by the csproj before it builds; fails on any error diagnostic.
 
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { createRequire } from "node:module";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -14,7 +14,8 @@ const outDir = join(repoRoot, "artifacts", "conformance");
 
 // The TypeSpec packages are the emitter's dev dependencies (src/typespec-csharp/node_modules).
 const require = createRequire(join(emitterDir, "package.json"));
-const { compile, NodeHost } = await import(require.resolve("@typespec/compiler"));
+// A file URL, not a path: Windows absolute paths are not importable as-is.
+const { compile, NodeHost } = await import(pathToFileURL(require.resolve("@typespec/compiler")).href);
 
 const program = await compile(NodeHost, join(emitterDir, "test", "fixtures", "widgets.tsp"), {
   emit: ["@typespec/openapi3", emitterDir],
