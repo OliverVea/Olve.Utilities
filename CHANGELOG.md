@@ -1,3 +1,9 @@
+## v0.57.0 (2026-10-27)
+
+### Feat
+
+- **utilities**: deprecate Pagination and Page<T>; offset/limit is the pagination model
+
 ## v0.56.0 (2026-10-26)
 
 ### Feat
