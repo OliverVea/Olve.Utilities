@@ -116,20 +116,21 @@ export async function buildExamples(files) {
     "discriminated-union.md": [
       header(
         "Discriminated unions",
-        'A `@discriminated(#{ envelope: "none", discriminatorPropertyName })` union becomes an abstract record with `[JsonPolymorphic]` and one `[JsonDerivedType]` per variant; the variants derive from it and lose the discriminator property (the polymorphism writes it). The discriminator may appear anywhere in a request object.',
+        'A `@discriminated(#{ envelope: "none", discriminatorPropertyName })` union becomes an abstract record with `[JsonPolymorphic]` and one `[JsonDerivedType]` per variant; the variants derive from it and lose the discriminator property (the polymorphism writes it). The discriminator may appear anywhere in a request object. A handler that receives the union switches on the variant records (`Circle circle => …, Square square => …`); one that answers it returns a variant, which converts implicitly.',
       ),
       "## Contract\n",
       tsp("discriminated-union"),
       "",
       tsp("shapes"),
       "\n## Generated\n",
+      cs(declaration(models, "Shape"), declaration(models, "Circle"), declaration(models, "Square")),
+      "",
       cs(
-        declaration(models, "Shape"),
-        declaration(models, "Circle"),
-        declaration(models, "Square"),
+        declaration(api, "ShapesAreaRequest"),
+        declaration(api, "ShapesAreaResponse"),
         declaration(api, "ShapesGetResponse"),
       ),
-      "\n## Hand-written handler\n\nA union variant converts implicitly to the `Ok` of a response union that carries the union.\n",
+      "\n## Hand-written handlers\n\n`ShapeArea` receives the union and switches on its variants; `GetShape` answers one, a variant converting implicitly to `Ok`.\n",
       cs(region(handlers, "shapes")),
     ].join("\n"),
 

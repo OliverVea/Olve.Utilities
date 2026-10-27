@@ -11,6 +11,7 @@ using Olve.Results;
 namespace Fixture.Api;
 
 [JsonSourceGenerationOptions(JsonSerializerDefaults.Web, AllowOutOfOrderMetadataProperties = true)]
+[JsonSerializable(typeof(Area))]
 [JsonSerializable(typeof(Color))]
 [JsonSerializable(typeof(FixtureErrorEnvelope))]
 [JsonSerializable(typeof(IReadOnlyList<Widget>))]

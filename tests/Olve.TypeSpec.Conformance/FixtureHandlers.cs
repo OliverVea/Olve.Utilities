@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Olve.TypeSpec.Conformance;
 
 /// <summary>
@@ -25,6 +27,7 @@ public static class FixtureHandlers
         services.AddSingleton<IWidgetsUpdateHandler, UpdateWidget>();
         services.AddSingleton<IWidgetsDeleteHandler, DeleteWidget>();
         services.AddSingleton<IShapesGetHandler, GetShape>();
+        services.AddSingleton<IShapesAreaHandler, ShapeArea>();
         services.AddSingleton<IWidgetEventsStreamHandler, StreamWidgetEvents>();
         services.AddSingleton<ITagsEchoHandler, EchoTags>();
     }
@@ -202,15 +205,34 @@ public static class FixtureHandlers
     #endregion
 
     #region shapes
+    /// <summary>A union in the request: the handler switches on the variant records.</summary>
+    private sealed class ShapeArea : IShapesAreaHandler
+    {
+        public Task<ShapesAreaResponse> HandleAsync(ShapesAreaRequest request, CancellationToken cancellationToken)
+        {
+            var area = request.Body switch
+            {
+                Circle circle => Math.PI * circle.Radius * circle.Radius,
+                Square square => square.Side * square.Side,
+                _ => throw new UnreachableException(),
+            };
+            return Task.FromResult<ShapesAreaResponse>(new Area { Value = area });
+        }
+    }
+
+    /// <summary>A union in the response: the stored data decides the variant; it converts implicitly to <c>Ok</c>.</summary>
     private sealed class GetShape : IShapesGetHandler
     {
+        private static readonly Dictionary<string, Shape> Shapes = new()
+        {
+            ["c-1"] = new Circle { Radius = 1.5 },
+            ["s-1"] = new Square { Side = 2 },
+        };
+
         public Task<ShapesGetResponse> HandleAsync(ShapesGetRequest request, CancellationToken cancellationToken) =>
-            Task.FromResult<ShapesGetResponse>(request.Id switch
-            {
-                "circle" => new Circle { Radius = 1.5 },
-                "square" => new Square { Side = 2 },
-                _ => new ShapesGetResponse.NotFound(Error("SHAPE_NOT_FOUND", request.Id)),
-            });
+            Task.FromResult<ShapesGetResponse>(Shapes.TryGetValue(request.Id, out var shape)
+                ? shape
+                : new ShapesGetResponse.NotFound(Error("SHAPE_NOT_FOUND", request.Id)));
     }
     #endregion
 }

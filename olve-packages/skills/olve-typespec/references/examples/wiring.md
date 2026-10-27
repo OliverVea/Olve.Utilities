@@ -12,6 +12,7 @@ public static class FixtureApi
     /// <summary>Every operation's handler interface; each must have a registered implementation.</summary>
     public static IReadOnlyList<Type> HandlerTypes { get; } =
     [
+        typeof(IShapesAreaHandler),
         typeof(IShapesGetHandler),
         typeof(ITagsEchoHandler),
         typeof(IWidgetEventsStreamHandler),
@@ -30,6 +31,14 @@ public static class FixtureApi
     /// <summary>Maps every contract operation onto its handler interface.</summary>
     public static FixtureEndpoints MapFixtureApi(this IEndpointRouteBuilder app) => new()
     {
+        ShapesArea = app.MapPost("/api/shapes/area", async (
+                [FromServices] IShapesAreaHandler handler,
+                [FromBody] Shape body,
+                CancellationToken ct) =>
+                (await handler.HandleAsync(new ShapesAreaRequest(body), ct)).ToHttpResult())
+            .WithName("Shapes_area")
+            .WithMetadata(FixtureOperations.ShapesArea)
+            .Produces<Area>(200),
         ShapesGet = app.MapGet("/api/shapes/{id}", async (
                 [FromServices] IShapesGetHandler handler,
                 [FromRoute(Name = "id")] string id,

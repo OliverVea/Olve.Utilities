@@ -134,9 +134,17 @@ interface Widgets {
 // #endregion
 
 // #region shapes
+/** The area of a shape. */
+model Area {
+  value: float64;
+}
+
 @route("/shapes")
 interface Shapes {
   @get get(@path id: string): Shape | NotFound;
+
+  /** Takes a shape, answers its area: the handler switches on the variant. */
+  @route("area") @post area(@body shape: Shape): Area;
 }
 // #endregion
 

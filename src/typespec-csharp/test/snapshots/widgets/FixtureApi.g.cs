@@ -15,6 +15,38 @@ using Olve.TypeSpec;
 
 namespace Fixture.Api;
 
+/// <summary>Input of <c>Shapes_area</c> (POST /api/shapes/area).</summary>
+public sealed record ShapesAreaRequest(Shape Body);
+
+/// <summary>The responses <c>Shapes_area</c> declares; its handler returns one.</summary>
+public abstract record ShapesAreaResponse : IOperationResponse
+{
+    private ShapesAreaResponse()
+    {
+    }
+
+    /// <inheritdoc />
+    public abstract int Status { get; }
+
+    /// <inheritdoc />
+    public abstract IResult ToHttpResult();
+
+    /// <summary>200.</summary>
+    public sealed record Ok(Area Body) : ShapesAreaResponse
+    {
+        /// <inheritdoc />
+        public override int Status => 200;
+
+        /// <inheritdoc />
+        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 200);
+    }
+
+    public static implicit operator ShapesAreaResponse(Area body) => new Ok(body);
+}
+
+/// <summary>Takes a shape, answers its area: the handler switches on the variant.</summary>
+public interface IShapesAreaHandler : IOperationHandler<ShapesAreaRequest, ShapesAreaResponse>;
+
 /// <summary>Input of <c>Shapes_get</c> (GET /api/shapes/{id}).</summary>
 public sealed record ShapesGetRequest(string Id);
 
@@ -309,6 +341,7 @@ public interface IWidgetsUpdateHandler : IOperationHandler<WidgetsUpdateRequest,
 /// <summary>Every operation's id, success statuses and declared error statuses.</summary>
 public static class FixtureOperations
 {
+    public static readonly ApiOperation ShapesArea = new("Shapes_area", [200], []);
     public static readonly ApiOperation ShapesGet = new("Shapes_get", [200], [404]);
     public static readonly ApiOperation TagsEcho = new("Tags_echo", [200], []);
     public static readonly ApiOperation WidgetEventsStream = new("WidgetEvents_stream", [200], [400]);
@@ -321,6 +354,7 @@ public static class FixtureOperations
 /// <summary>The route builder of each mapped operation, for app-side conventions (auth, rate limits, …).</summary>
 public sealed class FixtureEndpoints
 {
+    public required RouteHandlerBuilder ShapesArea { get; init; }
     public required RouteHandlerBuilder ShapesGet { get; init; }
     public required RouteHandlerBuilder TagsEcho { get; init; }
     public required RouteHandlerBuilder WidgetEventsStream { get; init; }
@@ -335,6 +369,7 @@ public static class FixtureApi
     /// <summary>Every operation's handler interface; each must have a registered implementation.</summary>
     public static IReadOnlyList<Type> HandlerTypes { get; } =
     [
+        typeof(IShapesAreaHandler),
         typeof(IShapesGetHandler),
         typeof(ITagsEchoHandler),
         typeof(IWidgetEventsStreamHandler),
@@ -353,6 +388,14 @@ public static class FixtureApi
     /// <summary>Maps every contract operation onto its handler interface.</summary>
     public static FixtureEndpoints MapFixtureApi(this IEndpointRouteBuilder app) => new()
     {
+        ShapesArea = app.MapPost("/api/shapes/area", async (
+                [FromServices] IShapesAreaHandler handler,
+                [FromBody] Shape body,
+                CancellationToken ct) =>
+                (await handler.HandleAsync(new ShapesAreaRequest(body), ct)).ToHttpResult())
+            .WithName("Shapes_area")
+            .WithMetadata(FixtureOperations.ShapesArea)
+            .Produces<Area>(200),
         ShapesGet = app.MapGet("/api/shapes/{id}", async (
                 [FromServices] IShapesGetHandler handler,
                 [FromRoute(Name = "id")] string id,
