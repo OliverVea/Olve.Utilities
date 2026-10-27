@@ -32,6 +32,7 @@ public sealed class FixtureApp : IAsyncInitializer, IAsyncDisposable
         }
     }
 
+    #region wiring
     /// <summary>Builds (but doesn't start) the fixture app with the given handler registrations.</summary>
     public static WebApplication Build(Action<IServiceCollection> registerHandlers)
     {
@@ -45,4 +46,5 @@ public sealed class FixtureApp : IAsyncInitializer, IAsyncDisposable
         app.UseFixtureApi();
         return app;
     }
+    #endregion
 }

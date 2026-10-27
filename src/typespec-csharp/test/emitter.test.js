@@ -2,8 +2,9 @@
 // file with test/snapshots/<name>/. A missing or different snapshot fails; to accept new output,
 // run `npm run test:update` (UPDATE_SNAPSHOTS=1) and review the diff.
 //
-// The widgets snapshots are also the generated examples of the olve-typespec skill
-// (olve-packages/skills/olve-typespec/references/): the same run keeps that copy current.
+// The widgets fixture and its output are also the olve-typespec skill's examples
+// (olve-packages/skills/olve-typespec/references/, built by skill-examples.js): the same run keeps
+// them current.
 
 import assert from "node:assert/strict";
 import { mkdtemp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
@@ -12,6 +13,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { compile, NodeHost } from "@typespec/compiler";
+import { buildExamples } from "./skill-examples.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const emitterDir = join(here, "..");
@@ -43,7 +45,11 @@ async function matchDirectory(dir, files, label) {
     return;
   }
   const expected = (await readdir(dir).catch(() => [])).sort();
-  assert.deepEqual(Object.keys(files).sort(), expected, `emitted files differ from ${label} (UPDATE_SNAPSHOTS=1 to accept)`);
+  assert.deepEqual(
+    Object.keys(files).sort(),
+    expected,
+    `emitted files differ from ${label} (UPDATE_SNAPSHOTS=1 to accept)`,
+  );
   for (const name of expected) {
     assert.equal(files[name], await readFile(join(dir, name), "utf8"), `${label}/${name} differs from its snapshot`);
   }
@@ -57,11 +63,19 @@ test("widgets fixture matches its snapshots", async () => {
   await matchDirectory(join(here, "snapshots", "widgets"), files, "test/snapshots/widgets");
 });
 
-test("the skill's generated examples are the widgets snapshots", async () => {
+test("the skill's examples are built from the widgets fixture and its output", async () => {
   const { files } = await emit("widgets", { namespace: "Fixture.Api", ...ERROR_ENVELOPE });
   const fixture = await readFile(join(here, "fixtures", "widgets.tsp"), "utf8");
-  await matchDirectory(join(skillReferences, "generated"), files, "olve-typespec/references/generated");
-  await matchDirectory(join(skillReferences, "contract"), { "widgets.tsp": fixture }, "olve-typespec/references/contract");
+  await matchDirectory(
+    join(skillReferences, "contract"),
+    { "widgets.tsp": fixture },
+    "olve-typespec/references/contract",
+  );
+  await matchDirectory(
+    join(skillReferences, "examples"),
+    await buildExamples(files),
+    "olve-typespec/references/examples",
+  );
 });
 
 test("output is deterministic", async () => {
@@ -74,8 +88,14 @@ test("the prefix defaults to the service namespace's name", async () => {
   assert.deepEqual(Object.keys(files).sort(), ["FixtureApi.g.cs", "FixtureJsonContext.g.cs", "FixtureModels.g.cs"]);
   const api = files["FixtureApi.g.cs"];
   assert.match(api, /public static class FixtureOperations/);
-  assert.match(api, /public static IServiceCollection AddFixtureApi\(this IServiceCollection services\) => services\.AddTypeSpecApi\(FixtureJsonContext\.Default\);/);
-  assert.match(api, /public static FixtureEndpoints UseFixtureApi\(this WebApplication app\) => app\.UseTypeSpecApi\(HandlerTypes\)\.MapFixtureApi\(\);/);
+  assert.match(
+    api,
+    /public static IServiceCollection AddFixtureApi\(this IServiceCollection services\) => services\.AddTypeSpecApi\(FixtureJsonContext\.Default\);/,
+  );
+  assert.match(
+    api,
+    /public static FixtureEndpoints UseFixtureApi\(this WebApplication app\) => app\.UseTypeSpecApi\(HandlerTypes\)\.MapFixtureApi\(\);/,
+  );
   assert.match(api, /public static FixtureEndpoints MapFixtureApi\(this IEndpointRouteBuilder app\)/);
 
   const custom = await emit("widgets", { prefix: "Shop", ...ERROR_ENVELOPE });
@@ -83,7 +103,8 @@ test("the prefix defaults to the service namespace's name", async () => {
   assert.match(custom.files["ShopApi.g.cs"], /UseShopApi/);
 });
 
-const record = (source, name) => source.match(new RegExp(`public sealed record ${name}\\n\\{[\\s\\S]*?\\n\\}`))?.[0] ?? "";
+const record = (source, name) =>
+  source.match(new RegExp(`public sealed record ${name}\\n\\{[\\s\\S]*?\\n\\}`))?.[0] ?? "";
 
 test("read-only properties are split into per-visibility request shapes", async () => {
   const models = (await emit("widgets")).files["FixtureModels.g.cs"];
@@ -120,12 +141,21 @@ test("SSE operations stream their @events union with ids; explode:false lists bi
   const { files } = await emit("widgets", ERROR_ENVELOPE);
   const api = files["FixtureApi.g.cs"];
   const models = files["FixtureModels.g.cs"];
-  assert.match(api, /IWidgetEventsStreamHandler : IOperationHandler<WidgetEventsStreamRequest, WidgetEventsStreamResponse>/);
+  assert.match(
+    api,
+    /IWidgetEventsStreamHandler : IOperationHandler<WidgetEventsStreamRequest, WidgetEventsStreamResponse>/,
+  );
   assert.match(api, /record Ok\(IAsyncEnumerable<ServerSentEvent<WidgetEvent>> Events\) : WidgetEventsStreamResponse/);
   assert.match(api, /ToHttpResult\(\) => new ServerSentEventsResult<WidgetEvent>\(Events\)/);
-  assert.match(api, /await handler\.HandleAsync\(new WidgetEventsStreamRequest\(QueryParameters\.List\(type\), lastEventId\), ct\)\)\.ToHttpResult\(\)/);
+  assert.match(
+    api,
+    /await handler\.HandleAsync\(new WidgetEventsStreamRequest\(QueryParameters\.List\(type\), lastEventId\), ct\)\)\.ToHttpResult\(\)/,
+  );
   assert.match(api, /\.Produces<WidgetEvent>\(200, "text\/event-stream"\)/);
-  assert.match(models, /\[JsonPolymorphic\(TypeDiscriminatorPropertyName = "type"\)\]\n\[JsonDerivedType\(typeof\(Ping\), "ping"\)\]/);
+  assert.match(
+    models,
+    /\[JsonPolymorphic\(TypeDiscriminatorPropertyName = "type"\)\]\n\[JsonDerivedType\(typeof\(Ping\), "ping"\)\]/,
+  );
   assert.match(models, /public abstract record WidgetEvent : IServerSentEvent/);
   assert.match(record(models, "WidgetChanged : WidgetEvent"), /override string EventType => "widget\.changed"/);
   // The discriminator is written by the polymorphism, not a property of its own.
@@ -148,5 +178,8 @@ test("every declared response is a variant of the operation's response union", a
   assert.doesNotMatch(api, /implicit operator \w+\(FixtureErrorEnvelope/);
   assert.doesNotMatch(api, /implicit operator \w+\(IReadOnlyList/);
   // A bodyless response.
-  assert.match(api, /public sealed record NoContent\(\) : WidgetsDeleteResponse[\s\S]*?TypedResults\.StatusCode\(204\)/);
+  assert.match(
+    api,
+    /public sealed record NoContent\(\) : WidgetsDeleteResponse[\s\S]*?TypedResults\.StatusCode\(204\)/,
+  );
 });

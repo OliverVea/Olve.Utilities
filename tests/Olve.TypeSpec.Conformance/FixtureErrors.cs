@@ -40,6 +40,7 @@ public static class FixtureErrors
     public const string InvalidRequest = "INVALID_REQUEST";
 }
 
+#region writer
 /// <summary>
 /// Answers binding and validation failures with the envelope when the operation declares the
 /// status, else with the status alone: the first problem is the message, every problem goes in
@@ -59,3 +60,4 @@ public sealed class FixtureErrorWriter : IApiErrorWriter
         return TypedResults.Json(new FixtureErrorEnvelope(error), FixtureErrorJsonContext.Default.FixtureErrorEnvelope, statusCode: status);
     }
 }
+#endregion

@@ -11,6 +11,7 @@ using SSE;
 @route("/api")
 namespace Fixture;
 
+// #region enums
 enum Color {
   Red: "red",
   /** The default. */
@@ -21,7 +22,9 @@ enum Priority {
   Low: 1,
   High: 2,
 }
+// #endregion
 
+// #region discriminated-union
 model Circle {
   kind: "circle";
   radius: float64;
@@ -38,7 +41,9 @@ union Shape {
   circle: Circle,
   square: Square,
 }
+// #endregion
 
+// #region visibility
 /** A widget. */
 model Widget {
   @visibility(Lifecycle.Read) @format("uuid") id: string;
@@ -60,7 +65,9 @@ model Widget {
   createdAt: utcDateTime;
   shape: Shape;
 }
+// #endregion
 
+// #region errors
 /** The error body (maps onto the app's own error type via external-types). */
 model ErrorEnvelope {
   error: ErrorBody;
@@ -98,7 +105,9 @@ model Conflict {
   @statusCode status: 409;
   @body error: ErrorEnvelope;
 }
+// #endregion
 
+// #region operations
 @route("/widgets")
 interface Widgets {
   /** List widgets. */
@@ -122,20 +131,26 @@ interface Widgets {
 
   @delete delete(@path id: string): NoContentResponse | NotFound;
 }
+// #endregion
 
+// #region shapes
 @route("/shapes")
 interface Shapes {
   @get get(@path id: string): Shape | NotFound;
 }
+// #endregion
 
+// #region parameters
 @route("/tags")
 interface Tags {
   /** Echoes a required `explode: false` list (`?names=a,b`). */
   @get echo(@query(#{ explode: false }) names: string[]): string[];
 }
+// #endregion
 
 // --- server-sent events ----------------------------------------------------------------------
 
+// #region sse
 /** Keeps the connection alive. */
 model Ping {
   type: "ping";
@@ -175,3 +190,4 @@ interface WidgetEvents {
     @header("Last-Event-ID") lastEventId?: string,
   ): SSEStream<WidgetEvent> | BadRequest;
 }
+// #endregion

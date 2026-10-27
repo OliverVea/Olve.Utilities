@@ -23,7 +23,14 @@ const FROM = { path: "FromRoute", query: "FromQuery", header: "FromHeader" };
 /** Records, enums, discriminated unions and request validators. */
 export function renderModels(ir, namespace) {
   const out = [
-    HEADER(namespace, ["System", "System.Collections.Generic", "System.Text.Json.Serialization", "Olve.Results", "Olve.TypeSpec", "Olve.Validation"]),
+    HEADER(namespace, [
+      "System",
+      "System.Collections.Generic",
+      "System.Text.Json.Serialization",
+      "Olve.Results",
+      "Olve.TypeSpec",
+      "Olve.Validation",
+    ]),
   ];
 
   for (const e of ir.enums.values()) {
@@ -32,7 +39,9 @@ export function renderModels(ir, namespace) {
     s += `public enum ${e.name}\n{\n`;
     for (const m of e.members) {
       s += summary(m.doc, "    ");
-      s += e.numeric ? `    ${m.name} = ${m.value},\n` : `    [JsonStringEnumMemberName(${str(m.value)})]\n    ${m.name},\n`;
+      s += e.numeric
+        ? `    ${m.name} = ${m.value},\n`
+        : `    [JsonStringEnumMemberName(${str(m.value)})]\n    ${m.name},\n`;
     }
     out.push(`${s}}\n`);
   }
@@ -59,7 +68,10 @@ export function renderModels(ir, namespace) {
       : summary(m.doc);
     s += `public sealed record ${m.name}${m.union ? ` : ${m.union.name}` : ""}\n{\n`;
     const members = m.props.map((p) => renderProperty(p));
-    if (m.union?.events) members.unshift(`    /// <inheritdoc />\n    [JsonIgnore]\n    public override string EventType => ${str(m.union.key)};\n`);
+    if (m.union?.events)
+      members.unshift(
+        `    /// <inheritdoc />\n    [JsonIgnore]\n    public override string EventType => ${str(m.union.key)};\n`,
+      );
     s += members.join("\n");
     out.push(`${s}}\n`);
   }
@@ -120,17 +132,21 @@ export function renderApi(ir, namespace, prefix) {
   }
   out.push(`${table}}\n`);
 
-  let endpoints = "/// <summary>The route builder of each mapped operation, for app-side conventions (auth, rate limits, …).</summary>\n";
+  let endpoints =
+    "/// <summary>The route builder of each mapped operation, for app-side conventions (auth, rate limits, …).</summary>\n";
   endpoints += `public sealed class ${prefix}Endpoints\n{\n`;
   endpoints += ir.operations.map((o) => `    public required RouteHandlerBuilder ${o.name} { get; init; }\n`).join("");
   out.push(`${endpoints}}\n`);
 
   let api = `public static class ${prefix}Api\n{\n`;
-  api += "    /// <summary>Every operation's handler interface; each must have a registered implementation.</summary>\n";
+  api +=
+    "    /// <summary>Every operation's handler interface; each must have a registered implementation.</summary>\n";
   api += `    public static IReadOnlyList<Type> HandlerTypes { get; } =\n    [\n${ir.operations.map((o) => `        typeof(I${o.name}Handler),\n`).join("")}    ];\n\n`;
-  api += "    /// <summary>Registers the generated JSON context and the runtime's request handling (the app registers its <see cref=\"IApiErrorWriter\"/> and handlers).</summary>\n";
+  api +=
+    '    /// <summary>Registers the generated JSON context and the runtime\'s request handling (the app registers its <see cref="IApiErrorWriter"/> and handlers).</summary>\n';
   api += `    public static IServiceCollection Add${prefix}Api(this IServiceCollection services) => services.AddTypeSpecApi(${prefix}JsonContext.Default);\n\n`;
-  api += "    /// <summary>Checks every handler is registered, adds the runtime's middleware and maps every contract operation.</summary>\n";
+  api +=
+    "    /// <summary>Checks every handler is registered, adds the runtime's middleware and maps every contract operation.</summary>\n";
   api += `    public static ${prefix}Endpoints Use${prefix}Api(this WebApplication app) => app.UseTypeSpecApi(HandlerTypes).Map${prefix}Api();\n\n`;
   api += "    /// <summary>Maps every contract operation onto its handler interface.</summary>\n";
   api += `    public static ${prefix}Endpoints Map${prefix}Api(this IEndpointRouteBuilder app) => new()\n    {\n`;
@@ -139,7 +155,13 @@ export function renderApi(ir, namespace, prefix) {
   out.push(api);
 
   const parsed = [...new Set(ir.operations.flatMap((o) => o.params.map((p) => stringEnumOf(p, ir)).filter(Boolean)))];
-  if (parsed.length) out.push(renderEnumParsers(parsed.map((name) => ir.enums.get(name)), prefix));
+  if (parsed.length)
+    out.push(
+      renderEnumParsers(
+        parsed.map((name) => ir.enums.get(name)),
+        prefix,
+      ),
+    );
 
   return out.join("\n");
 }
@@ -152,13 +174,15 @@ function stringEnumOf(p, ir) {
 
 /** Parses string-enum parameters by their wire values; anything else is a binding failure. */
 function renderEnumParsers(enums, prefix) {
-  let s = "/// <summary>Parses string-enum parameters by their wire values (minimal APIs only know member names).</summary>\n";
+  let s =
+    "/// <summary>Parses string-enum parameters by their wire values (minimal APIs only know member names).</summary>\n";
   s += `internal static class ${prefix}Parameters\n{\n`;
   s += enums
     .map((e) => {
       let m = `    public static ${e.name} Parse${e.name}(string value, string parameter) => value switch\n    {\n`;
       for (const member of e.members) m += `        ${str(member.value)} => ${e.name}.${member.name},\n`;
-      m += '        _ => throw new BadHttpRequestException($"Failed to bind parameter \\"{parameter}\\" from \\"{value}\\"."),\n';
+      m +=
+        '        _ => throw new BadHttpRequestException($"Failed to bind parameter \\"{parameter}\\" from \\"{value}\\"."),\n';
       return `${m}    };\n`;
     })
     .join("\n");
@@ -195,7 +219,8 @@ function renderEndpoint(o, ir, prefix) {
   s += `${i}        (await handler.HandleAsync(new ${o.name}Request(${args}), ct)).ToHttpResult())\n`;
   s += `${i}    .WithName(${str(o.operationId)})\n`;
   s += `${i}    .WithMetadata(${prefix}Operations.${o.name})`;
-  if (o.body?.validator) s += `\n${i}    .WithRequestValidation<${o.body.type}, ${o.body.validator}>(${prefix}Operations.${o.name})`;
+  if (o.body?.validator)
+    s += `\n${i}    .WithRequestValidation<${o.body.type}, ${o.body.validator}>(${prefix}Operations.${o.name})`;
   for (const r of [...o.successes, ...o.errors]) {
     s += r.stream
       ? `\n${i}    .Produces<${r.type}>(${r.status}, "text/event-stream")`
@@ -206,14 +231,26 @@ function renderEndpoint(o, ir, prefix) {
 
 // Variant names of a response union, by status.
 const STATUS_NAMES = {
-  200: "Ok", 201: "Created", 202: "Accepted", 204: "NoContent",
-  400: "BadRequest", 401: "Unauthorized", 403: "Forbidden", 404: "NotFound", 409: "Conflict", 410: "Gone",
-  422: "UnprocessableEntity", 429: "TooManyRequests", 500: "InternalServerError", 503: "ServiceUnavailable",
+  200: "Ok",
+  201: "Created",
+  202: "Accepted",
+  204: "NoContent",
+  400: "BadRequest",
+  401: "Unauthorized",
+  403: "Forbidden",
+  404: "NotFound",
+  409: "Conflict",
+  410: "Gone",
+  422: "UnprocessableEntity",
+  429: "TooManyRequests",
+  500: "InternalServerError",
+  503: "ServiceUnavailable",
 };
 const variantName = (status) => STATUS_NAMES[status] ?? `Status${status}`;
 
 /** Interfaces can't take part in user-defined conversions (CS0552). */
-const isInterface = (type) => /^(IReadOnlyList|IReadOnlyDictionary|IAsyncEnumerable)</.test(type) || type === "System.Text.Json.JsonElement";
+const isInterface = (type) =>
+  /^(IReadOnlyList|IReadOnlyDictionary|IAsyncEnumerable)</.test(type) || type === "System.Text.Json.JsonElement";
 
 /**
  * Every response an operation declares, as a closed union: one nested variant per status that
@@ -254,7 +291,12 @@ function renderResponseUnion(o) {
 
 /** The System.Text.Json source-generation context for every DTO. */
 export function renderJsonContext(ir, namespace, prefix) {
-  let s = HEADER(namespace, ["System.Collections.Generic", "System.Text.Json", "System.Text.Json.Serialization", "Olve.Results"]);
+  let s = HEADER(namespace, [
+    "System.Collections.Generic",
+    "System.Text.Json",
+    "System.Text.Json.Serialization",
+    "Olve.Results",
+  ]);
   s += "\n[JsonSourceGenerationOptions(JsonSerializerDefaults.Web, AllowOutOfOrderMetadataProperties = true)]\n";
   for (const t of ir.jsonTypes) s += `[JsonSerializable(typeof(${t}))]\n`;
   s += `public partial class ${prefix}JsonContext : JsonSerializerContext;\n`;

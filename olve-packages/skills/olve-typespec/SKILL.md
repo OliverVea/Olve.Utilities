@@ -19,9 +19,19 @@ spec/main.tsp ── tsp compile ──► artifacts/generated/<Prefix>{Models,A
 
 ## Examples
 
-[references/contract/widgets.tsp](references/contract/widgets.tsp) is a contract that uses every supported shape (visibility splits, enums, a discriminated union, nullables and optionals, path/query/header parameters, an `explode: false` list, several success statuses, an error envelope, an SSE stream), and [references/generated/](references/generated/) is exactly what the emitter writes for it: `FixtureModels.g.cs`, `FixtureApi.g.cs`, `FixtureJsonContext.g.cs`. The emitter's snapshot test fails when these copies differ from the emitter's output, so they are always current (`UPDATE_SNAPSHOTS=1 npm test` in `src/typespec-csharp` refreshes them).
+One short file per topic in [references/examples/](references/examples/), each pairing a region of a contract with the C# the emitter generates for it and the hand-written code that goes with it. Read only the one you need:
 
-Hand-written code against that contract is in `Olve.Utilities/tests/Olve.TypeSpec.Conformance/`: `FixtureHandlers.cs` (one handler per operation), `FixtureErrors.cs` (an error envelope and its `IApiErrorWriter`), `FixtureApp.cs` (the wiring). The runtime README embeds them.
+| Read | When |
+| --- | --- |
+| [response-unions.md](references/examples/response-unions.md) | writing a handler: what it receives, what it may return, several success statuses, implicit `Ok` |
+| [visibility.md](references/examples/visibility.md) | a model's properties differ between request and response (`@visibility`) |
+| [discriminated-union.md](references/examples/discriminated-union.md) | a `kind`-style union in a request, response or model |
+| [enums-and-parameters.md](references/examples/enums-and-parameters.md) | query/header/path parameters, string enums, `explode: false` lists |
+| [validation-and-errors.md](references/examples/validation-and-errors.md) | constraints on a request body, the error envelope, the `IApiErrorWriter` |
+| [sse.md](references/examples/sse.md) | an event stream: the `@events` union, the handler, what the runtime does and doesn't do |
+| [wiring.md](references/examples/wiring.md) | `Add…Api` / `Use…Api` and handler registration |
+
+The complete contract they come from is [references/contract/widgets.tsp](references/contract/widgets.tsp). All of it is built by the emitter's snapshot test (`src/typespec-csharp/test/skill-examples.js`) from the fixture and the emitter's current output, so the examples fail the build when they drift; `UPDATE_SNAPSHOTS=1 npm test` refreshes them.
 
 ## Rules
 

@@ -57,8 +57,23 @@ const SCALARS = {
   bytes: "byte[]",
 };
 const VALUE_TYPES = new Set([
-  "bool", "sbyte", "short", "int", "long", "byte", "ushort", "uint", "ulong", "float", "double", "decimal",
-  "DateTimeOffset", "DateOnly", "TimeOnly", "Guid", "System.Text.Json.JsonElement",
+  "bool",
+  "sbyte",
+  "short",
+  "int",
+  "long",
+  "byte",
+  "ushort",
+  "uint",
+  "ulong",
+  "float",
+  "double",
+  "decimal",
+  "DateTimeOffset",
+  "DateOnly",
+  "TimeOnly",
+  "Guid",
+  "System.Text.Json.JsonElement",
 ]);
 const JSON_ELEMENT = "System.Text.Json.JsonElement";
 const EVENT_STREAM = "text/event-stream";
@@ -104,7 +119,10 @@ export function collect(program, options = {}) {
   }
 
   const propsFor = (model, vis) => allProperties(model).filter((p) => isVisible(program, p, vis));
-  const propKey = (model, vis) => propsFor(model, vis).map((p) => p.name).join(",");
+  const propKey = (model, vis) =>
+    propsFor(model, vis)
+      .map((p) => p.name)
+      .join(",");
 
   /**
    * The C# name of `model` as seen with visibility `vis`:
@@ -191,7 +209,12 @@ export function collect(program, options = {}) {
         value: m.value ?? m.name,
         doc: getDoc(program, m),
       }));
-      enums.set(name, { name, doc: getDoc(program, type), numeric: members.some((m) => typeof m.value === "number"), members });
+      enums.set(name, {
+        name,
+        doc: getDoc(program, type),
+        numeric: members.some((m) => typeof m.value === "number"),
+        members,
+      });
     }
     return name;
   }
@@ -203,14 +226,19 @@ export function collect(program, options = {}) {
     if (nonNull.length === 1) return csType(nonNull[0], vis, prop, hint) + q;
 
     // `"a" | "b"` (and named unions of string literals/string) → string.
-    if (nonNull.every((t) => t.kind === "String" || (t.kind === "Scalar" && scalarType(t) === "string"))) return `string${q}`;
+    if (nonNull.every((t) => t.kind === "String" || (t.kind === "Scalar" && scalarType(t) === "string")))
+      return `string${q}`;
 
     const [disc] = getDiscriminatedUnion(program, type);
     if (disc && type.name && disc.options.envelope === "none") {
       const discriminator = disc.options.discriminatorPropertyName;
-      const named = [...disc.variants].map(([key, t]) => ({ key, name: csType(t, vis, undefined, type.name + pascal(key)) }));
+      const named = [...disc.variants].map(([key, t]) => ({
+        key,
+        name: csType(t, vis, undefined, type.name + pascal(key)),
+      }));
       // Keep the union's name in step with its variants' visibility naming (`Pet` / `PetWritable`).
-      const suffix = [...disc.variants].map(([, t], i) => named[i].name.slice(baseName(t, "").length)).find(Boolean) ?? "";
+      const suffix =
+        [...disc.variants].map(([, t], i) => named[i].name.slice(baseName(t, "").length)).find(Boolean) ?? "";
       registerUnion({ name: type.name + suffix, doc: getDoc(program, type), discriminator, variants: named });
       return type.name + suffix + q;
     }
@@ -277,7 +305,8 @@ export function collect(program, options = {}) {
       case "Number":
         return Number.isInteger(type.value) ? "int" : "double";
       case "Model":
-        if (isArrayModelType(type)) return `IReadOnlyList<${csType(type.indexer.value, vis, undefined, `${hint}Item`)}>`;
+        if (isArrayModelType(type))
+          return `IReadOnlyList<${csType(type.indexer.value, vis, undefined, `${hint}Item`)}>`;
         if (isRecordModelType(type)) {
           return `IReadOnlyDictionary<string, ${csType(type.indexer.value, vis, undefined, `${hint}Value`)}>`;
         }
@@ -307,7 +336,11 @@ export function collect(program, options = {}) {
     const name = group + pascal(op.name);
     const operationId = group ? `${group}_${op.name}` : op.name;
     const unsupported = (reason) =>
-      reportDiagnostic(program, { code: "unsupported-operation", format: { operation: operationId, reason }, target: op });
+      reportDiagnostic(program, {
+        code: "unsupported-operation",
+        format: { operation: operationId, reason },
+        target: op,
+      });
     const reqVis = resolveRequestVisibility(program, op, http.verb);
 
     const params = [];
@@ -343,7 +376,10 @@ export function collect(program, options = {}) {
       const bodyType = r.responses.find((x) => x.body)?.body?.type;
       const response = stream
         ? { status: r.statusCodes, type: eventsType(getStreamOf(program, r.type), unsupported), stream: true }
-        : { status: r.statusCodes, type: bodyType ? csType(bodyType, READ, undefined, `${name}${r.statusCodes}Body`) : undefined };
+        : {
+            status: r.statusCodes,
+            type: bodyType ? csType(bodyType, READ, undefined, `${name}${r.statusCodes}Body`) : undefined,
+          };
       if (stream && !response.type) continue;
       if (r.statusCodes >= 300) errors.push(response);
       else successes.push(response);
@@ -355,7 +391,17 @@ export function collect(program, options = {}) {
     }
     // Handlers return a generated response union with one variant per declared status
     // (render.js), so several success statuses (`201 | 202`) are just more variants.
-    operations.push({ name, operationId, verb: http.verb, path: http.path, doc: getDoc(program, op), params, body, successes, errors });
+    operations.push({
+      name,
+      operationId,
+      verb: http.verb,
+      path: http.path,
+      doc: getDoc(program, op),
+      params,
+      body,
+      successes,
+      errors,
+    });
   }
   operations.sort((a, b) => ordinal(a.name, b.name));
 
@@ -369,7 +415,8 @@ export function collect(program, options = {}) {
     const rules = model.props.flatMap((p) => rulesFor(p, (t) => VALUE_TYPES.has(t) || enums.has(t)));
     if (rules.length) validators.push({ name: `${typeName}Validator`, model: typeName, rules });
   }
-  for (const o of operations) if (o.body && validators.some((v) => v.model === o.body.type)) o.body.validator = `${o.body.type}Validator`;
+  for (const o of operations)
+    if (o.body && validators.some((v) => v.model === o.body.type)) o.body.validator = `${o.body.type}Validator`;
 
   // ---- JSON source-gen roots ----------------------------------------------------------------
 
@@ -378,7 +425,9 @@ export function collect(program, options = {}) {
     ...[...models.keys()].filter((n) => !variantNames.has(n)),
     ...unions.keys(),
     ...enums.keys(),
-    ...operations.flatMap((o) => [o.body?.type, ...o.successes.map((r) => r.type), ...o.errors.map((e) => e.type)]).filter(Boolean),
+    ...operations
+      .flatMap((o) => [o.body?.type, ...o.successes.map((r) => r.type), ...o.errors.map((e) => e.type)])
+      .filter(Boolean),
   ]);
 
   return {
@@ -388,7 +437,10 @@ export function collect(program, options = {}) {
     enums: sortedMap(enums),
     operations,
     validators,
-    jsonTypes: [...jsonTypes].map((t) => t.replace(/\?$/, "")).filter((t) => !VALUE_TYPES.has(t)).sort(ordinal),
+    jsonTypes: [...jsonTypes]
+      .map((t) => t.replace(/\?$/, ""))
+      .filter((t) => !VALUE_TYPES.has(t))
+      .sort(ordinal),
   };
 }
 
@@ -400,17 +452,35 @@ function rulesFor(p, isValueType) {
   const x = `value.${p.name}`;
   if (!p.optional && !p.nullable && ref) rules.push({ test: `${x} is null`, message: `'${p.wire}' is required.` });
   if (p.baseType === "string") {
-    if (c.minLength !== undefined) rules.push({ test: `${x} is { Length: < ${c.minLength} }`, message: `'${p.wire}' must be at least ${plural(c.minLength, "character")}.` });
-    if (c.maxLength !== undefined) rules.push({ test: `${x} is { Length: > ${c.maxLength} }`, message: `'${p.wire}' cannot exceed ${plural(c.maxLength, "character")}.` });
+    if (c.minLength !== undefined)
+      rules.push({
+        test: `${x} is { Length: < ${c.minLength} }`,
+        message: `'${p.wire}' must be at least ${plural(c.minLength, "character")}.`,
+      });
+    if (c.maxLength !== undefined)
+      rules.push({
+        test: `${x} is { Length: > ${c.maxLength} }`,
+        message: `'${p.wire}' cannot exceed ${plural(c.maxLength, "character")}.`,
+      });
   }
   if (p.baseType.startsWith("IReadOnlyList<")) {
-    if (c.minItems !== undefined) rules.push({ test: `${x} is { Count: < ${c.minItems} }`, message: `'${p.wire}' must have at least ${plural(c.minItems, "item")}.` });
-    if (c.maxItems !== undefined) rules.push({ test: `${x} is { Count: > ${c.maxItems} }`, message: `'${p.wire}' cannot have more than ${plural(c.maxItems, "item")}.` });
+    if (c.minItems !== undefined)
+      rules.push({
+        test: `${x} is { Count: < ${c.minItems} }`,
+        message: `'${p.wire}' must have at least ${plural(c.minItems, "item")}.`,
+      });
+    if (c.maxItems !== undefined)
+      rules.push({
+        test: `${x} is { Count: > ${c.maxItems} }`,
+        message: `'${p.wire}' cannot have more than ${plural(c.maxItems, "item")}.`,
+      });
   }
   const numeric = typeof c.minValue === "number" || typeof c.maxValue === "number";
   if (numeric && isValueType(p.baseType)) {
-    if (c.minValue !== undefined) rules.push({ test: `${x} < ${c.minValue}`, message: `'${p.wire}' must be at least ${c.minValue}.` });
-    if (c.maxValue !== undefined) rules.push({ test: `${x} > ${c.maxValue}`, message: `'${p.wire}' cannot exceed ${c.maxValue}.` });
+    if (c.minValue !== undefined)
+      rules.push({ test: `${x} < ${c.minValue}`, message: `'${p.wire}' must be at least ${c.minValue}.` });
+    if (c.maxValue !== undefined)
+      rules.push({ test: `${x} > ${c.maxValue}`, message: `'${p.wire}' cannot exceed ${c.maxValue}.` });
   }
   return rules;
 }
