@@ -298,6 +298,8 @@ export function collect(program, options = {}) {
   // ---- operations --------------------------------------------------------------------------
 
   const [services] = getAllHttpServices(program);
+  // The default prefix of the generated names: the (first) service namespace's name.
+  const serviceName = services[0]?.namespace?.name ? pascal(services[0].namespace.name) : undefined;
   const operations = [];
   for (const http of services.flatMap((s) => s.operations)) {
     const op = http.operation;
@@ -380,6 +382,7 @@ export function collect(program, options = {}) {
   ]);
 
   return {
+    serviceName,
     models: sortedMap(models),
     unions: sortedMap(unions),
     enums: sortedMap(enums),

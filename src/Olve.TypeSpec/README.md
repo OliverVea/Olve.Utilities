@@ -33,55 +33,106 @@ npm install --save-dev @olivervea/typespec-csharp @typespec/compiler @typespec/h
 
 ## Usage
 
-The contract is a `.tsp` file; `tsp compile` with the emitter writes `<prefix>Models.g.cs`, `<prefix>Api.g.cs` and `<prefix>JsonContext.g.cs` into a folder the service compiles (an MSBuild target can run the compile before the build).
+The examples below are the conformance suite's fixture (`tests/Olve.TypeSpec.Conformance`), which the emitter's tests keep current. The contract is a `.tsp` file:
+
+```ts
+// ../typespec-csharp/test/fixtures/widgets.tsp#L25-L40
+
+model Circle {
+  kind: "circle";
+  radius: float64;
+}
+
+model Square {
+  kind: "square";
+  side: float64;
+}
+
+/** A shape, discriminated on `kind`. */
+@discriminated(#{ envelope: "none", discriminatorPropertyName: "kind" })
+union Shape {
+  circle: Circle,
+  square: Square,
+}
+```
+
+```ts
+// ../typespec-csharp/test/fixtures/widgets.tsp#L126-L129
+
+@route("/shapes")
+interface Shapes {
+  @get get(@path id: string): Shape | NotFound;
+}
+```
+
+`tsp compile` with the emitter writes `<prefix>Models.g.cs`, `<prefix>Api.g.cs` and `<prefix>JsonContext.g.cs` into a folder the service compiles (an MSBuild target can run the compile before the build). The prefix is the service namespace's name unless set in `tspconfig.yaml`:
 
 ```yaml
-# tspconfig.yaml
 emit:
   - "@typespec/openapi3"
   - "@olivervea/typespec-csharp"
 options:
   "@olivervea/typespec-csharp":
     emitter-output-dir: "{project-root}/artifacts/generated"
-    namespace: "MyService.Api"
-    prefix: "MyService"
+    namespace: "Fixture.Api"
     external-types:
-      ErrorEnvelope: "MyService.Api.ErrorEnvelope"   # a spec model the app already has a type for
+      ErrorEnvelope: "Fixture.FixtureErrorEnvelope"   # a spec model the app already has a type for
 ```
 
 A handler implements the generated interface and returns one of the declared responses. A success body converts implicitly; errors are named:
 
-```csharp
-public sealed class GetWidget(WidgetStore store) : IWidgetsGetHandler
+```cs
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L186-L195
+
+private sealed class GetShape : IShapesGetHandler
 {
-    public Task<WidgetsGetResponse> HandleAsync(WidgetsGetRequest request, CancellationToken ct) =>
-        Task.FromResult<WidgetsGetResponse>(store.Find(request.Id) is { } widget
-            ? widget
-            : new WidgetsGetResponse.NotFound(new ErrorEnvelope("WIDGET_NOT_FOUND", $"No widget '{request.Id}'.")));
+    public Task<ShapesGetResponse> HandleAsync(ShapesGetRequest request, CancellationToken cancellationToken) =>
+        Task.FromResult<ShapesGetResponse>(request.Id switch
+        {
+            "circle" => new Circle { Radius = 1.5 },
+            "square" => new Square { Side = 2 },
+            _ => new ShapesGetResponse.NotFound(Error("SHAPE_NOT_FOUND", request.Id)),
+        });
 }
 ```
 
-Wiring: the generated `Add…Api` registers the JSON context and makes binding failures reach the middleware; the app registers its handlers and its `IApiErrorWriter`; the generated `Use…Api` checks every handler is registered (fail fast, not a runtime 500), adds the middleware and maps every operation. It returns the route builders, for app-side conventions such as authorization.
+The error writer decides the body of a binding or validation failure. This one answers its envelope when the operation declares the status and the bare status otherwise:
 
-```csharp
-builder.Services.AddMyServiceApi();
-builder.Services.AddSingleton<IApiErrorWriter, MyErrorWriter>();
-builder.Services.AddSingleton<IWidgetsGetHandler, GetWidget>();
+```cs
+// ../../tests/Olve.TypeSpec.Conformance/FixtureErrors.cs#L48-L61
 
-var app = builder.Build();
-var endpoints = app.UseMyServiceApi();
-endpoints.WidgetsGet.RequireAuthorization("read");
+public sealed class FixtureErrorWriter : IApiErrorWriter
+{
+    public IResult InvalidRequest(IReadOnlyList<ResultProblem> problems, int status, ApiOperation? operation)
+    {
+        if (operation?.Declares(status) != true)
+        {
+            return TypedResults.StatusCode(status);
+        }
+
+        var entries = problems.Select(p => new FixtureErrorProblem(FixtureErrors.InvalidRequest, p.FormattedMessage)).ToList();
+        var error = new FixtureError(FixtureErrors.InvalidRequest, entries[0].Message, new FixtureErrorDetails { Problems = entries.Count > 1 ? entries : null });
+        return TypedResults.Json(new FixtureErrorEnvelope(error), FixtureErrorJsonContext.Default.FixtureErrorEnvelope, statusCode: status);
+    }
+}
 ```
 
-The error writer decides the body of a binding or validation failure. A typical one answers its envelope when the operation declares the status and the bare status otherwise:
+Wiring: the generated `Add…Api` registers the JSON context and makes binding failures reach the middleware; the app registers its handlers and its `IApiErrorWriter`; the generated `Use…Api` checks every handler is registered (fail fast, not a runtime 500), adds the middleware and maps every operation. It returns the route builders, for app-side conventions such as authorization (`endpoints.ShapesGet.RequireAuthorization("read")`).
 
-```csharp
-public sealed class MyErrorWriter : IApiErrorWriter
+```cs
+// ../../tests/Olve.TypeSpec.Conformance/FixtureApp.cs#L36-L47
+
+public static WebApplication Build(Action<IServiceCollection> registerHandlers)
 {
-    public IResult InvalidRequest(IReadOnlyList<ResultProblem> problems, int status, ApiOperation? operation) =>
-        operation?.Declares(status) == true
-            ? TypedResults.Json(new ErrorEnvelope("INVALID_REQUEST", problems[0].FormattedMessage), statusCode: status)
-            : TypedResults.StatusCode(status);
+    var builder = WebApplication.CreateSlimBuilder(new WebApplicationOptions { EnvironmentName = "Testing" });
+    builder.WebHost.UseTestServer();
+    builder.Services.AddFixtureApi();
+    builder.Services.AddSingleton<IApiErrorWriter, FixtureErrorWriter>();
+    registerHandlers(builder.Services);
+
+    var app = builder.Build();
+    app.UseFixtureApi();
+    return app;
 }
 ```
 
@@ -89,8 +140,12 @@ public sealed class MyErrorWriter : IApiErrorWriter
 
 An operation returning `SSEStream<Events>` of an `@events` union (every variant a JSON model whose `type` literal is its event name) gets a response union whose `Ok` carries `IAsyncEnumerable<ServerSentEvent<Events>>`. Each item's `Id` becomes the SSE id (`null` for heartbeats, so `Last-Event-ID` never points at one). The stream ends quietly on disconnect or shutdown.
 
+### Performance and AOT
+
+The package is `IsAotCompatible` and `IsTrimmable`, and builds with the AOT analyzers as errors: no reflection, the middleware is registered with `app.Use`, JSON goes through the generated source-gen context, and every error body is written with a `JsonTypeInfo`. Per request, the generated endpoint allocates the request record and the response variant; the validation filter is one `IValidator<T>` instance per endpoint and a scan of the handful of bound arguments.
+
 ### What the emitter checks
 
-The emitter's conformance suite (in the Olve.Utilities repo) compiles a fixture contract with this runtime and proves over HTTP that every operation is routed, every response validates against the contract's schema for its status, declared statuses are honoured, parameters bind and binding failures are answered as the contract says. Services only test their own behaviour.
+The emitter's conformance suite (in the Olve.Utilities repo) compiles the fixture contract above with this runtime and proves over HTTP that every operation is routed, every response validates against the contract's schema for its status, declared statuses are honoured, parameters bind and binding failures are answered as the contract says. Services only test their own behaviour.
 
-Shapes the emitter does not support are reported as `unsupported-*` warnings, never silently mistyped: untagged unions, enveloped discriminated unions, cookie and multipart parameters, status ranges and default responses, array parameters other than `explode: false` string lists in the query.
+Shapes the emitter does not support are reported as `unsupported-*` warnings, never silently mistyped: untagged unions, enveloped discriminated unions, cookie parameters, multipart bodies, status code ranges, array parameters other than `explode: false` string lists in the query.

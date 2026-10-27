@@ -1,6 +1,9 @@
 // Snapshot tests: compile test/fixtures/<name>.tsp with the emitter and compare every emitted
 // file with test/snapshots/<name>/. A missing or different snapshot fails; to accept new output,
 // run `npm run test:update` (UPDATE_SNAPSHOTS=1) and review the diff.
+//
+// The widgets snapshots are also the generated examples of the olve-typespec skill
+// (olve-packages/skills/olve-typespec/references/): the same run keeps that copy current.
 
 import assert from "node:assert/strict";
 import { mkdtemp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
@@ -12,7 +15,9 @@ import { compile, NodeHost } from "@typespec/compiler";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const emitterDir = join(here, "..");
+const skillReferences = join(emitterDir, "..", "..", "olve-packages", "skills", "olve-typespec", "references");
 const update = process.env.UPDATE_SNAPSHOTS === "1";
+const ERROR_ENVELOPE = { "external-types": { ErrorEnvelope: "FixtureErrorEnvelope" } };
 
 async function emit(fixture, options = {}) {
   const outputDir = await mkdtemp(join(tmpdir(), "typespec-csharp-"));
@@ -29,8 +34,8 @@ async function emit(fixture, options = {}) {
   }
 }
 
-async function matchSnapshots(fixture, files) {
-  const dir = join(here, "snapshots", fixture);
+/** Compares `files` with the snapshot directory (or rewrites it under UPDATE_SNAPSHOTS=1). */
+async function matchDirectory(dir, files, label) {
   if (update) {
     await rm(dir, { recursive: true, force: true });
     await mkdir(dir, { recursive: true });
@@ -38,30 +43,50 @@ async function matchSnapshots(fixture, files) {
     return;
   }
   const expected = (await readdir(dir).catch(() => [])).sort();
-  assert.deepEqual(Object.keys(files), expected, `emitted files differ from test/snapshots/${fixture}/ (UPDATE_SNAPSHOTS=1 to accept)`);
+  assert.deepEqual(Object.keys(files).sort(), expected, `emitted files differ from ${label} (UPDATE_SNAPSHOTS=1 to accept)`);
   for (const name of expected) {
-    assert.equal(files[name], await readFile(join(dir, name), "utf8"), `${fixture}/${name} differs from its snapshot`);
+    assert.equal(files[name], await readFile(join(dir, name), "utf8"), `${label}/${name} differs from its snapshot`);
   }
 }
 
 const diagnosticCodes = (diagnostics) => diagnostics.map((d) => `${d.severity} ${d.code}: ${d.message}`);
 
 test("widgets fixture matches its snapshots", async () => {
-  const { diagnostics, files } = await emit("widgets", { namespace: "Fixture.Api", "external-types": { ErrorEnvelope: "FixtureErrorEnvelope" } });
+  const { diagnostics, files } = await emit("widgets", { namespace: "Fixture.Api", ...ERROR_ENVELOPE });
   assert.deepEqual(diagnosticCodes(diagnostics), []);
-  await matchSnapshots("widgets", files);
+  await matchDirectory(join(here, "snapshots", "widgets"), files, "test/snapshots/widgets");
+});
+
+test("the skill's generated examples are the widgets snapshots", async () => {
+  const { files } = await emit("widgets", { namespace: "Fixture.Api", ...ERROR_ENVELOPE });
+  const fixture = await readFile(join(here, "fixtures", "widgets.tsp"), "utf8");
+  await matchDirectory(join(skillReferences, "generated"), files, "olve-typespec/references/generated");
+  await matchDirectory(join(skillReferences, "contract"), { "widgets.tsp": fixture }, "olve-typespec/references/contract");
 });
 
 test("output is deterministic", async () => {
-  const options = { "external-types": { ErrorEnvelope: "FixtureErrorEnvelope" } };
-  const [a, b] = [await emit("widgets", options), await emit("widgets", options)];
+  const [a, b] = [await emit("widgets", ERROR_ENVELOPE), await emit("widgets", ERROR_ENVELOPE)];
   assert.deepEqual(a.files, b.files);
+});
+
+test("the prefix defaults to the service namespace's name", async () => {
+  const { files } = await emit("widgets", ERROR_ENVELOPE);
+  assert.deepEqual(Object.keys(files).sort(), ["FixtureApi.g.cs", "FixtureJsonContext.g.cs", "FixtureModels.g.cs"]);
+  const api = files["FixtureApi.g.cs"];
+  assert.match(api, /public static class FixtureOperations/);
+  assert.match(api, /public static IServiceCollection AddFixtureApi\(this IServiceCollection services\) => services\.AddTypeSpecApi\(FixtureJsonContext\.Default\);/);
+  assert.match(api, /public static FixtureEndpoints UseFixtureApi\(this WebApplication app\) => app\.UseTypeSpecApi\(HandlerTypes\)\.MapFixtureApi\(\);/);
+  assert.match(api, /public static FixtureEndpoints MapFixtureApi\(this IEndpointRouteBuilder app\)/);
+
+  const custom = await emit("widgets", { prefix: "Shop", ...ERROR_ENVELOPE });
+  assert.deepEqual(Object.keys(custom.files).sort(), ["ShopApi.g.cs", "ShopJsonContext.g.cs", "ShopModels.g.cs"]);
+  assert.match(custom.files["ShopApi.g.cs"], /UseShopApi/);
 });
 
 const record = (source, name) => source.match(new RegExp(`public sealed record ${name}\\n\\{[\\s\\S]*?\\n\\}`))?.[0] ?? "";
 
 test("read-only properties are split into per-visibility request shapes", async () => {
-  const models = (await emit("widgets")).files["ApiModels.g.cs"];
+  const models = (await emit("widgets")).files["FixtureModels.g.cs"];
   // Response: id, no update-only note. POST (Create): serial, no id/note. PUT (Create|Update): serial and note.
   assert.match(record(models, "Widget"), /Guid Id/);
   assert.doesNotMatch(record(models, "Widget"), / Note /);
@@ -72,19 +97,29 @@ test("read-only properties are split into per-visibility request shapes", async 
   assert.doesNotMatch(record(models, "WidgetWritable"), / Id /);
 });
 
+// Every shape the olve-typespec skill lists as reported, one diagnostic each, nothing mistyped.
 test("unsupported shapes are reported, not silently mistyped", async () => {
-  const { diagnostics } = await emit("unsupported");
-  assert.deepEqual(diagnosticCodes(diagnostics), [
-    "warning @olivervea/typespec-csharp/unsupported-type: Unsupported type shape (union without a discriminator); emitted as System.Text.Json.JsonElement.",
+  const { diagnostics, files } = await emit("unsupported");
+  assert.deepEqual(diagnosticCodes(diagnostics).sort(), [
+    "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'ids': array parameter 'id' must be a string list in the query with explode: false.",
+    "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'range': status code ranges and default responses are not supported.",
+    "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'session': cookie parameter 'sid' is not supported.",
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'tags': array parameter 'tag' must be a string list in the query with explode: false.",
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'ticks': event 'tick' of 'Ticks' must be a model with `type: \"tick\"`.",
+    "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'upload': multipart bodies are not supported.",
+    "warning @olivervea/typespec-csharp/unsupported-type: Unsupported type shape (discriminated union with an envelope); emitted as System.Text.Json.JsonElement.",
+    "warning @olivervea/typespec-csharp/unsupported-type: Unsupported type shape (union without a discriminator); emitted as System.Text.Json.JsonElement.",
   ]);
+  // The mistyped shapes land as JsonElement, so a reader can't mistake them for a typed model.
+  const models = files["UnsupportedModels.g.cs"];
+  assert.match(record(models, "A"), /System\.Text\.Json\.JsonElement X/);
+  assert.match(files["UnsupportedApi.g.cs"], /record PetRequest;[\s\S]*?Ok\(System\.Text\.Json\.JsonElement Body\)/);
 });
 
 test("SSE operations stream their @events union with ids; explode:false lists bind from one string", async () => {
-  const { files } = await emit("widgets", { "external-types": { ErrorEnvelope: "FixtureErrorEnvelope" } });
-  const api = files["ApiApi.g.cs"];
-  const models = files["ApiModels.g.cs"];
+  const { files } = await emit("widgets", ERROR_ENVELOPE);
+  const api = files["FixtureApi.g.cs"];
+  const models = files["FixtureModels.g.cs"];
   assert.match(api, /IWidgetEventsStreamHandler : IOperationHandler<WidgetEventsStreamRequest, WidgetEventsStreamResponse>/);
   assert.match(api, /record Ok\(IAsyncEnumerable<ServerSentEvent<WidgetEvent>> Events\) : WidgetEventsStreamResponse/);
   assert.match(api, /ToHttpResult\(\) => new ServerSentEventsResult<WidgetEvent>\(Events\)/);
@@ -98,8 +133,8 @@ test("SSE operations stream their @events union with ids; explode:false lists bi
 });
 
 test("every declared response is a variant of the operation's response union", async () => {
-  const { files } = await emit("widgets", { "external-types": { ErrorEnvelope: "FixtureErrorEnvelope" } });
-  const api = files["ApiApi.g.cs"];
+  const { files } = await emit("widgets", ERROR_ENVELOPE);
+  const api = files["FixtureApi.g.cs"];
   // 201 | 202 | 400: one variant each, named by status, each writing its own status.
   assert.match(api, /public abstract record WidgetsCreateResponse : IOperationResponse/);
   assert.match(api, /public sealed record Created\(Widget Body\) : WidgetsCreateResponse[\s\S]*?Status => 201;/);

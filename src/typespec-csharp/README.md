@@ -4,13 +4,13 @@
 
 A [TypeSpec](https://typespec.io) emitter: an HTTP contract → its C# minimal-API surface, on the [Olve.TypeSpec](https://www.nuget.org/packages/Olve.TypeSpec) runtime. The service compiles the generated files and hand-writes one handler class per operation; the contract is the only place the API is defined.
 
-With the default prefix `Api`, `tsp compile` writes three files:
+`tsp compile` writes three files, named after the service namespace (`namespace Widgets;` below; the `prefix` option overrides it):
 
 | File | Contents |
 | --- | --- |
-| `ApiModels.g.cs` | Records (request shapes split by `@visibility`), enums, `@discriminated` unions, `@events` unions (`IServerSentEvent`), and an `IValidator<T>` per request body with constraints (`@minLength`, `@maxValue`, …). |
-| `ApiApi.g.cs` | Per operation: a request record, a response union with one variant per declared status, and `I…Handler : IOperationHandler<…>`. Plus `ApiOperations` (declared statuses), `ApiApi.HandlerTypes`, `AddApiApi()`, `UseApiApi()`, `MapApiApi()`. |
-| `ApiJsonContext.g.cs` | A System.Text.Json source-generation context for every DTO (Native AOT ready). |
+| `WidgetsModels.g.cs` | Records (request shapes split by `@visibility`), enums, `@discriminated` unions, `@events` unions (`IServerSentEvent`), and an `IValidator<T>` per request body with constraints (`@minLength`, `@maxValue`, …). |
+| `WidgetsApi.g.cs` | Per operation: a request record, a response union with one variant per declared status, and `I…Handler : IOperationHandler<…>`. Plus `WidgetsOperations` (declared statuses), `WidgetsApi.HandlerTypes`, `AddWidgetsApi()`, `UseWidgetsApi()`, `MapWidgetsApi()`. |
+| `WidgetsJsonContext.g.cs` | A System.Text.Json source-generation context for every DTO (Native AOT ready). |
 
 ## Install
 
@@ -30,7 +30,7 @@ options:
   "@olivervea/typespec-csharp":
     emitter-output-dir: "{project-root}/artifacts/generated"
     namespace: "MyService.Api"        # default: Generated.Api
-    prefix: "MyService"               # default: Api → MyServiceApi, MyServiceOperations, AddMyServiceApi, …
+    prefix: "MyService"               # default: the service namespace's name → MyServiceApi, AddMyServiceApi, …
     external-types:                   # spec models the app already has a C# type for
       ErrorEnvelope: "MyService.Api.ErrorEnvelope"
 ```
@@ -47,7 +47,7 @@ Generated files belong in a gitignored folder the service's project compiles; an
 - **SSE.** `SSEStream<Events>` of an `@events` union streams `ServerSentEvent<Events>` items: the event name is the variant's `type` literal, and the emitter refuses a variant whose `type` disagrees with its name.
 - **Validation.** Constraints on a request body become a validator that runs before the handler; failures and binding failures are answered by the app's `IApiErrorWriter`, in the contract's terms (the matched operation's declared statuses are at hand).
 
-Unsupported shapes are reported as `@olivervea/typespec-csharp/unsupported-type` or `unsupported-operation` warnings and emitted as `JsonElement` or skipped, never silently mistyped: untagged unions, enveloped discriminated unions, cookie and multipart parameters, status ranges and default responses, array parameters other than `explode: false` string lists in the query. Validation covers the top-level request body only.
+Unsupported shapes are reported as `@olivervea/typespec-csharp/unsupported-type` or `unsupported-operation` warnings and emitted as `JsonElement` or skipped, never silently mistyped: untagged unions, enveloped discriminated unions, cookie parameters, multipart bodies, status code ranges, array parameters other than `explode: false` string lists in the query. `test/fixtures/unsupported.tsp` holds one operation per shape and the snapshot test asserts each diagnostic; none of them is blocked by the design, they are simply not needed yet. Validation covers the top-level request body only.
 
 ## Conformance
 

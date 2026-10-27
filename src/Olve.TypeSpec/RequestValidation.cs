@@ -18,8 +18,7 @@ public static class RequestValidation
         var validator = new TValidator();
         return builder.AddEndpointFilter(async (context, next) =>
         {
-            var request = context.Arguments.OfType<TRequest>().FirstOrDefault();
-            if (request is not null && validator.Validate(request).TryPickProblems(out var problems))
+            if (FindArgument(context.Arguments) is { } request && validator.Validate(request).TryPickProblems(out var problems))
             {
                 var errors = context.HttpContext.RequestServices.GetRequiredService<IApiErrorWriter>();
                 return errors.InvalidRequest([.. problems], StatusCodes.Status400BadRequest, operation);
@@ -27,5 +26,19 @@ public static class RequestValidation
 
             return await next(context);
         });
+
+        // The body is one of a handful of arguments; a plain scan beats a LINQ enumerator per request.
+        static TRequest? FindArgument(IList<object?> arguments)
+        {
+            for (var i = 0; i < arguments.Count; i++)
+            {
+                if (arguments[i] is TRequest request)
+                {
+                    return request;
+                }
+            }
+
+            return default;
+        }
     }
 }
