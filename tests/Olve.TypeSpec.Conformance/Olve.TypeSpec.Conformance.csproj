@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!--
+    Conformance suite for @olivervea/typespec-csharp (src/typespec-csharp) and the Olve.TypeSpec
+    runtime: compiles the widgets fixture's generated C# (the emitter's test/fixtures/widgets.tsp →
+    artifacts/conformance/generated) with the runtime, hosts it in-process with trivial handlers,
+    and checks it over HTTP against the fixture's OpenAPI (artifacts/conformance/spec/openapi.json):
+    every operation routed, every response valid for its declared status, the status rules,
+    binding failures, the handler check. Services built on the generator don't re-test it.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <UserSecretsId></UserSecretsId>
+    <!-- The fixture's generated code lives in Fixture.Api; the tests here in Olve.TypeSpec.Conformance. -->
+    <RootNamespace>Olve.TypeSpec.Conformance</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../'))</RepoRoot>
+    <EmitterDir>$(RepoRoot)src/typespec-csharp/</EmitterDir>
+    <FixtureOutDir>$(RepoRoot)artifacts/conformance/</FixtureOutDir>
+    <FixtureGeneratedDir>$(FixtureOutDir)generated/</FixtureGeneratedDir>
+    <FixtureOpenApi>$(FixtureOutDir)spec/openapi.json</FixtureOpenApi>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="Fixture.Api" />
+    <Using Include="Microsoft.AspNetCore.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FixtureInput Include="$(EmitterDir)src/**/*.js;$(EmitterDir)package.json;$(EmitterDir)test/fixtures/widgets.tsp;$(MSBuildThisFileDirectory)emit-fixture.js" />
+    <FixtureOutput Include="$(FixtureGeneratedDir)FixtureApi.g.cs;$(FixtureGeneratedDir)FixtureModels.g.cs;$(FixtureGeneratedDir)FixtureJsonContext.g.cs;$(FixtureOpenApi)" />
+    <!-- Static include for IDEs; re-added after generation below for a clean checkout. -->
+    <Compile Include="$(FixtureGeneratedDir)*.g.cs" Link="Generated/%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <Target Name="InstallEmitter" BeforeTargets="EmitFixture" Condition="!Exists('$(EmitterDir)node_modules')">
+    <Exec Command="npm ci --no-audit --no-fund" WorkingDirectory="$(EmitterDir)" />
+  </Target>
+
+  <Target Name="EmitFixture" BeforeTargets="BeforeBuild" Inputs="@(FixtureInput)" Outputs="@(FixtureOutput)">
+    <Exec Command="node emit-fixture.js" WorkingDirectory="$(MSBuildThisFileDirectory)" />
+    <Touch Files="@(FixtureOutput)" />
+  </Target>
+
+  <Target Name="IncludeFixture" AfterTargets="EmitFixture" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <Compile Remove="$(FixtureGeneratedDir)*.g.cs" />
+      <Compile Include="$(FixtureGeneratedDir)*.g.cs" />
+      <None Include="$(FixtureOpenApi)" Link="openapi.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="JsonSchema.Net" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" />
+    <PackageReference Include="TUnit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Olve.TypeSpec\Olve.TypeSpec.csproj" />
+  </ItemGroup>
+
+</Project>

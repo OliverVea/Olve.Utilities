@@ -57,6 +57,12 @@
           "files": [
             "**/Olve.TinyEXR.csproj"
           ]
+        },
+        {
+          "src": "../src/Olve.TypeSpec",
+          "files": [
+            "**/Olve.TypeSpec.csproj"
+          ]
         }
       ],
       "dest": "api"

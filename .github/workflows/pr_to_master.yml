@@ -17,6 +17,7 @@ env:
     src/Olve.Validation/Olve.Validation.csproj
     src/Olve.MinimalApi/Olve.MinimalApi.csproj
     src/Olve.TinyEXR/Olve.TinyEXR.csproj
+    src/Olve.TypeSpec/Olve.TypeSpec.csproj
 
 jobs:
   test-ubuntu:
@@ -59,6 +60,19 @@ jobs:
           }
         shell: pwsh
 
+  emitter-tests:
+    name: Emitter snapshot tests (@olivervea/typespec-csharp)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci --no-audit --no-fund
+        working-directory: src/typespec-csharp
+      - run: npm test
+        working-directory: src/typespec-csharp
+
   verify-docs:
     name: Verify code snippets
     runs-on: ubuntu-latest
@@ -83,6 +97,7 @@ jobs:
           - id: Olve.Paths
           - id: Olve.Paths.Glob
           - id: Olve.TinyEXR
+          - id: Olve.TypeSpec
     steps:
       - uses: actions/checkout@v6
       - name: Dry run publish ${{ matrix.id }} to NuGet

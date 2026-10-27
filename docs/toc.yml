@@ -41,6 +41,12 @@ items:
       href: ../src/Olve.TinyEXR/README.md
     - name: API
       href: api/Olve.TinyEXR.yml
+- name: Olve.TypeSpec
+  items:
+    - name: Overview
+      href: ../src/Olve.TypeSpec/README.md
+    - name: API
+      href: api/Olve.TypeSpec.yml
 - name: Olve.Utilities
   items:
     - name: Overview

@@ -41,6 +41,7 @@
     <Project Path="src/Olve.Results/Olve.Results.csproj" />
     <Project Path="src/Olve.Utilities/Olve.Utilities.csproj" />
     <Project Path="src/Olve.TinyEXR/Olve.TinyEXR.csproj" />
+    <Project Path="src/Olve.TypeSpec/Olve.TypeSpec.csproj" />
     <Project Path="src/Olve.Validation/Olve.Validation.csproj" />
   </Folder>
   <Folder Name="/tests/">
@@ -54,5 +55,6 @@
     <Project Path="tests/Olve.Validation.Tests/Olve.Validation.Tests.csproj" />
     <Project Path="tests/Olve.OpenRaster.Tests/Olve.OpenRaster.Tests.csproj" />
     <Project Path="tests/Olve.TinyEXR.Tests/Olve.TinyEXR.Tests.csproj" />
+    <Project Path="tests/Olve.TypeSpec.Conformance/Olve.TypeSpec.Conformance.csproj" />
   </Folder>
 </Solution>
