@@ -208,9 +208,27 @@ Entities are immutable values: use records and change them with `with`. Events f
 The store doesn't keep indexes and views alive: hold them for as long as you read them. One that becomes unreachable is garbage-collected and stops tracking the store; `Dispose()` stops it immediately.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L225-L243
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L196-L214
 
+// record Train(Id<Train> Id, string Line, int Order) : IHasId<Id<Train>>;
+EntityStore<Train> trains = [];
 
+// Keep indexes and views as long as you read them, e.g. in a field next to the store
+var byLine = trains.CreateIndex(t => t.Line);
+var byOrder = trains.CreateOrderedView(Comparer<Train>.Create((a, b) => a.Order.CompareTo(b.Order)));
+
+// Events carry the committed values
+trains.OnDeleted.Subscribe(e => Console.WriteLine($"{e.Entity.Line} train removed"));
+
+var express = new Train(Id.New<Train>(), "red", 2);
+trains.Set(express);
+trains.Set(new Train(Id.New<Train>(), "red", 1));
+
+// Mutate is an atomic read-modify-write; indexes follow key changes
+var mutated = trains.Mutate(express.Id, t => t with { Line = "blue", Order = 3 });
+
+var redTrains = byLine.GetForKey("red"); // 1 id
+var first = byOrder[0]; // the Order = 1 train
 ```
 
 Event handlers run synchronously and in isolation: a handler that throws doesn't stop the others and never fails the write that raised the event. The exception goes to `EventDispatch.OnHandlerException` instead, which is `null` (swallow) by default, so route it to your logger at startup:
@@ -227,10 +245,31 @@ EventDispatch.OnHandlerException = ex =>
 `DirectedGraph` provides an ID-based directed graph with node and edge management.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L153-L165
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L135-L147
 
-t]
-ic async Task DictionaryExtensionsExample()
+var graph = new DirectedGraph();
+
+// Create nodes
+var nodeA = graph.CreateNode();
+var nodeB = graph.CreateNode();
+var nodeC = graph.CreateNode();
+
+// Create edges: A -> B, A -> C
+graph.CreateEdge(nodeA, nodeB);
+graph.CreateEdge(nodeA, nodeC);
+
+// Query outgoing edges
+graph.TryGetOutgoingEdges(nodeA, out var edges); // 2 edges
+```
+
+---
+
+### DictionaryExtensions
+
+High-performance `GetOrAdd` and `TryUpdate` extensions using `CollectionsMarshal` for zero-overhead dictionary operations.
+
+```cs
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L156-L166
 
 var cache = new Dictionary<string, List<int>>();
 
@@ -242,28 +281,7 @@ var same = cache.GetOrAdd("scores", () => []); // same reference as list
 
 // TryUpdate: update only if the key exists
 var updated = cache.TryUpdate("scores", old => [..old, 200]); // true
-```
-
----
-
-### DictionaryExtensions
-
-High-performance `GetOrAdd` and `TryUpdate` extensions using `CollectionsMarshal` for zero-overhead dictionary operations.
-
-```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L174-L184
-
-t]
-ic async Task OffsetPaginationExample()
-
-var users = new[] { "alice", "bob", "charlie", "dave", "eve" };
-
-// e.g. bound from a request body like { "offset": 1, "limit": 2 }
-var request = new OffsetPagination(Offset: 1, Limit: 2).Clamp(defaultLimit: 20, maxLimit: 100);
-
-var slice = users.Paginate(request);
-// slice.Items == ["bob", "charlie"], slice.TotalCount == 5
-// slice.HasMore == true, slice.Next == OffsetPagination { Offset = 3, Limit = 2 }
+var missed = cache.TryUpdate("missing", _ => []); // false
 ```
 
 ---
