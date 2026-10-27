@@ -49,6 +49,13 @@ public abstract record WidgetEvent : IServerSentEvent
     public abstract string EventType { get; }
 }
 
+/// <summary>The area of a shape.</summary>
+public sealed record Area
+{
+    [JsonPropertyName("value")]
+    public required double Value { get; init; }
+}
+
 public sealed record Circle : Shape
 {
     [JsonPropertyName("radius")]

@@ -57,11 +57,19 @@ union Shape {
 ```
 
 ```ts
-// ../typespec-csharp/test/fixtures/widgets.tsp#L137-L140
+// ../typespec-csharp/test/fixtures/widgets.tsp#L137-L148
+
+/** The area of a shape. */
+model Area {
+  value: float64;
+}
 
 @route("/shapes")
 interface Shapes {
   @get get(@path id: string): Shape | NotFound;
+
+  /** Takes a shape, answers its area: the handler switches on the variant. */
+  @route("area") @post area(@body shape: Shape): Area;
 }
 ```
 
@@ -79,20 +87,45 @@ options:
       ErrorEnvelope: "Fixture.FixtureErrorEnvelope"   # a spec model the app already has a type for
 ```
 
-A handler implements the generated interface and returns one of the declared responses. A success body converts implicitly; errors are named. The fixture's ids are plain strings, so its tests can address a variant by name (`missing`, `circle`); a real contract would type them (`@format("uuid")` binds as `Guid`):
+A handler implements the generated interface and returns one of the declared responses. A success body converts implicitly; errors are named:
 
 ```cs
-// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L205-L214
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L223-L236
 
+/// <summary>A union in the response: the stored data decides the variant; it converts implicitly to <c>Ok</c>.</summary>
 private sealed class GetShape : IShapesGetHandler
 {
+    private static readonly Dictionary<string, Shape> Shapes = new()
+    {
+        ["c-1"] = new Circle { Radius = 1.5 },
+        ["s-1"] = new Square { Side = 2 },
+    };
+
     public Task<ShapesGetResponse> HandleAsync(ShapesGetRequest request, CancellationToken cancellationToken) =>
-        Task.FromResult<ShapesGetResponse>(request.Id switch
+        Task.FromResult<ShapesGetResponse>(Shapes.TryGetValue(request.Id, out var shape)
+            ? shape
+            : new ShapesGetResponse.NotFound(Error("SHAPE_NOT_FOUND", request.Id)));
+}
+```
+
+A discriminated union in a request arrives as the abstract record; the handler switches on the variant records:
+
+```cs
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L208-L221
+
+/// <summary>A union in the request: the handler switches on the variant records.</summary>
+private sealed class ShapeArea : IShapesAreaHandler
+{
+    public Task<ShapesAreaResponse> HandleAsync(ShapesAreaRequest request, CancellationToken cancellationToken)
+    {
+        var area = request.Body switch
         {
-            "circle" => new Circle { Radius = 1.5 },
-            "square" => new Square { Side = 2 },
-            _ => new ShapesGetResponse.NotFound(Error("SHAPE_NOT_FOUND", request.Id)),
-        });
+            Circle circle => Math.PI * circle.Radius * circle.Radius,
+            Square square => square.Side * square.Side,
+            _ => throw new UnreachableException(),
+        };
+        return Task.FromResult<ShapesAreaResponse>(new Area { Value = area });
+    }
 }
 ```
 
@@ -147,7 +180,7 @@ public static WebApplication Build(Action<IServiceCollection> registerHandlers)
 An operation returning `SSEStream<Events>` of an `@events` union (every variant a JSON model whose `type` literal is its event name) gets a response union whose `Ok` carries `IAsyncEnumerable<ServerSentEvent<Events>>`:
 
 ```ts
-// ../typespec-csharp/test/fixtures/widgets.tsp#L177-L192
+// ../typespec-csharp/test/fixtures/widgets.tsp#L185-L200
 
 /** The widget event stream. */
 @TypeSpec.Events.events
@@ -171,6 +204,39 @@ The handler yields events; the runtime writes each one as a frame named by the v
 
 ```cs
 // ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L161-L192
+
+region
+
+ion sse
+<summary>
+A finite stream: a ping (no id), then <c>widget.changed</c> (id 1) and <c>widget.removed</c>
+(id 2). <c>type</c> keeps only the named events (an unknown name is a 400 before streaming);
+<c>Last-Event-ID</c> skips ids up to it.
+</summary>
+ate sealed class StreamWidgetEvents : IWidgetEventsStreamHandler
+
+public static readonly Guid WidgetId = Guid.Parse("0b6f7f0e-4a52-4d0e-9d7a-5b1f0f6c2a11");
+
+public Task<WidgetEventsStreamResponse> HandleAsync(WidgetEventsStreamRequest request, CancellationToken cancellationToken)
+{
+    if (request.Type?.FirstOrDefault(t => !WidgetEvent.EventTypes.Contains(t)) is { } unknown)
+    {
+        return Task.FromResult<WidgetEventsStreamResponse>(
+            new WidgetEventsStreamResponse.BadRequest(FixtureError.Create("UNKNOWN_EVENT", $"Unknown event type '{unknown}'.")));
+    }
+
+    var after = long.TryParse(request.LastEventId, out var id) ? id : 0;
+    var events = Events()
+        .Where(e => request.Type is null || request.Type.Contains(e.Data.EventType))
+        .Where(e => e.Id is null || long.Parse(e.Id, System.Globalization.CultureInfo.InvariantCulture) > after);
+    return Task.FromResult<WidgetEventsStreamResponse>(new WidgetEventsStreamResponse.Ok(events.ToAsyncEnumerable()));
+}
+
+private static IEnumerable<ServerSentEvent<WidgetEvent>> Events()
+{
+    yield return new(new Ping { At = DateTimeOffset.UnixEpoch });
+    yield return new(new WidgetChanged { At = DateTimeOffset.UnixEpoch, WidgetId = WidgetId, Name = "sample", Shape = new Square { Side = 2 } }, "1");
+    yield return new(new WidgetRemoved { At = DateTimeOffset.UnixEpoch, WidgetId = WidgetId }, "2");
 ```
 
 ### Performance and AOT

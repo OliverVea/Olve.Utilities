@@ -63,9 +63,13 @@ public class ResponseConformanceTests(FixtureApp fixture)
         yield return () => new("Widgets_delete", "handler answers 404", 404, c => c.DeleteAsync($"/api/widgets/{FixtureHandlers.Missing}"));
 
         // GET /api/shapes/{id} (a discriminated union response)
-        yield return () => new("Shapes_get", "circle", 200, c => c.GetAsync("/api/shapes/circle"));
-        yield return () => new("Shapes_get", "square", 200, c => c.GetAsync("/api/shapes/square"));
+        yield return () => new("Shapes_get", "a circle", 200, c => c.GetAsync("/api/shapes/c-1"));
+        yield return () => new("Shapes_get", "a square", 200, c => c.GetAsync("/api/shapes/s-1"));
         yield return () => new("Shapes_get", "handler answers 404", 404, c => c.GetAsync($"/api/shapes/{FixtureHandlers.Missing}"));
+
+        // POST /api/shapes/area (a discriminated union in the request body)
+        yield return () => new("Shapes_area", "circle", 200, c => c.PostAsync("/api/shapes/area", Json("""{"kind":"circle","radius":2}""")));
+        yield return () => new("Shapes_area", "square, discriminator last", 200, c => c.PostAsync("/api/shapes/area", Json("""{"side":3,"kind":"square"}""")));
 
         // GET /api/tags (a required explode:false list)
         yield return () => new("Tags_echo", "a comma list", 200, c => c.GetAsync("/api/tags?names=a,b"));
