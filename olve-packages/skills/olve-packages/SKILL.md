@@ -23,6 +23,7 @@ API docs: https://olivervea.github.io/Olve.Utilities/
 | **Olve.Validation** | Fluent validation framework returning `Result` |
 | **Olve.Utilities** | Meta-package: typed IDs, collections, entity stores, graphs, pagination, datetime formatting |
 | **Olve.MinimalApi** | ASP.NET Minimal API extensions for Result mapping and validation filters |
+| **Olve.TypeSpec** | Runtime for the `@olivervea/typespec-csharp` emitter: spec-first minimal APIs from a TypeSpec contract (see `olve-typespec`) |
 | **Olve.OpenRaster** | Read-only access to OpenRaster (.ora) layered image files |
 | **Olve.TinyEXR** | P/Invoke bindings for tinyexr OpenEXR library |
 
@@ -39,6 +40,10 @@ Olve.MinimalApi
 ├── Olve.Results
 ├── Olve.Validation
 └── Olve.Paths
+
+Olve.TypeSpec (+ npm @olivervea/typespec-csharp)
+├── Olve.Results
+└── Olve.Validation
 
 Olve.Results.TUnit
 └── Olve.Results

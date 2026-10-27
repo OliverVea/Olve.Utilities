@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Title>Olve.TypeSpec</Title>
+    <Authors>Oliver Vea</Authors>
+    <Description>Runtime for the C# minimal-API surface that @olivervea/typespec-csharp generates from a TypeSpec contract: handler and response interfaces, request validation, binding-failure answers, server-sent events</Description>
+    <PackageProjectUrl>https://github.com/OliverVea/Olve.Utilities/src/Olve.TypeSpec</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/OliverVea/Olve.Utilities</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Olve.Results\Olve.Results.csproj" />
+    <ProjectReference Include="..\Olve.Validation\Olve.Validation.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+</Project>

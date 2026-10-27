@@ -21,6 +21,7 @@ Full API documentation: [olivervea.github.io/Olve.Utilities](https://olivervea.g
 | [Olve.MinimalApi](src/Olve.MinimalApi) | [![NuGet](https://img.shields.io/nuget/v/Olve.MinimalApi?logo=nuget)](https://www.nuget.org/packages/Olve.MinimalApi) | Conventions for ASP.NET Minimal API endpoints. |
 | [Olve.OpenRaster](src/Olve.OpenRaster) | [![NuGet](https://img.shields.io/nuget/v/Olve.OpenRaster?logo=nuget)](https://www.nuget.org/packages/Olve.OpenRaster) | Read-only access to OpenRaster (`.ora`) image files. |
 | [Olve.TinyEXR](src/Olve.TinyEXR) | [![NuGet](https://img.shields.io/nuget/v/Olve.TinyEXR?logo=nuget)](https://www.nuget.org/packages/Olve.TinyEXR) | P/Invoke bindings for the tinyexr OpenEXR library. |
+| [Olve.TypeSpec](src/Olve.TypeSpec) | [![NuGet](https://img.shields.io/nuget/v/Olve.TypeSpec?logo=nuget)](https://www.nuget.org/packages/Olve.TypeSpec) | Runtime for [@olivervea/typespec-csharp](src/typespec-csharp), the TypeSpec emitter for spec-first minimal APIs. |
 
 ### Deprecated
 

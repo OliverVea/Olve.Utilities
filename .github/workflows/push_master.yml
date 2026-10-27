@@ -52,11 +52,26 @@ jobs:
       - run: dotnet build --no-restore -c Release /p:Version="1.0.0"
       - run: dotnet test --no-restore --no-build -c Release
 
+  emitter-tests:
+    name: Emitter snapshot tests (@olivervea/typespec-csharp)
+    if: ${{ !startsWith(github.event.head_commit.message, 'bump:') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci --no-audit --no-fund
+        working-directory: src/typespec-csharp
+      - run: npm test
+        working-directory: src/typespec-csharp
+
   bump-version:
     name: Bump version and create changelog
     needs:
       - test-ubuntu
       - test-windows
+      - emitter-tests
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.cz.outputs.version }}
@@ -123,6 +138,7 @@ jobs:
           - id: Olve.Logging
           - id: Olve.OpenRaster
           - id: Olve.TinyEXR
+          - id: Olve.TypeSpec
 
     steps:
       - uses: actions/checkout@v6
@@ -144,6 +160,36 @@ jobs:
           version: ${{ needs.bump-version.outputs.version }}
           nuget-api-key: ${{ steps.nuget-secret.outputs.secret }}
           dotnet-version: ${{ env.DOTNET_VERSION }}
+
+  publish-emitter:
+    name: Publish @olivervea/typespec-csharp to npm
+    needs:
+      - bump-version
+    if: "${{ needs.bump-version.outputs.changed == 'true' }}"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: v${{ needs.bump-version.outputs.version }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - name: Get npm token from OpenBao
+        id: npm-secret
+        uses: ./.github/actions/openbao-secret
+        with:
+          role-id: ${{ secrets.OPENBAO_ROLE_ID }}
+          secret-id: ${{ secrets.OPENBAO_SECRET_ID }}
+          secret-path: external/data/npm/olive-utilities
+          secret-field: token
+      # The emitter shares the repo's version; the package.json version is only set here.
+      - run: npm version "${{ needs.bump-version.outputs.version }}" --no-git-tag-version
+        working-directory: src/typespec-csharp
+      - run: npm publish --access public
+        working-directory: src/typespec-csharp
+        env:
+          NODE_AUTH_TOKEN: ${{ steps.npm-secret.outputs.secret }}
 
   publish-docs:
     name: Publish DocFX to GitHub Pages
