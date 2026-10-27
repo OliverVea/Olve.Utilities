@@ -9,6 +9,7 @@ namespace Olve.Utilities.Paginations;
 /// <param name="Page">The (0-based) page number.</param>
 /// <param name="PageSize">The number of items per page.</param>
 [StructLayout(LayoutKind.Sequential)]
+[Obsolete("Page numbers are a UI notion; address a list with OffsetPagination and answer with Slice<T>.")]
 public readonly record struct Pagination(int Page, int PageSize)
 {
     /// <summary>

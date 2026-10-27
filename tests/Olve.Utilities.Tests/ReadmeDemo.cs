@@ -130,25 +130,6 @@ public class ReadmeDemo
     }
 
     [Test]
-    public async Task PaginationExample()
-    {
-        var items = new[] { "alice", "bob", "charlie" };
-
-        var page = new Page<string>(
-            Items: items[..2],
-            PageNumber: 0,
-            PageSize: 2,
-            TotalCount: items.Length);
-
-        // page.HasNextPage == true
-        // page.TotalPages == 2
-
-        await Assert.That(page.HasNextPage).IsTrue();
-        await Assert.That(page.TotalPages).IsEqualTo(2);
-        await Assert.That(page.Items.Count).IsEqualTo(2);
-    }
-
-    [Test]
     public async Task DirectedGraphExample()
     {
         var graph = new DirectedGraph();
@@ -202,19 +183,9 @@ public class ReadmeDemo
         // slice.Items == ["bob", "charlie"], slice.TotalCount == 5
         // slice.HasMore == true, slice.Next == OffsetPagination { Offset = 3, Limit = 2 }
 
-        // Page-based pagination always converts to offset/limit...
-        var fromPage = new Pagination(Page: 2, PageSize: 2).ToOffsetPagination(); // Offset = 4, Limit = 2
-
-        // ...but offset/limit only converts back when the offset is a multiple of the limit
-        request.TryToPagination(out _); // false
-        fromPage.TryToPagination(out var pagination); // true, pagination == Pagination { Page = 2, PageSize = 2 }
-
         await Assert.That(slice.Items).IsEquivalentTo(["bob", "charlie"]);
         await Assert.That(slice.TotalCount).IsEqualTo(5);
         await Assert.That(slice.Next).IsEqualTo(new OffsetPagination(3, 2));
-        await Assert.That(fromPage).IsEqualTo(new OffsetPagination(4, 2));
-        await Assert.That(request.TryToPagination(out _)).IsFalse();
-        await Assert.That(pagination).IsEqualTo(new Pagination(2, 2));
     }
 
     private record Train(Id<Train> Id, string Line, int Order) : IHasId<Id<Train>>;
