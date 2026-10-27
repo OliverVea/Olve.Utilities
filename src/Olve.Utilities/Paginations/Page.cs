@@ -8,6 +8,7 @@ namespace Olve.Utilities.Paginations;
 /// <param name="PageNumber">Zero-based index of this page.</param>
 /// <param name="PageSize">Maximum number of items per page.</param>
 /// <param name="TotalCount">Total number of items across all pages.</param>
+[Obsolete("Page numbers are a UI notion; address a list with OffsetPagination and answer with Slice<T>.")]
 public sealed record Page<T>(
     IReadOnlyList<T> Items,
     int PageNumber,

@@ -34,6 +34,7 @@ public sealed record Slice<T>(
     /// </summary>
     /// <param name="page">The equivalent page, or <c>null</c> when no equivalent exists.</param>
     /// <returns><c>true</c> if an equivalent page exists; otherwise <c>false</c>.</returns>
+    [Obsolete("Page numbers are a UI notion; address a list with OffsetPagination and answer with Slice<T>.")]
     public bool TryToPage([NotNullWhen(true)] out Page<T>? page)
     {
         if (!new OffsetPagination(Offset, Limit).TryToPagination(out var pagination))

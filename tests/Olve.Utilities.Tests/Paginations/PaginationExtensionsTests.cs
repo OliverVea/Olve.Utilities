@@ -1,3 +1,4 @@
+#pragma warning disable CS0618 // Covers the obsolete page-number API until it is removed.
 using System.Collections;
 using System.Linq.Expressions;
 using Olve.Utilities.Paginations;

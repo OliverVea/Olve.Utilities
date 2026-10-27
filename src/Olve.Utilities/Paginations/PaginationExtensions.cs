@@ -1,7 +1,7 @@
 namespace Olve.Utilities.Paginations;
 
 /// <summary>
-///     Applies a <see cref="Pagination" /> or <see cref="OffsetPagination" /> to a sequence.
+///     Applies an <see cref="OffsetPagination" /> (or the obsolete <see cref="Pagination" />) to a sequence.
 /// </summary>
 public static class PaginationExtensions
 {
@@ -16,6 +16,7 @@ public static class PaginationExtensions
     /// <exception cref="ArgumentOutOfRangeException">
     ///     <see cref="Pagination.Page" /> is negative, or <see cref="Pagination.PageSize" /> is zero or negative.
     /// </exception>
+    [Obsolete("Page numbers are a UI notion; address a list with OffsetPagination and answer with Slice<T>.")]
     public static Page<T> Paginate<T>(this IEnumerable<T> source, Pagination pagination)
     {
         ArgumentNullException.ThrowIfNull(source);
@@ -38,6 +39,7 @@ public static class PaginationExtensions
     /// <exception cref="ArgumentOutOfRangeException">
     ///     <see cref="Pagination.Page" /> is negative, or <see cref="Pagination.PageSize" /> is zero or negative.
     /// </exception>
+    [Obsolete("Page numbers are a UI notion; address a list with OffsetPagination and answer with Slice<T>.")]
     public static Page<T> Paginate<T>(this IQueryable<T> source, Pagination pagination)
     {
         ArgumentNullException.ThrowIfNull(source);

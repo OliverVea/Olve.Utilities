@@ -34,7 +34,7 @@ Installing `Olve.Utilities` also brings in:
 | **IDs** | `Id`, `Id<T>`, `UnionId<T1, T2>` | GUID-backed typed identifiers with deterministic generation (UUIDv5) |
 | **Collections** | `BidirectionalDictionary<T1, T2>`, `FixedSizeQueue<T>`, `OneToManyLookup<TLeft, TRight>`, `ManyToManyLookup<TLeft, TRight>` | Specialized collection types with `TryGet` pattern lookups |
 | **DateTime** | `DateTimeFormatter` | Human-readable relative time formatting |
-| **Pagination** | `Pagination`, `Page<T>`, `OffsetPagination`, `Slice<T>` | Page-number and offset/limit pagination with result wrappers |
+| **Pagination** | `OffsetPagination`, `Slice<T>` | Offset/limit pagination with a result wrapper (`Pagination` and `Page<T>` are obsolete) |
 | **Stores** | `EntityStore<T>`, `EntityStoreIndex<T, TKey>`, `EntityStoreUniqueIndex<T, TKey>`, `EntityStoreOrderedView<T, TId>`, `EntityStoreColumns<T, TId>`, `Event<T>`, `Event` | Concurrent, observable in-memory entity store with secondary indexes, ordered views and dense columns |
 | **Graphs** | `DirectedGraph`, `Node`, `DirectedEdge` | ID-based directed graph with node/edge management |
 | **Builders** | `IBuilder<T>`, `BuilderExtensions` | Builder pattern interface with validation integration |
@@ -180,29 +180,10 @@ var text = DateTimeFormatter.FormatTimeAgo(now, then); // "2 days ago"
 
 ### Pagination
 
-`Pagination` computes offsets from page number and size. `Page<T>` wraps a page of items with total count and navigation metadata.
+`OffsetPagination` addresses a list by offset and limit; `Slice<T>` wraps the items with the total count and navigation metadata. `Validate(max)` returns a `Result`, `Clamp(default, max)` fixes up out-of-range values (the bounds are always passed explicitly), and `.Paginate(...)` works on `IEnumerable<T>` and `IQueryable<T>`.
 
 ```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L134-L143
-
-
-var items = new[] { "alice", "bob", "charlie" };
-
-var page = new Page<string>(
-    Items: items[..2],
-    PageNumber: 0,
-    PageSize: 2,
-    TotalCount: items.Length);
-
-// page.HasNextPage == true
-```
-
-#### Offset/limit pagination
-
-`OffsetPagination` and `Slice<T>` mirror `Pagination` and `Page<T>` for offset/limit APIs, where the offset need not be a multiple of the limit. Both request types have `Validate(max)` (returns a `Result`) and `Clamp(default, max)` (fixes up out-of-range values), with the bounds always passed explicitly, and `.Paginate(...)` works on `IEnumerable<T>` and `IQueryable<T>` for either kind.
-
-```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L196-L210
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L177-L184
 
 var users = new[] { "alice", "bob", "charlie", "dave", "eve" };
 
@@ -212,14 +193,9 @@ var request = new OffsetPagination(Offset: 1, Limit: 2).Clamp(defaultLimit: 20, 
 var slice = users.Paginate(request);
 // slice.Items == ["bob", "charlie"], slice.TotalCount == 5
 // slice.HasMore == true, slice.Next == OffsetPagination { Offset = 3, Limit = 2 }
-
-// Page-based pagination always converts to offset/limit...
-var fromPage = new Pagination(Page: 2, PageSize: 2).ToOffsetPagination(); // Offset = 4, Limit = 2
-
-// ...but offset/limit only converts back when the offset is a multiple of the limit
-request.TryToPagination(out _); // false
-fromPage.TryToPagination(out var pagination); // true, pagination == Pagination { Page = 2, PageSize = 2 }
 ```
+
+`Pagination` and `Page<T>` (page number and size) are obsolete: a page is a UI notion, computed by the client from an offset and a limit.
 
 ---
 
@@ -234,25 +210,7 @@ The store doesn't keep indexes and views alive: hold them for as long as you rea
 ```cs
 // ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L225-L243
 
-// record Train(Id<Train> Id, string Line, int Order) : IHasId<Id<Train>>;
-EntityStore<Train> trains = [];
 
-// Keep indexes and views as long as you read them, e.g. in a field next to the store
-var byLine = trains.CreateIndex(t => t.Line);
-var byOrder = trains.CreateOrderedView(Comparer<Train>.Create((a, b) => a.Order.CompareTo(b.Order)));
-
-// Events carry the committed values
-trains.OnDeleted.Subscribe(e => Console.WriteLine($"{e.Entity.Line} train removed"));
-
-var express = new Train(Id.New<Train>(), "red", 2);
-trains.Set(express);
-trains.Set(new Train(Id.New<Train>(), "red", 1));
-
-// Mutate is an atomic read-modify-write; indexes follow key changes
-var mutated = trains.Mutate(express.Id, t => t with { Line = "blue", Order = 3 });
-
-var redTrains = byLine.GetForKey("red"); // 1 id
-var first = byOrder[0]; // the Order = 1 train
 ```
 
 Event handlers run synchronously and in isolation: a handler that throws doesn't stop the others and never fails the write that raised the event. The exception goes to `EventDispatch.OnHandlerException` instead, which is `null` (swallow) by default, so route it to your logger at startup:
@@ -271,30 +229,8 @@ EventDispatch.OnHandlerException = ex =>
 ```cs
 // ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L153-L165
 
-
-var graph = new DirectedGraph();
-
-// Create nodes
-var nodeA = graph.CreateNode();
-var nodeB = graph.CreateNode();
-var nodeC = graph.CreateNode();
-
-// Create edges: A -> B, A -> C
-graph.CreateEdge(nodeA, nodeB);
-graph.CreateEdge(nodeA, nodeC);
-
-// Query outgoing edges
-```
-
----
-
-### DictionaryExtensions
-
-High-performance `GetOrAdd` and `TryUpdate` extensions using `CollectionsMarshal` for zero-overhead dictionary operations.
-
-```cs
-// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L174-L184
-
+t]
+ic async Task DictionaryExtensionsExample()
 
 var cache = new Dictionary<string, List<int>>();
 
@@ -306,6 +242,28 @@ var same = cache.GetOrAdd("scores", () => []); // same reference as list
 
 // TryUpdate: update only if the key exists
 var updated = cache.TryUpdate("scores", old => [..old, 200]); // true
+```
+
+---
+
+### DictionaryExtensions
+
+High-performance `GetOrAdd` and `TryUpdate` extensions using `CollectionsMarshal` for zero-overhead dictionary operations.
+
+```cs
+// ../../tests/Olve.Utilities.Tests/ReadmeDemo.cs#L174-L184
+
+t]
+ic async Task OffsetPaginationExample()
+
+var users = new[] { "alice", "bob", "charlie", "dave", "eve" };
+
+// e.g. bound from a request body like { "offset": 1, "limit": 2 }
+var request = new OffsetPagination(Offset: 1, Limit: 2).Clamp(defaultLimit: 20, maxLimit: 100);
+
+var slice = users.Paginate(request);
+// slice.Items == ["bob", "charlie"], slice.TotalCount == 5
+// slice.HasMore == true, slice.Next == OffsetPagination { Offset = 3, Limit = 2 }
 ```
 
 ---

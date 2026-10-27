@@ -3,7 +3,7 @@ using Olve.Results;
 namespace Olve.Utilities.Paginations;
 
 /// <summary>
-///     Validation and clamping shared by <see cref="Pagination" /> and <see cref="OffsetPagination" />.
+///     Validation and clamping shared by <see cref="OffsetPagination" /> and the obsolete <see cref="Pagination" />.
 /// </summary>
 internal static class PaginationRules
 {

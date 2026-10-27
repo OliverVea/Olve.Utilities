@@ -49,6 +49,7 @@ public readonly record struct OffsetPagination(int Offset, int Limit)
     ///     when no equivalent exists.
     /// </param>
     /// <returns><c>true</c> if an equivalent page-based pagination exists; otherwise <c>false</c>.</returns>
+    [Obsolete("Page numbers are a UI notion; address a list with OffsetPagination and answer with Slice<T>.")]
     public bool TryToPagination(out Pagination pagination)
     {
         if (Offset < 0 || Limit <= 0 || Offset % Limit != 0)
