@@ -94,7 +94,7 @@ options:
 A handler implements the generated interface and returns one of the declared responses. A success body converts implicitly; errors are named:
 
 ```cs
-// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L223-L236
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L307-L320
 
 /// <summary>A union in the response: the stored data decides the variant; it converts implicitly to <c>Ok</c>.</summary>
 private sealed class GetShape : IShapesGetHandler
@@ -115,7 +115,7 @@ private sealed class GetShape : IShapesGetHandler
 A discriminated union in a request arrives as the abstract record; the handler switches on the variant records:
 
 ```cs
-// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L208-L221
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L292-L305
 
 /// <summary>A union in the request: the handler switches on the variant records.</summary>
 private sealed class ShapeArea : IShapesAreaHandler
@@ -207,7 +207,7 @@ interface WidgetEvents {
 The handler yields events; the runtime writes each one as a frame named by the variant's `type`, with the item's `Id` as the SSE id (`null` for heartbeats, so `Last-Event-ID` never points at one). Nothing is kept per connection: `Last-Event-ID` is an ordinary header parameter the handler reads to decide where to resume, reconnecting is the client's job, and the stream ends quietly when the client disconnects or the app stops.
 
 ```cs
-// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L161-L192
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L172-L203
 
 region
 
