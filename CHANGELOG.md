@@ -1,3 +1,9 @@
+## v0.59.0 (2026-10-28)
+
+### Feat
+
+- **typespec**: the generated code builds and runs under Native AOT
+
 ## v0.58.0 (2026-10-28)
 
 ### Feat
