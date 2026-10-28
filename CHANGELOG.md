@@ -1,3 +1,13 @@
+## v0.60.0 (2026-10-28)
+
+### Feat
+
+- **typespec**: streamed file and text responses, response headers, catch-all paths, HEAD and raw request bodies
+
+### Fix
+
+- **typespec**: streams disposed when a header is refused; catch-all only as the last segment; safe Content-Disposition in the example
+
 ## v0.59.0 (2026-10-28)
 
 ### Feat
