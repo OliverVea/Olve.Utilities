@@ -123,11 +123,14 @@ test("unsupported shapes are reported, not silently mistyped", async () => {
   const { diagnostics, files } = await emit("unsupported");
   assert.deepEqual(diagnosticCodes(diagnostics).sort(), [
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'ids': array parameter 'id' must be a string list in the query with explode: false.",
+    "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'note': a text/plain body must be JSON, or bytes (read raw).",
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'range': status code ranges and default responses are not supported.",
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'session': cookie parameter 'sid' is not supported.",
+    "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'stamped': response header 'Last-Modified' must be a string, an integer or a string literal.",
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'tags': array parameter 'tag' must be a string list in the query with explode: false.",
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'ticks': event 'tick' of 'Ticks' must be a model with `type: \"tick\"`.",
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'upload': multipart bodies are not supported.",
+    "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'xml': a application/xml response must be JSON, text/* string or bytes.",
     "warning @olivervea/typespec-csharp/unsupported-type: Unsupported type shape (discriminated union with an envelope); emitted as System.Text.Json.JsonElement.",
     "warning @olivervea/typespec-csharp/unsupported-type: Unsupported type shape (union without a discriminator); emitted as System.Text.Json.JsonElement.",
   ]);

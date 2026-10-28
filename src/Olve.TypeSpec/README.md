@@ -27,6 +27,9 @@ npm install --save-dev @olivervea/typespec-csharp @typespec/compiler @typespec/h
 | `RequestValidation` | Runs the generated request-body validator before the handler. |
 | `BindingFailureMiddleware` | Answers `BadHttpRequestException` (malformed JSON, `limit=abc`, a missing parameter) through the error writer, and a bare 400 the endpoint set without a body (how the request delegate generator reports a bad optional parameter). |
 | `JsonResponse<T>` | A response variant's JSON body with its status, serialized through the app's `JsonOptions` (no reflection, so it suits Native AOT). |
+| `TextResponse`, `StreamResponse` | A `text/*` body written as is; a binary body copied from a `Stream` as it is read, then disposed. |
+| `ResponseHeaders` | Sets a variant's declared `@header`s (null = not sent) before its body. |
+| `PathParameters` | `CatchAll`: a `{+path}` value, with the `%2F` generated clients send read as `/`; a `.` or `..` segment is a binding failure (400). |
 | `IServerSentEvent`, `ServerSentEvent<T>`, `ServerSentEventsResult<T>` | SSE streams of an `@events` union: event name = the variant's `type`. |
 | `TypeSpecApiExtensions` | `AddTypeSpecApi` / `UseTypeSpecApi`, called by the generated `Add…Api` / `Use…Api`. |
 

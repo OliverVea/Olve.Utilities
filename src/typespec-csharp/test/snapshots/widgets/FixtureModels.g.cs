@@ -62,6 +62,19 @@ public sealed record Circle : Shape
     public required double Radius { get; init; }
 }
 
+/// <summary>What the server received.</summary>
+public sealed record Digest
+{
+    [JsonPropertyName("sha256")]
+    public required string Sha256 { get; init; }
+
+    [JsonPropertyName("length")]
+    public required long Length { get; init; }
+
+    [JsonPropertyName("signature"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public string? Signature { get; init; }
+}
+
 /// <summary>Keeps the connection alive.</summary>
 public sealed record Ping : WidgetEvent
 {

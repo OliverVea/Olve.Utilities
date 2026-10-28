@@ -15,6 +15,168 @@ using Olve.TypeSpec;
 
 namespace Fixture.Api;
 
+/// <summary>Input of <c>Deliveries_receive</c> (POST /api/deliveries).</summary>
+public sealed record DeliveriesReceiveRequest(string? Signature, System.IO.Stream Body);
+
+/// <summary>The responses <c>Deliveries_receive</c> declares; its handler returns one.</summary>
+public abstract record DeliveriesReceiveResponse : IOperationResponse
+{
+    private DeliveriesReceiveResponse()
+    {
+    }
+
+    /// <inheritdoc />
+    public abstract int Status { get; }
+
+    /// <inheritdoc />
+    public abstract IResult ToHttpResult();
+
+    /// <summary>200.</summary>
+    public sealed record Ok(Digest Body) : DeliveriesReceiveResponse
+    {
+        /// <inheritdoc />
+        public override int Status => 200;
+
+        /// <inheritdoc />
+        public override IResult ToHttpResult() => new JsonResponse<Digest>(Body, 200);
+    }
+
+    /// <summary>413.</summary>
+    public sealed record PayloadTooLarge() : DeliveriesReceiveResponse
+    {
+        /// <inheritdoc />
+        public override int Status => 413;
+
+        /// <inheritdoc />
+        public override IResult ToHttpResult() => TypedResults.StatusCode(413);
+    }
+
+    public static implicit operator DeliveriesReceiveResponse(Digest body) => new Ok(body);
+}
+
+/// <summary>Takes the body exactly as sent, whatever its content type (signatures cover the raw bytes).</summary>
+public interface IDeliveriesReceiveHandler : IOperationHandler<DeliveriesReceiveRequest, DeliveriesReceiveResponse>;
+
+/// <summary>Input of <c>Files_get</c> (GET /api/files/{path}).</summary>
+public sealed record FilesGetRequest(string Path);
+
+/// <summary>The responses <c>Files_get</c> declares; its handler returns one.</summary>
+public abstract record FilesGetResponse : IOperationResponse
+{
+    private FilesGetResponse()
+    {
+    }
+
+    /// <inheritdoc />
+    public abstract int Status { get; }
+
+    /// <inheritdoc />
+    public abstract IResult ToHttpResult();
+
+    /// <summary>200.</summary>
+    public sealed record Ok(System.IO.Stream Body, string ContentType, int Revision, long? ContentLength = null, string? ContentDisposition = null) : FilesGetResponse
+    {
+        /// <inheritdoc />
+        public override int Status => 200;
+
+        /// <inheritdoc />
+        public override IResult ToHttpResult() => new ResponseHeaders(new StreamResponse(Body, ContentType, 200), [new("content-length", ContentLength?.ToString(System.Globalization.CultureInfo.InvariantCulture)), new("content-disposition", ContentDisposition), new("X-Revision", Revision.ToString(System.Globalization.CultureInfo.InvariantCulture))]);
+    }
+
+    /// <summary>404.</summary>
+    public sealed record NotFound(FixtureErrorEnvelope Body) : FilesGetResponse
+    {
+        /// <inheritdoc />
+        public override int Status => 404;
+
+        /// <inheritdoc />
+        public override IResult ToHttpResult() => new JsonResponse<FixtureErrorEnvelope>(Body, 404);
+    }
+}
+
+/// <summary>Streams a file; its path may span segments (`{+path}`).</summary>
+public interface IFilesGetHandler : IOperationHandler<FilesGetRequest, FilesGetResponse>;
+
+/// <summary>Input of <c>Files_head</c> (HEAD /api/files/{path}).</summary>
+public sealed record FilesHeadRequest(string Path);
+
+/// <summary>The responses <c>Files_head</c> declares; its handler returns one.</summary>
+public abstract record FilesHeadResponse : IOperationResponse
+{
+    private FilesHeadResponse()
+    {
+    }
+
+    /// <inheritdoc />
+    public abstract int Status { get; }
+
+    /// <inheritdoc />
+    public abstract IResult ToHttpResult();
+
+    /// <summary>200.</summary>
+    public sealed record Ok(long ContentLength) : FilesHeadResponse
+    {
+        /// <inheritdoc />
+        public override int Status => 200;
+
+        /// <inheritdoc />
+        public override IResult ToHttpResult() => new ResponseHeaders(TypedResults.StatusCode(200), [new("content-type", "application/octet-stream"), new("content-length", ContentLength.ToString(System.Globalization.CultureInfo.InvariantCulture))]);
+    }
+
+    /// <summary>404.</summary>
+    public sealed record NotFound() : FilesHeadResponse
+    {
+        /// <inheritdoc />
+        public override int Status => 404;
+
+        /// <inheritdoc />
+        public override IResult ToHttpResult() => TypedResults.StatusCode(404);
+    }
+}
+
+/// <summary>A file's headers, without its content.</summary>
+public interface IFilesHeadHandler : IOperationHandler<FilesHeadRequest, FilesHeadResponse>;
+
+/// <summary>Input of <c>Notices_get</c> (GET /api/notice).</summary>
+public sealed record NoticesGetRequest(bool? Busy);
+
+/// <summary>The responses <c>Notices_get</c> declares; its handler returns one.</summary>
+public abstract record NoticesGetResponse : IOperationResponse
+{
+    private NoticesGetResponse()
+    {
+    }
+
+    /// <inheritdoc />
+    public abstract int Status { get; }
+
+    /// <inheritdoc />
+    public abstract IResult ToHttpResult();
+
+    /// <summary>200.</summary>
+    public sealed record Ok(string Body) : NoticesGetResponse
+    {
+        /// <inheritdoc />
+        public override int Status => 200;
+
+        /// <inheritdoc />
+        public override IResult ToHttpResult() => new TextResponse(Body, "text/plain", 200);
+    }
+
+    /// <summary>503.</summary>
+    public sealed record ServiceUnavailable(string Body, int RetryAfter) : NoticesGetResponse
+    {
+        /// <inheritdoc />
+        public override int Status => 503;
+
+        /// <inheritdoc />
+        public override IResult ToHttpResult() => new ResponseHeaders(new TextResponse(Body, "text/plain", 503), [new("Retry-After", RetryAfter.ToString(System.Globalization.CultureInfo.InvariantCulture))]);
+    }
+}
+
+/// <summary>Plain text, written as is.</summary>
+public interface INoticesGetHandler : IOperationHandler<NoticesGetRequest, NoticesGetResponse>;
+
 /// <summary>Input of <c>Shapes_area</c> (POST /api/shapes/area).</summary>
 public sealed record ShapesAreaRequest(Shape Body);
 
@@ -341,6 +503,10 @@ public interface IWidgetsUpdateHandler : IOperationHandler<WidgetsUpdateRequest,
 /// <summary>Every operation's id, success statuses and declared error statuses.</summary>
 public static class FixtureOperations
 {
+    public static readonly ApiOperation DeliveriesReceive = new("Deliveries_receive", [200], [413]);
+    public static readonly ApiOperation FilesGet = new("Files_get", [200], [404]);
+    public static readonly ApiOperation FilesHead = new("Files_head", [200], [404]);
+    public static readonly ApiOperation NoticesGet = new("Notices_get", [200], [503]);
     public static readonly ApiOperation ShapesArea = new("Shapes_area", [200], []);
     public static readonly ApiOperation ShapesGet = new("Shapes_get", [200], [404]);
     public static readonly ApiOperation TagsEcho = new("Tags_echo", [200], []);
@@ -354,6 +520,10 @@ public static class FixtureOperations
 /// <summary>The route builder of each mapped operation, for app-side conventions (auth, rate limits, …).</summary>
 public sealed class FixtureEndpoints
 {
+    public required RouteHandlerBuilder DeliveriesReceive { get; init; }
+    public required RouteHandlerBuilder FilesGet { get; init; }
+    public required RouteHandlerBuilder FilesHead { get; init; }
+    public required RouteHandlerBuilder NoticesGet { get; init; }
     public required RouteHandlerBuilder ShapesArea { get; init; }
     public required RouteHandlerBuilder ShapesGet { get; init; }
     public required RouteHandlerBuilder TagsEcho { get; init; }
@@ -369,6 +539,10 @@ public static class FixtureApi
     /// <summary>Every operation's handler interface; each must have a registered implementation.</summary>
     public static IReadOnlyList<Type> HandlerTypes { get; } =
     [
+        typeof(IDeliveriesReceiveHandler),
+        typeof(IFilesGetHandler),
+        typeof(IFilesHeadHandler),
+        typeof(INoticesGetHandler),
         typeof(IShapesAreaHandler),
         typeof(IShapesGetHandler),
         typeof(ITagsEchoHandler),
@@ -388,6 +562,43 @@ public static class FixtureApi
     /// <summary>Maps every contract operation onto its handler interface.</summary>
     public static FixtureEndpoints MapFixtureApi(this IEndpointRouteBuilder app) => new()
     {
+        DeliveriesReceive = app.MapPost("/api/deliveries", async (
+                [FromServices] IDeliveriesReceiveHandler handler,
+                [FromHeader(Name = "X-Signature")] string? signature,
+                System.IO.Stream body,
+                CancellationToken ct) =>
+                (await handler.HandleAsync(new DeliveriesReceiveRequest(signature, body), ct)).ToHttpResult())
+            .WithName("Deliveries_receive")
+            .WithMetadata(FixtureOperations.DeliveriesReceive)
+            .Produces<Digest>(200)
+            .Produces(413),
+        FilesGet = app.MapGet("/api/files/{**path}", async (
+                [FromServices] IFilesGetHandler handler,
+                [FromRoute(Name = "path")] string path,
+                CancellationToken ct) =>
+                (await handler.HandleAsync(new FilesGetRequest(PathParameters.CatchAll(path)), ct)).ToHttpResult())
+            .WithName("Files_get")
+            .WithMetadata(FixtureOperations.FilesGet)
+            .Produces(200, null, "application/octet-stream")
+            .Produces<FixtureErrorEnvelope>(404),
+        FilesHead = app.MapMethods("/api/files/{**path}", ["HEAD"], async (
+                [FromServices] IFilesHeadHandler handler,
+                [FromRoute(Name = "path")] string path,
+                CancellationToken ct) =>
+                (await handler.HandleAsync(new FilesHeadRequest(PathParameters.CatchAll(path)), ct)).ToHttpResult())
+            .WithName("Files_head")
+            .WithMetadata(FixtureOperations.FilesHead)
+            .Produces(200)
+            .Produces(404),
+        NoticesGet = app.MapGet("/api/notice", async (
+                [FromServices] INoticesGetHandler handler,
+                [FromQuery(Name = "busy")] bool? busy,
+                CancellationToken ct) =>
+                (await handler.HandleAsync(new NoticesGetRequest(busy), ct)).ToHttpResult())
+            .WithName("Notices_get")
+            .WithMetadata(FixtureOperations.NoticesGet)
+            .Produces<string>(200, "text/plain")
+            .Produces<string>(503, "text/plain"),
         ShapesArea = app.MapPost("/api/shapes/area", async (
                 [FromServices] IShapesAreaHandler handler,
                 [FromBody] Shape body,

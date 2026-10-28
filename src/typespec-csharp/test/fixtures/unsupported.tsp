@@ -73,3 +73,18 @@ model ClientError {
 }
 
 @route("/range") @get op range(): A | ClientError;
+
+// A text body in the request (only JSON, or bytes read raw).
+@route("/note") @post op note(@header contentType: "text/plain", @body text: string): A;
+
+// A string response that is neither JSON nor text/*.
+@route("/xml") @get op xml(): {
+  @header contentType: "application/xml";
+  @body body: string;
+};
+
+// A response header that is not a string, an integer or a string literal.
+@route("/stamped") @get op stamped(): {
+  @header("Last-Modified") lastModified: utcDateTime;
+  @body body: A;
+};

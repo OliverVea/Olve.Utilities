@@ -6,7 +6,8 @@
 //                            unions, SSE event unions (IServerSentEvent, EventTypes), and IValidator<T>s
 //                            for request bodies from @maxLength etc.
 //   WidgetsApi.g.cs          per operation: a request record, a response union with one variant per
-//                            declared status (an SSE variant carries IAsyncEnumerable<ServerSentEvent<TEvent>>)
+//                            declared status (its body: JSON, an SSE IAsyncEnumerable<ServerSentEvent<TEvent>>,
+//                            a Stream or text; its @headers as members)
 //                            and I…Handler : IOperationHandler<Req, Response>; WidgetsOperations
 //                            (declared statuses), WidgetsApi.HandlerTypes, AddWidgetsApi()/UseWidgetsApi()/
 //                            MapWidgetsApi(), and WidgetsParameters (string-enum parameters parsed by wire value)

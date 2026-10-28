@@ -199,3 +199,81 @@ interface WidgetEvents {
   ): SSEStream<WidgetEvent> | BadRequest;
 }
 // #endregion
+
+// --- files, text and raw bodies --------------------------------------------------------------
+
+// #region files
+/** A stored file, streamed as it is read. */
+model FileContent {
+  @header contentType: string;
+  @header contentLength?: int64;
+  @header contentDisposition?: string;
+  @header("X-Revision") revision: int32;
+  @body body: bytes;
+}
+
+/** A stored file's type and size, without its content. */
+model FileHead {
+  @header contentType: "application/octet-stream";
+  @header contentLength: int64;
+}
+
+model NoFile {
+  @statusCode status: 404;
+}
+
+@route("/files")
+interface Files {
+  // OpenAPI has no reserved expansion: clients send `a%2Fb`, which the generated binding accepts as `a/b`.
+  #suppress "@typespec/openapi3/path-reserved-expansion" "Served as a catch-all"
+  /** Streams a file; its path may span segments (`{+path}`). */
+  @get @route("{+path}") get(@path path: string): FileContent | NotFound;
+
+  #suppress "@typespec/openapi3/path-reserved-expansion" "Served as a catch-all"
+  /** A file's headers, without its content. */
+  @head @route("{+path}") head(@path path: string): FileHead | NoFile;
+}
+// #endregion
+
+// #region text
+model Notice {
+  @header contentType: "text/plain";
+  @body text: string;
+}
+
+model NoticeUnavailable {
+  @statusCode status: 503;
+  @header("Retry-After") retryAfter: int32;
+  @header contentType: "text/plain";
+  @body text: string;
+}
+
+@route("/notice")
+interface Notices {
+  /** Plain text, written as is. */
+  @get get(@query busy?: boolean): Notice | NoticeUnavailable;
+}
+// #endregion
+
+// #region raw-body
+/** What the server received. */
+model Digest {
+  sha256: string;
+  length: int64;
+  signature?: string;
+}
+
+model TooLarge {
+  @statusCode status: 413;
+}
+
+@route("/deliveries")
+interface Deliveries {
+  /** Takes the body exactly as sent, whatever its content type (signatures cover the raw bytes). */
+  @post receive(
+    @header contentType: "*/*",
+    @header("X-Signature") signature?: string,
+    @body body: bytes,
+  ): Digest | TooLarge;
+}
+// #endregion

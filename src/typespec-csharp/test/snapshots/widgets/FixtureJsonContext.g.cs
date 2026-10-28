@@ -13,6 +13,7 @@ namespace Fixture.Api;
 [JsonSourceGenerationOptions(JsonSerializerDefaults.Web, AllowOutOfOrderMetadataProperties = true)]
 [JsonSerializable(typeof(Area))]
 [JsonSerializable(typeof(Color))]
+[JsonSerializable(typeof(Digest))]
 [JsonSerializable(typeof(FixtureErrorEnvelope))]
 [JsonSerializable(typeof(IReadOnlyList<Widget>))]
 [JsonSerializable(typeof(IReadOnlyList<string>))]

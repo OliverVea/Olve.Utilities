@@ -191,8 +191,8 @@ function renderEnumParsers(enums, prefix) {
 
 function renderEndpoint(o, ir, prefix) {
   const route = MAP_METHODS[o.verb]
-    ? `app.${MAP_METHODS[o.verb]}(${str(o.path)}, `
-    : `app.MapMethods(${str(o.path)}, [${str(o.verb.toUpperCase())}], `;
+    ? `app.${MAP_METHODS[o.verb]}(${str(o.route)}, `
+    : `app.MapMethods(${str(o.route)}, [${str(o.verb.toUpperCase())}], `;
   const lambdaParams = [
     `[FromServices] I${o.name}Handler handler`,
     ...o.params.map((p) => {
@@ -201,11 +201,13 @@ function renderEndpoint(o, ir, prefix) {
       const type = stringEnumOf(p, ir) || p.list ? (p.type.endsWith("?") ? "string?" : "string") : p.type;
       return `[${FROM[p.kind]}(Name = ${str(p.wire)})] ${type} ${p.local}`;
     }),
-    ...(o.body ? [`[FromBody] ${o.body.type} body`] : []),
+    // A Stream parameter binds the raw request body, whatever its content type.
+    ...(o.body ? [o.body.raw ? `${o.body.type} body` : `[FromBody] ${o.body.type} body`] : []),
     "CancellationToken ct",
   ];
   const arg = (p) => {
     if (p.list) return `QueryParameters.List(${p.local})`;
+    if (p.catchAll) return `PathParameters.CatchAll(${p.local})`;
     const e = stringEnumOf(p, ir);
     if (!e) return p.local;
     const parse = `${prefix}Parameters.Parse${e}(${p.local}, ${str(p.wire)})`;
@@ -221,12 +223,23 @@ function renderEndpoint(o, ir, prefix) {
   s += `${i}    .WithMetadata(${prefix}Operations.${o.name})`;
   if (o.body?.validator)
     s += `\n${i}    .WithRequestValidation<${o.body.type}, ${o.body.validator}>(${prefix}Operations.${o.name})`;
-  for (const r of [...o.successes, ...o.errors]) {
-    s += r.stream
-      ? `\n${i}    .Produces<${r.type}>(${r.status}, "text/event-stream")`
-      : `\n${i}    .Produces${r.type ? `<${r.type}>` : ""}(${r.status})`;
-  }
+  for (const r of [...o.successes, ...o.errors]) s += `\n${i}    ${produces(r)}`;
   return `${s},\n`;
+}
+
+function produces(r) {
+  switch (r.kind) {
+    case "sse":
+      return `.Produces<${r.type}>(${r.status}, "text/event-stream")`;
+    case "json":
+      return `.Produces<${r.type}>(${r.status})`;
+    case "text":
+      return `.Produces<string>(${r.status}, ${str(r.contentType ?? "text/plain")})`;
+    case "binary":
+      return `.Produces(${r.status}, null, ${str(r.contentType ?? "application/octet-stream")})`;
+    default:
+      return `.Produces(${r.status})`;
+  }
 }
 
 // Variant names of a response union, by status.
@@ -241,6 +254,7 @@ const STATUS_NAMES = {
   404: "NotFound",
   409: "Conflict",
   410: "Gone",
+  413: "PayloadTooLarge",
   422: "UnprocessableEntity",
   429: "TooManyRequests",
   500: "InternalServerError",
@@ -269,24 +283,55 @@ function renderResponseUnion(o) {
   const responses = [...o.successes, ...o.errors];
   for (const r of responses) {
     const name = variantName(r.status);
-    const field = r.stream ? `IAsyncEnumerable<ServerSentEvent<${r.type}>> Events` : r.type ? `${r.type} Body` : "";
-    const write = r.stream
-      ? `new ServerSentEventsResult<${r.type}>(Events)`
-      : r.type
-        ? `new JsonResponse<${r.type}>(Body, ${r.status})`
-        : `TypedResults.StatusCode(${r.status})`;
     s += `\n    /// <summary>${r.status}.</summary>\n`;
-    s += `    public sealed record ${name}(${field}) : ${union}\n    {\n`;
+    s += `    public sealed record ${name}(${variantFields(r).join(", ")}) : ${union}\n    {\n`;
     s += `        /// <inheritdoc />\n        public override int Status => ${r.status};\n\n`;
-    s += `        /// <inheritdoc />\n        public override IResult ToHttpResult() => ${write};\n    }\n`;
+    s += `        /// <inheritdoc />\n        public override IResult ToHttpResult() => ${variantWrite(r)};\n    }\n`;
   }
   const counts = new Map();
-  for (const r of responses) if (r.type && !r.stream) counts.set(r.type, (counts.get(r.type) ?? 0) + 1);
+  for (const r of responses) if (r.kind === "json") counts.set(r.type, (counts.get(r.type) ?? 0) + 1);
   for (const r of o.successes) {
-    if (!r.type || r.stream || counts.get(r.type) !== 1 || isInterface(r.type)) continue;
+    if (r.kind !== "json" || r.headers.length || counts.get(r.type) !== 1 || isInterface(r.type)) continue;
     s += `\n    public static implicit operator ${union}(${r.type} body) => new ${variantName(r.status)}(body);\n`;
   }
   return `${s}}\n\n`;
+}
+
+/** A variant's members: its body, an open content type, then its headers (optional ones last, defaulting to null). */
+function variantFields(r) {
+  const body = {
+    sse: `IAsyncEnumerable<ServerSentEvent<${r.type}>> Events`,
+    json: `${r.type} Body`,
+    text: "string Body",
+    binary: "System.IO.Stream Body",
+  }[r.kind];
+  const open = (r.kind === "text" || r.kind === "binary") && !r.contentType ? ["string ContentType"] : [];
+  const headers = r.headers.filter((h) => !h.constant);
+  return [
+    ...(body ? [body] : []),
+    ...open,
+    ...headers.filter((h) => !h.optional).map((h) => `${h.type} ${h.name}`),
+    ...headers.filter((h) => h.optional).map((h) => `${h.type}? ${h.name} = null`),
+  ];
+}
+
+function variantWrite(r) {
+  const contentType = r.contentType ? str(r.contentType) : "ContentType";
+  const body = {
+    sse: `new ServerSentEventsResult<${r.type}>(Events)`,
+    json: `new JsonResponse<${r.type}>(Body, ${r.status})`,
+    text: `new TextResponse(Body, ${contentType}, ${r.status})`,
+    binary: `new StreamResponse(Body, ${contentType}, ${r.status})`,
+    none: `TypedResults.StatusCode(${r.status})`,
+  }[r.kind];
+  if (!r.headers.length) return body;
+  const value = (h) => {
+    if (h.constant !== undefined) return str(h.constant);
+    if (h.type === "string") return h.name;
+    return `${h.name}${h.optional ? "?" : ""}.ToString(System.Globalization.CultureInfo.InvariantCulture)`;
+  };
+  const headers = r.headers.map((h) => `new(${str(h.wire)}, ${value(h)})`).join(", ");
+  return `new ResponseHeaders(${body}, [${headers}])`;
 }
 
 /** The System.Text.Json source-generation context for every DTO. */
