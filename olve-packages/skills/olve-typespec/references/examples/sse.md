@@ -115,7 +115,7 @@ public abstract record WidgetEventsStreamResponse : IOperationResponse
         public override int Status => 400;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 400);
+        public override IResult ToHttpResult() => new JsonResponse<FixtureErrorEnvelope>(Body, 400);
     }
 }
 ```

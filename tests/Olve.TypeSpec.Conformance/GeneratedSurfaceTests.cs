@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace Olve.TypeSpec.Conformance;
@@ -8,13 +7,19 @@ namespace Olve.TypeSpec.Conformance;
 /// The rest of the generated surface: the operation table matches the contract, parameters bind
 /// from where the contract puts them, the response unions (variant statuses, the error envelope),
 /// binding failures on operations without a declared 400, and the startup check for missing
-/// handlers.
+/// handlers. The suite runs without reflection-based JSON (the project's
+/// <c>JsonSerializerIsReflectionEnabledByDefault</c>), so bodies are read as documents.
 /// </summary>
 [ClassDataSource<FixtureApp>(Shared = SharedType.PerAssembly)]
 public class GeneratedSurfaceTests(FixtureApp fixture)
 {
     private static IReadOnlyList<ApiOperation> GeneratedOperations =>
         [.. typeof(FixtureOperations).GetFields().Select(f => (ApiOperation)f.GetValue(null)!)];
+
+    private static async Task<JsonElement> Body(HttpResponseMessage response) =>
+        JsonDocument.Parse(await response.Content.ReadAsStringAsync()).RootElement;
+
+    private static string Joined(IEnumerable<string> items) => string.Join("\n", items);
 
     [Test]
     public async Task OperationTable_MatchesContractStatuses()
@@ -29,7 +34,7 @@ public class GeneratedSurfaceTests(FixtureApp fixture)
             .ToList();
 
         await Assert.That(generated).IsNotEmpty();
-        await Assert.That(generated).IsEquivalentTo(spec);
+        await Assert.That(Joined(generated)).IsEqualTo(Joined(spec));
     }
 
     [Test]
@@ -58,7 +63,7 @@ public class GeneratedSurfaceTests(FixtureApp fixture)
         request.Headers.Add("x-request-id", "req-1");
 
         using var response = await fixture.CreateClient().SendAsync(request);
-        var widgets = await response.Content.ReadFromJsonAsync<JsonElement>();
+        var widgets = await Body(response);
 
         var labels = widgets[0].GetProperty("labels");
         await Assert.That(labels.GetProperty("color").GetString()).IsEqualTo(nameof(Color.Green));
@@ -72,7 +77,7 @@ public class GeneratedSurfaceTests(FixtureApp fixture)
         var body = ResponseConformanceTests.WidgetBody(serial: "SN-9", name: "renamed", extra: """ "note":"hi", """);
 
         using var response = await fixture.CreateClient().PutAsync("/api/widgets/w42?dryRun=false", ResponseConformanceTests.Json(body));
-        var widget = await response.Content.ReadFromJsonAsync<JsonElement>();
+        var widget = await Body(response);
 
         await Assert.That((int)response.StatusCode).IsEqualTo(200);
         var labels = widget.GetProperty("labels");
@@ -91,7 +96,7 @@ public class GeneratedSurfaceTests(FixtureApp fixture)
             extra: """ "color":"red","parent":null,"tags":["a","b"],"labels":{"k":"v"},"weight":0, """);
 
         using var response = await fixture.CreateClient().PostAsync("/api/widgets", ResponseConformanceTests.Json(body));
-        var widget = await response.Content.ReadFromJsonAsync<JsonElement>();
+        var widget = await Body(response);
 
         await Assert.That((int)response.StatusCode).IsEqualTo(201);
         await Assert.That(widget.GetProperty("shape").GetProperty("kind").GetString()).IsEqualTo("square");
@@ -109,8 +114,8 @@ public class GeneratedSurfaceTests(FixtureApp fixture)
         var events = OpenApiContract.ParseEvents(await response.Content.ReadAsStringAsync());
 
         await Assert.That(response.Content.Headers.ContentType?.MediaType).IsEqualTo("text/event-stream");
-        await Assert.That(events.Select(e => $"{e.EventType}#{e.EventId}").ToList())
-            .IsEquivalentTo(["ping#", "widget.changed#1", "widget.removed#2"]);
+        await Assert.That(Joined(events.Select(e => $"{e.EventType}#{e.EventId}")))
+            .IsEqualTo(Joined(["ping#", "widget.changed#1", "widget.removed#2"]));
         foreach (var e in events)
         {
             using var data = JsonDocument.Parse(e.Data);
@@ -127,15 +132,16 @@ public class GeneratedSurfaceTests(FixtureApp fixture)
         using var response = await fixture.CreateClient().SendAsync(request);
         var events = OpenApiContract.ParseEvents(await response.Content.ReadAsStringAsync());
 
-        await Assert.That(events.Select(e => e.EventType).ToList()).IsEquivalentTo(["widget.removed"]);
+        await Assert.That(Joined(events.Select(e => e.EventType))).IsEqualTo("widget.removed");
     }
 
     [Test]
     public async Task RequiredExplodeFalseList_SplitsTrimsAndDropsEmptyEntries()
     {
-        var names = await fixture.CreateClient().GetFromJsonAsync<string[]>("/api/tags?names=a, b,,c");
+        using var response = await fixture.CreateClient().GetAsync("/api/tags?names=a, b,,c");
+        var names = (await Body(response)).EnumerateArray().Select(e => e.GetString()!);
 
-        await Assert.That(names).IsEquivalentTo(["a", "b", "c"]);
+        await Assert.That(Joined(names)).IsEqualTo(Joined(["a", "b", "c"]));
     }
 
     [Test]
@@ -143,7 +149,7 @@ public class GeneratedSurfaceTests(FixtureApp fixture)
     {
         using var response = await fixture.CreateClient().PutAsync(
             $"/api/widgets/{FixtureHandlers.Conflict}", ResponseConformanceTests.Json(ResponseConformanceTests.WidgetBody()));
-        var error = (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("error");
+        var error = (await Body(response)).GetProperty("error");
 
         await Assert.That((int)response.StatusCode).IsEqualTo(409);
         await Assert.That(error.GetProperty("code").GetString()).IsEqualTo("WIDGET_LOCKED");
@@ -157,13 +163,13 @@ public class GeneratedSurfaceTests(FixtureApp fixture)
         var body = ResponseConformanceTests.WidgetBody(name: new string('x', 51), extra: """ "weight":101, """);
 
         using var response = await fixture.CreateClient().PostAsync("/api/widgets", ResponseConformanceTests.Json(body));
-        var error = (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("error");
+        var error = (await Body(response)).GetProperty("error");
 
         await Assert.That((int)response.StatusCode).IsEqualTo(400);
         await Assert.That(error.GetProperty("code").GetString()).IsEqualTo(FixtureErrors.InvalidRequest);
         var problems = error.GetProperty("details").GetProperty("problems");
-        await Assert.That(problems.EnumerateArray().Select(p => p.GetProperty("message").GetString()!).ToList())
-            .IsEquivalentTo(["'name' cannot exceed 50 characters.", "'weight' cannot exceed 100."]);
+        await Assert.That(Joined(problems.EnumerateArray().Select(p => p.GetProperty("message").GetString()!).Order()))
+            .IsEqualTo(Joined(["'name' cannot exceed 50 characters.", "'weight' cannot exceed 100."]));
         await Assert.That(error.GetProperty("message").GetString()).IsEqualTo(problems[0].GetProperty("message").GetString());
     }
 
@@ -195,7 +201,7 @@ public class GeneratedSurfaceTests(FixtureApp fixture)
     public async Task BindingFailure_OnOperationWithDeclared400_ExplainsTheFailure()
     {
         using var response = await fixture.CreateClient().PostAsync("/api/widgets", ResponseConformanceTests.Json("{"));
-        var error = (await response.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("error");
+        var error = (await Body(response)).GetProperty("error");
 
         await Assert.That((int)response.StatusCode).IsEqualTo(400);
         await Assert.That(error.GetProperty("code").GetString()).IsEqualTo(FixtureErrors.InvalidRequest);

@@ -38,7 +38,7 @@ public abstract record ShapesAreaResponse : IOperationResponse
         public override int Status => 200;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 200);
+        public override IResult ToHttpResult() => new JsonResponse<Area>(Body, 200);
     }
 
     public static implicit operator ShapesAreaResponse(Area body) => new Ok(body);
@@ -70,7 +70,7 @@ public abstract record ShapesGetResponse : IOperationResponse
         public override int Status => 200;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 200);
+        public override IResult ToHttpResult() => new JsonResponse<Shape>(Body, 200);
     }
 
     /// <summary>404.</summary>
@@ -80,7 +80,7 @@ public abstract record ShapesGetResponse : IOperationResponse
         public override int Status => 404;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 404);
+        public override IResult ToHttpResult() => new JsonResponse<FixtureErrorEnvelope>(Body, 404);
     }
 
     public static implicit operator ShapesGetResponse(Shape body) => new Ok(body);
@@ -111,7 +111,7 @@ public abstract record TagsEchoResponse : IOperationResponse
         public override int Status => 200;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 200);
+        public override IResult ToHttpResult() => new JsonResponse<IReadOnlyList<string>>(Body, 200);
     }
 }
 
@@ -151,7 +151,7 @@ public abstract record WidgetEventsStreamResponse : IOperationResponse
         public override int Status => 400;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 400);
+        public override IResult ToHttpResult() => new JsonResponse<FixtureErrorEnvelope>(Body, 400);
     }
 }
 
@@ -181,7 +181,7 @@ public abstract record WidgetsCreateResponse : IOperationResponse
         public override int Status => 201;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 201);
+        public override IResult ToHttpResult() => new JsonResponse<Widget>(Body, 201);
     }
 
     /// <summary>202.</summary>
@@ -191,7 +191,7 @@ public abstract record WidgetsCreateResponse : IOperationResponse
         public override int Status => 202;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 202);
+        public override IResult ToHttpResult() => new JsonResponse<Widget>(Body, 202);
     }
 
     /// <summary>400.</summary>
@@ -201,7 +201,7 @@ public abstract record WidgetsCreateResponse : IOperationResponse
         public override int Status => 400;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 400);
+        public override IResult ToHttpResult() => new JsonResponse<FixtureErrorEnvelope>(Body, 400);
     }
 }
 
@@ -241,7 +241,7 @@ public abstract record WidgetsDeleteResponse : IOperationResponse
         public override int Status => 404;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 404);
+        public override IResult ToHttpResult() => new JsonResponse<FixtureErrorEnvelope>(Body, 404);
     }
 }
 
@@ -270,7 +270,7 @@ public abstract record WidgetsListResponse : IOperationResponse
         public override int Status => 200;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 200);
+        public override IResult ToHttpResult() => new JsonResponse<IReadOnlyList<Widget>>(Body, 200);
     }
 }
 
@@ -300,7 +300,7 @@ public abstract record WidgetsUpdateResponse : IOperationResponse
         public override int Status => 200;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 200);
+        public override IResult ToHttpResult() => new JsonResponse<Widget>(Body, 200);
     }
 
     /// <summary>400.</summary>
@@ -310,7 +310,7 @@ public abstract record WidgetsUpdateResponse : IOperationResponse
         public override int Status => 400;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 400);
+        public override IResult ToHttpResult() => new JsonResponse<FixtureErrorEnvelope>(Body, 400);
     }
 
     /// <summary>404.</summary>
@@ -320,7 +320,7 @@ public abstract record WidgetsUpdateResponse : IOperationResponse
         public override int Status => 404;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 404);
+        public override IResult ToHttpResult() => new JsonResponse<FixtureErrorEnvelope>(Body, 404);
     }
 
     /// <summary>409.</summary>
@@ -330,7 +330,7 @@ public abstract record WidgetsUpdateResponse : IOperationResponse
         public override int Status => 409;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 409);
+        public override IResult ToHttpResult() => new JsonResponse<FixtureErrorEnvelope>(Body, 409);
     }
 
     public static implicit operator WidgetsUpdateResponse(Widget body) => new Ok(body);
