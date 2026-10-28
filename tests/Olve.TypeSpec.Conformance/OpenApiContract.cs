@@ -83,6 +83,12 @@ public static partial class OpenApiContract
         }
 
         var schemaNode = response["content"]?["application/json"]?["schema"];
+        if (schemaNode is null && response["content"] is JsonObject { Count: > 0 })
+        {
+            // Text or binary: any body (its media type and headers are checked by ValidateEnvelope).
+            return [];
+        }
+
         if (schemaNode is null)
         {
             // No content declared: the response must have no body.
@@ -95,6 +101,48 @@ public static partial class OpenApiContract
         }
 
         return ValidateJson(schemaNode, body);
+    }
+
+    /// <summary>
+    /// Checks what surrounds the body: every required header the contract declares for
+    /// <paramref name="status"/> is sent (integers as integers), and the response's media type is
+    /// one the status declares (<c>*/*</c> allows any).
+    /// </summary>
+    public static IReadOnlyList<string> ValidateEnvelope(SpecOperation operation, int status, HttpResponseMessage message)
+    {
+        var response = operation.Responses[status.ToString(System.Globalization.CultureInfo.InvariantCulture)]
+            ?? throw new InvalidOperationException($"{operation} does not declare status {status}.");
+
+        var errors = new List<string>();
+        foreach (var (name, header) in response["headers"]?.AsObject() ?? [])
+        {
+            var value = message.Headers.TryGetValues(name, out var values) || message.Content.Headers.TryGetValues(name, out values)
+                ? string.Join(",", values)
+                : null;
+            if (value is null)
+            {
+                if (header?["required"]?.GetValue<bool>() == true)
+                {
+                    errors.Add($"required header '{name}' is missing");
+                }
+
+                continue;
+            }
+
+            if (header?["schema"]?["type"]?.GetValue<string>() == "integer" && !long.TryParse(value, out _))
+            {
+                errors.Add($"header '{name}' is '{value}', not an integer");
+            }
+        }
+
+        var declared = response["content"]?.AsObject().Select(c => c.Key).ToList() ?? [];
+        var mediaType = message.Content.Headers.ContentType?.MediaType;
+        if (declared.Count > 0 && !declared.Contains("*/*") && (mediaType is null || !declared.Contains(mediaType)))
+        {
+            errors.Add($"media type '{mediaType}' is not one of {string.Join(", ", declared)}");
+        }
+
+        return errors;
     }
 
     /// <summary>The events of a <c>text/event-stream</c> body, parsed as a client would.</summary>

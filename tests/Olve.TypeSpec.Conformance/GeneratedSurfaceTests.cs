@@ -189,6 +189,9 @@ public class GeneratedSurfaceTests(FixtureApp fixture)
     [Arguments("/api/widgets?limit=abc")]
     [Arguments("/api/widgets?color=blue")]
     [Arguments("/api/tags")]
+    [Arguments("/api/files/docs%2F..%2F..%2Fsecret")]
+    [Arguments("/api/files/%2E%2E%2Fsecret")]
+    [Arguments("/api/files/docs%2F.%2Freadme.txt")]
     public async Task BindingFailure_OnOperationWithoutDeclared400_IsBodyless400(string url)
     {
         using var response = await fixture.CreateClient().GetAsync(url);

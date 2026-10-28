@@ -1,7 +1,7 @@
 {
   "name": "olve-packages",
   "description": "API references and usage guides for Olve.* shared NuGet packages",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "author": {
     "name": "Oliver Vea"
   },

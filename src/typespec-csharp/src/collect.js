@@ -76,7 +76,14 @@ const VALUE_TYPES = new Set([
   "System.Text.Json.JsonElement",
 ]);
 const JSON_ELEMENT = "System.Text.Json.JsonElement";
+const STREAM = "System.IO.Stream";
 const EVENT_STREAM = "text/event-stream";
+const isJsonContentType = (ct) => ct === "application/json" || /^application\/[^;]*\+json$/.test(ct);
+// C# types a response header can carry (written invariant; string literals are constants).
+const HEADER_TYPES = new Set(["string", "sbyte", "short", "int", "long", "byte", "ushort", "uint", "ulong"]);
+// Response variant members the generated union already has (Status) or fills itself (Body, Events);
+// an open content type (ContentType) only exists with a body, when TypeSpec lists no content-type header.
+const RESERVED_MEMBERS = new Set(["Status", "Body", "Events"]);
 
 const READ = Visibility.Read;
 const WRITE = Visibility.Create | Visibility.Update;
@@ -324,6 +331,63 @@ export function collect(program, options = {}) {
     }
   }
 
+  /** Whether `type` is the std scalar `name` (or a scalar derived from it). */
+  function isScalar(type, name) {
+    for (let s = type; s?.kind === "Scalar"; s = s.baseScalar)
+      if (s.name === name && s.namespace?.name === "TypeSpec") return true;
+    return false;
+  }
+
+  /**
+   * One declared status: its body (`kind`: json, sse, text, binary or none) and its `@header`s.
+   * A text or binary body's content type is a constant, or a `contentType` member the handler
+   * sets when the contract leaves it open (`@header contentType: string`).
+   * @returns undefined (with a diagnostic) when the response can't be typed.
+   */
+  function responseOf(r, hint, unsupported) {
+    const x = r.responses.find((y) => y.body) ?? r.responses[0];
+    const response = { status: r.statusCodes, kind: "none", headers: [] };
+    const body = x?.body;
+    if (body?.contentTypes?.includes(EVENT_STREAM)) {
+      response.kind = "sse";
+      response.type = eventsType(getStreamOf(program, r.type), unsupported);
+      if (!response.type) return undefined;
+      response.stream = true;
+    } else if (body?.type) {
+      const contentTypes = body.contentTypes ?? [];
+      if (contentTypes.every(isJsonContentType)) {
+        response.kind = "json";
+        response.type = csType(body.type, READ, undefined, `${hint}Body`);
+      } else {
+        if (isScalar(body.type, "bytes")) response.kind = "binary";
+        else if (isScalar(body.type, "string") && contentTypes.every((ct) => ct.startsWith("text/")))
+          response.kind = "text";
+        else {
+          unsupported(`a ${contentTypes.join(" | ")} response must be JSON, text/* string or bytes`);
+          return undefined;
+        }
+        const open = contentTypes.length !== 1 || contentTypes[0] === "*/*";
+        response.contentType = open ? undefined : contentTypes[0];
+      }
+    }
+    for (const [wire, prop] of Object.entries(x?.headers ?? {})) {
+      if (prop.type.kind === "String") {
+        response.headers.push({ wire, constant: prop.type.value });
+        continue;
+      }
+      const type = csType(prop.type, READ, prop, hint + pascal(prop.name));
+      if (!HEADER_TYPES.has(type.replace(/\?$/, ""))) {
+        unsupported(`response header '${wire}' must be a string, an integer or a string literal`);
+        return undefined;
+      }
+      let member = pascal(prop.name);
+      if (RESERVED_MEMBERS.has(member)) member += "Header";
+      const optional = !!prop.optional || type.endsWith("?");
+      response.headers.push({ wire, name: member, type: type.replace(/\?$/, ""), optional });
+    }
+    return response;
+  }
+
   // ---- operations --------------------------------------------------------------------------
 
   const [services] = getAllHttpServices(program);
@@ -343,8 +407,11 @@ export function collect(program, options = {}) {
       });
     const reqVis = resolveRequestVisibility(program, op, http.verb);
 
+    const b = http.parameters.body;
     const params = [];
     for (const p of http.parameters.parameters) {
+      // A body's literal content type is the contract's, not the caller's choice: nothing to bind.
+      if (p.param === b?.contentTypeProperty && p.param.type.kind === "String") continue;
       if (!["path", "query", "header"].includes(p.type)) {
         unsupported(`${p.type} parameter '${p.name}' is not supported`);
         continue;
@@ -357,13 +424,28 @@ export function collect(program, options = {}) {
         continue;
       }
       if (p.param.optional && !type.endsWith("?")) type += "?";
-      params.push({ kind: p.type, wire: p.name, name: pascal(p.param.name), local: camel(p.param.name), type, list });
+      // `{+path}`: the value may span segments, so it maps to a catch-all route parameter.
+      const catchAll = p.type === "path" && !!p.allowReserved;
+      params.push({
+        kind: p.type,
+        wire: p.name,
+        name: pascal(p.param.name),
+        local: camel(p.param.name),
+        type,
+        list,
+        catchAll,
+      });
     }
+    let route = http.path;
+    for (const p of params) if (p.catchAll) route = route.replace(`{${p.wire}}`, `{**${p.wire}}`);
 
     let body;
-    const b = http.parameters.body;
     if (b?.bodyKind === "multipart") unsupported("multipart bodies are not supported");
-    else if (b?.type) body = { type: csType(b.type, reqVis, undefined, `${name}Body`) };
+    else if (b?.type && b.contentTypes.every(isJsonContentType))
+      body = { type: csType(b.type, reqVis, undefined, `${name}Body`) };
+    // Any other content type: the exact request bytes, unread (signatures cover them as sent).
+    else if (b?.type && isScalar(b.type, "bytes")) body = { type: STREAM, raw: true };
+    else if (b?.type) unsupported(`a ${b.contentTypes.join(" | ")} body must be JSON, or bytes (read raw)`);
 
     const successes = [];
     const errors = [];
@@ -372,19 +454,12 @@ export function collect(program, options = {}) {
         unsupported("status code ranges and default responses are not supported");
         continue;
       }
-      const stream = r.responses.some((x) => x.body?.contentTypes?.includes(EVENT_STREAM));
-      const bodyType = r.responses.find((x) => x.body)?.body?.type;
-      const response = stream
-        ? { status: r.statusCodes, type: eventsType(getStreamOf(program, r.type), unsupported), stream: true }
-        : {
-            status: r.statusCodes,
-            type: bodyType ? csType(bodyType, READ, undefined, `${name}${r.statusCodes}Body`) : undefined,
-          };
-      if (stream && !response.type) continue;
+      const response = responseOf(r, `${name}${r.statusCodes}`, unsupported);
+      if (!response) continue;
       if (r.statusCodes >= 300) errors.push(response);
       else successes.push(response);
     }
-    if (!successes.length) successes.push({ status: 204 });
+    if (!successes.length) successes.push({ status: 204, kind: "none", headers: [] });
     if (successes.length > 1 && successes.some((s) => s.stream)) {
       unsupported("an SSE stream must be the operation's only success response");
       successes.splice(1);
@@ -396,6 +471,7 @@ export function collect(program, options = {}) {
       operationId,
       verb: http.verb,
       path: http.path,
+      route,
       doc: getDoc(program, op),
       params,
       body,
@@ -408,7 +484,7 @@ export function collect(program, options = {}) {
   // ---- validators (request bodies with constraints) ----------------------------------------
 
   const validators = [];
-  const bodyTypes = [...new Set(operations.map((o) => o.body?.type).filter(Boolean))].sort(ordinal);
+  const bodyTypes = [...new Set(operations.map((o) => !o.body?.raw && o.body?.type).filter(Boolean))].sort(ordinal);
   for (const typeName of bodyTypes) {
     const model = models.get(typeName);
     if (!model) continue;
@@ -426,7 +502,11 @@ export function collect(program, options = {}) {
     ...unions.keys(),
     ...enums.keys(),
     ...operations
-      .flatMap((o) => [o.body?.type, ...o.successes.map((r) => r.type), ...o.errors.map((e) => e.type)])
+      .flatMap((o) => [
+        o.body?.raw ? undefined : o.body?.type,
+        ...o.successes.map((r) => r.type),
+        ...o.errors.map((e) => e.type),
+      ])
       .filter(Boolean),
   ]);
 

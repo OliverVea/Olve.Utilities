@@ -15,7 +15,7 @@ spec/main.tsp ── tsp compile ──► artifacts/generated/<Prefix>{Models,A
                             └──► openapi.json ──► clients (Hey API, …)
 ```
 
-`<Prefix>` is the service namespace's name (`namespace Widgets;` → `WidgetsApi`, `AddWidgetsApi`, …) unless `prefix` is set. The generated code relies on `Olve.TypeSpec`: `IOperationHandler<TRequest, TResponse>`, `IOperationResponse`, `ApiOperation`, `IApiErrorWriter`, `RequestValidation`, the binding-failure middleware, `JsonResponse<T>`, `IServerSentEvent` / `ServerSentEvent<T>` / `ServerSentEventsResult<T>`, `TypeSpecApiExtensions`.
+`<Prefix>` is the service namespace's name (`namespace Widgets;` → `WidgetsApi`, `AddWidgetsApi`, …) unless `prefix` is set. The generated code relies on `Olve.TypeSpec`: `IOperationHandler<TRequest, TResponse>`, `IOperationResponse`, `ApiOperation`, `IApiErrorWriter`, `RequestValidation`, the binding-failure middleware, `JsonResponse<T>`, `TextResponse`, `StreamResponse`, `ResponseHeaders`, `PathParameters`, `IServerSentEvent` / `ServerSentEvent<T>` / `ServerSentEventsResult<T>`, `TypeSpecApiExtensions`.
 
 ## Examples
 
@@ -28,6 +28,7 @@ One short file per topic in [references/examples/](references/examples/), each p
 | [discriminated-union.md](references/examples/discriminated-union.md) | a `kind`-style union in a request, response or model |
 | [enums-and-parameters.md](references/examples/enums-and-parameters.md) | query/header/path parameters, string enums, `explode: false` lists |
 | [validation-and-errors.md](references/examples/validation-and-errors.md) | constraints on a request body, the error envelope, the `IApiErrorWriter` |
+| [content.md](references/examples/content.md) | a file download, plain text, response headers, `{+path}`, `@head`, or a raw request body (webhook signatures) |
 | [sse.md](references/examples/sse.md) | an event stream: the `@events` union, the handler, what the runtime does and doesn't do |
 | [wiring.md](references/examples/wiring.md) | `Add…Api` / `Use…Api` and handler registration |
 
@@ -52,6 +53,6 @@ The complete contract they come from is [references/contract/widgets.tsp](refere
 
 ## Supported / reported
 
-Supported (all exercised by the example contract above): models with `@visibility` splits, enums (string by wire value, numeric), `@discriminated(#{ envelope: "none" })` unions, arrays, `Record<T>`, nullables and optionals, path/query/header parameters, `@query(#{ explode: false })` string lists, several success statuses, SSE streams of an `@events` union whose variants carry `type: "<event name>"`, request-body constraints (`@minLength`, `@maxLength`, `@minItems`, `@maxItems`, `@minValue`, `@maxValue`).
+Supported (all exercised by the example contract above): models with `@visibility` splits, enums (string by wire value, numeric), `@discriminated(#{ envelope: "none" })` unions, arrays, `Record<T>`, nullables and optionals, path/query/header parameters, `@query(#{ explode: false })` string lists, several success statuses, SSE streams of an `@events` union whose variants carry `type: "<event name>"`, request-body constraints (`@minLength`, `@maxLength`, `@minItems`, `@maxItems`, `@minValue`, `@maxValue`), streamed `bytes` and `text/*` `string` responses with a literal or handler-set content type, response `@header`s (strings, integers, string literals), `{+path}` catch-all path parameters, `@head` operations, and raw `bytes` request bodies of any non-JSON content type.
 
-Reported as `unsupported-*` warnings, emitted as `JsonElement` or skipped, never silently mistyped: untagged unions, enveloped discriminated unions, cookie parameters, multipart bodies, status code ranges, array parameters other than `explode: false` string lists in the query. `src/typespec-csharp/test/fixtures/unsupported.tsp` holds one operation per shape and the snapshot test asserts each diagnostic. None is blocked by the design; each can be added when a contract needs it. Validation covers the top-level request body only; `@pattern` is not enforced.
+Reported as `unsupported-*` warnings, emitted as `JsonElement` or skipped, never silently mistyped: untagged unions, enveloped discriminated unions, cookie parameters, multipart bodies, status code ranges, array parameters other than `explode: false` string lists in the query, non-JSON request bodies other than `bytes`, non-JSON responses other than `bytes` and `text/*` `string`, response headers of other types (dates, booleans). `src/typespec-csharp/test/fixtures/unsupported.tsp` holds one operation per shape and the snapshot test asserts each diagnostic. None is blocked by the design; each can be added when a contract needs it. Validation covers the top-level request body only; `@pattern` is not enforced.

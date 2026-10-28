@@ -12,6 +12,10 @@ public static class FixtureApi
     /// <summary>Every operation's handler interface; each must have a registered implementation.</summary>
     public static IReadOnlyList<Type> HandlerTypes { get; } =
     [
+        typeof(IDeliveriesReceiveHandler),
+        typeof(IFilesGetHandler),
+        typeof(IFilesHeadHandler),
+        typeof(INoticesGetHandler),
         typeof(IShapesAreaHandler),
         typeof(IShapesGetHandler),
         typeof(ITagsEchoHandler),
@@ -31,6 +35,43 @@ public static class FixtureApi
     /// <summary>Maps every contract operation onto its handler interface.</summary>
     public static FixtureEndpoints MapFixtureApi(this IEndpointRouteBuilder app) => new()
     {
+        DeliveriesReceive = app.MapPost("/api/deliveries", async (
+                [FromServices] IDeliveriesReceiveHandler handler,
+                [FromHeader(Name = "X-Signature")] string? signature,
+                System.IO.Stream body,
+                CancellationToken ct) =>
+                (await handler.HandleAsync(new DeliveriesReceiveRequest(signature, body), ct)).ToHttpResult())
+            .WithName("Deliveries_receive")
+            .WithMetadata(FixtureOperations.DeliveriesReceive)
+            .Produces<Digest>(200)
+            .Produces(413),
+        FilesGet = app.MapGet("/api/files/{**path}", async (
+                [FromServices] IFilesGetHandler handler,
+                [FromRoute(Name = "path")] string path,
+                CancellationToken ct) =>
+                (await handler.HandleAsync(new FilesGetRequest(PathParameters.CatchAll(path)), ct)).ToHttpResult())
+            .WithName("Files_get")
+            .WithMetadata(FixtureOperations.FilesGet)
+            .Produces(200, null, "application/octet-stream")
+            .Produces<FixtureErrorEnvelope>(404),
+        FilesHead = app.MapMethods("/api/files/{**path}", ["HEAD"], async (
+                [FromServices] IFilesHeadHandler handler,
+                [FromRoute(Name = "path")] string path,
+                CancellationToken ct) =>
+                (await handler.HandleAsync(new FilesHeadRequest(PathParameters.CatchAll(path)), ct)).ToHttpResult())
+            .WithName("Files_head")
+            .WithMetadata(FixtureOperations.FilesHead)
+            .Produces(200)
+            .Produces(404),
+        NoticesGet = app.MapGet("/api/notice", async (
+                [FromServices] INoticesGetHandler handler,
+                [FromQuery(Name = "busy")] bool? busy,
+                CancellationToken ct) =>
+                (await handler.HandleAsync(new NoticesGetRequest(busy), ct)).ToHttpResult())
+            .WithName("Notices_get")
+            .WithMetadata(FixtureOperations.NoticesGet)
+            .Produces<string>(200, "text/plain")
+            .Produces<string>(503, "text/plain"),
         ShapesArea = app.MapPost("/api/shapes/area", async (
                 [FromServices] IShapesAreaHandler handler,
                 [FromBody] Shape body,

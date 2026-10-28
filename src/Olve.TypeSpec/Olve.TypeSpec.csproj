@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Title>Olve.TypeSpec</Title>
     <Authors>Oliver Vea</Authors>
-    <Description>Runtime for the C# minimal-API surface that @olivervea/typespec-csharp generates from a TypeSpec contract: handler and response interfaces, request validation, binding-failure answers, server-sent events</Description>
+    <Description>Runtime for the C# minimal-API surface that @olivervea/typespec-csharp generates from a TypeSpec contract: handler and response interfaces, request validation, binding-failure answers, server-sent events, streamed file and text responses</Description>
     <PackageProjectUrl>https://github.com/OliverVea/Olve.Utilities/src/Olve.TypeSpec</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/OliverVea/Olve.Utilities</RepositoryUrl>

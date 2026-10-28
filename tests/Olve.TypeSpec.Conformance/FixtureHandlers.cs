@@ -30,7 +30,18 @@ public static class FixtureHandlers
         services.AddSingleton<IShapesAreaHandler, ShapeArea>();
         services.AddSingleton<IWidgetEventsStreamHandler, StreamWidgetEvents>();
         services.AddSingleton<ITagsEchoHandler, EchoTags>();
+        services.AddSingleton<IFilesGetHandler, GetFile>();
+        services.AddSingleton<IFilesHeadHandler, HeadFile>();
+        services.AddSingleton<INoticesGetHandler, GetNotice>();
+        services.AddSingleton<IDeliveriesReceiveHandler, ReceiveDelivery>();
     }
+
+    /// <summary>A file's content: its path, so tests can see what the route bound.</summary>
+    public static byte[] FileContent(string path) => System.Text.Encoding.UTF8.GetBytes($"content of {path}");
+
+    public const string FileContentType = "text/x-fixture";
+    public const int FileRevision = 3;
+    public const int MaxDeliveryBytes = 1024;
 
     public static FixtureError Error(string code, string id) => FixtureError.Create(code, $"'{id}' failed with {code}.");
 
@@ -202,6 +213,77 @@ public static class FixtureHandlers
             Task.FromResult<TagsEchoResponse>(new TagsEchoResponse.Ok(request.Names));
     }
 
+    #endregion
+
+    #region files
+    /// <summary>Streams <see cref="FileContent"/> from a non-seekable stream, so nothing sets the length but the handler.</summary>
+    private sealed class GetFile : IFilesGetHandler
+    {
+        public Task<FilesGetResponse> HandleAsync(FilesGetRequest request, CancellationToken cancellationToken)
+        {
+            if (request.Path.EndsWith(Missing, StringComparison.Ordinal))
+            {
+                return Task.FromResult<FilesGetResponse>(new FilesGetResponse.NotFound(Error("FILE_NOT_FOUND", request.Path)));
+            }
+
+            var content = FileContent(request.Path);
+            return Task.FromResult<FilesGetResponse>(new FilesGetResponse.Ok(
+                new ForwardOnlyStream(content), FileContentType, FileRevision, content.Length,
+                $"attachment; filename=\"{Path.GetFileName(request.Path)}\""));
+        }
+    }
+
+    private sealed class HeadFile : IFilesHeadHandler
+    {
+        public Task<FilesHeadResponse> HandleAsync(FilesHeadRequest request, CancellationToken cancellationToken) =>
+            Task.FromResult<FilesHeadResponse>(request.Path.EndsWith(Missing, StringComparison.Ordinal)
+                ? new FilesHeadResponse.NotFound()
+                : new FilesHeadResponse.Ok(FileContent(request.Path).Length));
+    }
+
+    private sealed class ForwardOnlyStream(byte[] content) : MemoryStream(content)
+    {
+        public override bool CanSeek => false;
+    }
+    #endregion
+
+    #region text
+    private sealed class GetNotice : INoticesGetHandler
+    {
+        public Task<NoticesGetResponse> HandleAsync(NoticesGetRequest request, CancellationToken cancellationToken) =>
+            Task.FromResult<NoticesGetResponse>(request.Busy == true
+                ? new NoticesGetResponse.ServiceUnavailable("busy, try later\n", 30)
+                : new NoticesGetResponse.Ok("hello \"world\"\n"));
+    }
+    #endregion
+
+    #region raw-body
+    /// <summary>Reads the raw body up to <see cref="MaxDeliveryBytes"/> and answers its SHA-256.</summary>
+    private sealed class ReceiveDelivery : IDeliveriesReceiveHandler
+    {
+        public async Task<DeliveriesReceiveResponse> HandleAsync(DeliveriesReceiveRequest request, CancellationToken cancellationToken)
+        {
+            using var buffer = new MemoryStream();
+            var chunk = new byte[256];
+            int read;
+            while ((read = await request.Body.ReadAsync(chunk, cancellationToken)) > 0)
+            {
+                if (buffer.Length + read > MaxDeliveryBytes)
+                {
+                    return new DeliveriesReceiveResponse.PayloadTooLarge();
+                }
+
+                buffer.Write(chunk, 0, read);
+            }
+
+            return new Digest
+            {
+                Sha256 = Convert.ToHexStringLower(System.Security.Cryptography.SHA256.HashData(buffer.ToArray())),
+                Length = buffer.Length,
+                Signature = request.Signature,
+            };
+        }
+    }
     #endregion
 
     #region shapes

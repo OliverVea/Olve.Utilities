@@ -84,6 +84,23 @@ public class ResponseConformanceTests(FixtureApp fixture)
             return c.SendAsync(request);
         });
         yield return () => new("WidgetEvents_stream", "handler failure before streaming", 400, c => c.GetAsync("/api/widget-events?type=widget.exploded"));
+
+        // GET /api/files/{+path} (a streamed binary body with declared headers) and HEAD (headers only)
+        yield return () => new("Files_get", "a nested path", 200, c => c.GetAsync("/api/files/docs/a/readme.txt"));
+        yield return () => new("Files_get", "an encoded slash (as generated clients send it)", 200, c => c.GetAsync("/api/files/docs%2Freadme.txt"));
+        yield return () => new("Files_get", "handler answers 404 (a JSON error)", 404, c => c.GetAsync($"/api/files/docs/{FixtureHandlers.Missing}"));
+        yield return () => new("Files_head", "headers only", 200, c => c.SendAsync(new HttpRequestMessage(HttpMethod.Head, "/api/files/docs/readme.txt")));
+        yield return () => new("Files_head", "handler answers 404 (no body)", 404, c => c.SendAsync(new HttpRequestMessage(HttpMethod.Head, $"/api/files/{FixtureHandlers.Missing}")));
+
+        // GET /api/notice (text/plain, on a success and an error with a header)
+        yield return () => new("Notices_get", "text", 200, c => c.GetAsync("/api/notice"));
+        yield return () => new("Notices_get", "text with Retry-After", 503, c => c.GetAsync("/api/notice?busy=true"));
+
+        // POST /api/deliveries (the raw body, any content type)
+        yield return () => new("Deliveries_receive", "JSON as sent", 200, c => c.PostAsync("/api/deliveries", Json("""{ "a" :1 }""")));
+        yield return () => new("Deliveries_receive", "bytes without a content type", 200, c => c.PostAsync("/api/deliveries", new ByteArrayContent([0, 1, 2])));
+        yield return () => new("Deliveries_receive", "over the handler's limit", 413, c => c.PostAsync("/api/deliveries",
+            new ByteArrayContent(new byte[FixtureHandlers.MaxDeliveryBytes + 1])));
     }
 
     [Test]
@@ -99,6 +116,7 @@ public class ResponseConformanceTests(FixtureApp fixture)
         await Assert.That(status).IsEqualTo(conformanceCase.ExpectedStatus).Because(body);
         await Assert.That(operation.DeclaredStatuses).Contains(status);
         await Assert.That(OpenApiContract.Validate(operation, status, body)).IsEmpty();
+        await Assert.That(OpenApiContract.ValidateEnvelope(operation, status, response)).IsEmpty();
     }
 
     /// <summary>Every status the fixture contract declares is exercised by at least one case above.</summary>
