@@ -1,3 +1,16 @@
+## v0.58.0 (2026-10-28)
+
+### Feat
+
+- **typespec**: the discriminated-union example receives a Shape and switches on Circle/Square; GetShape looks up by id
+- **typespec**: per-topic examples built by the snapshot test for the skill; SSE and id notes in the README; lint and format checks for the emitter package
+- **typespec**: prefix defaults to the service namespace; unsupported shapes tested one by one; generated examples kept current in the skill and README
+- **typespec**: Olve.TypeSpec runtime and the @olivervea/typespec-csharp emitter, with their conformance suite
+
+### Fix
+
+- **typespec**: conformance fixture script imports by file URL (Windows); README YAML block has no file-like comment
+
 ## v0.57.0 (2026-10-27)
 
 ### Feat
