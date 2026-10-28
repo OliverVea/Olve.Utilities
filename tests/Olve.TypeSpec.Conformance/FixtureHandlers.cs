@@ -226,10 +226,12 @@ public static class FixtureHandlers
                 return Task.FromResult<FilesGetResponse>(new FilesGetResponse.NotFound(Error("FILE_NOT_FOUND", request.Path)));
             }
 
+            // SetHttpFileName writes an ASCII `filename` and an encoded `filename*`, so any name is a valid header.
+            var disposition = new Microsoft.Net.Http.Headers.ContentDispositionHeaderValue("attachment");
+            disposition.SetHttpFileName(Path.GetFileName(request.Path));
             var content = FileContent(request.Path);
             return Task.FromResult<FilesGetResponse>(new FilesGetResponse.Ok(
-                new ForwardOnlyStream(content), FileContentType, FileRevision, content.Length,
-                $"attachment; filename=\"{Path.GetFileName(request.Path)}\""));
+                new ForwardOnlyStream(content), FileContentType, FileRevision, content.Length, disposition.ToString()));
         }
     }
 

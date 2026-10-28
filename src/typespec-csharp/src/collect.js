@@ -437,7 +437,13 @@ export function collect(program, options = {}) {
       });
     }
     let route = http.path;
-    for (const p of params) if (p.catchAll) route = route.replace(`{${p.wire}}`, `{**${p.wire}}`);
+    const catchAlls = params.filter((p) => p.catchAll);
+    if (catchAlls.length > 1 || (catchAlls.length && !route.endsWith(`{${catchAlls[0].wire}}`))) {
+      // ASP.NET routing only has a catch-all as the last segment.
+      unsupported("a {+…} path parameter must be the route's only one, and its last segment");
+      continue;
+    }
+    if (catchAlls.length) route = route.replace(`{${catchAlls[0].wire}}`, `{**${catchAlls[0].wire}}`);
 
     let body;
     if (b?.bodyKind === "multipart") unsupported("multipart bodies are not supported");

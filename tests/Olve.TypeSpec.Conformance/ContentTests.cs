@@ -15,6 +15,7 @@ public class ContentTests(FixtureApp fixture)
     [Arguments("/api/files/docs/a/readme.txt", "docs/a/readme.txt")]
     [Arguments("/api/files/docs%2Fa%2Freadme.txt", "docs/a/readme.txt")]
     [Arguments("/api/files/one%20file.txt", "one file.txt")]
+    [Arguments("/api/files/r%C3%A9sum%C3%A9%20%22v2%22.txt", "résumé \"v2\".txt")]
     public async Task FileGet_StreamsTheBodyWithItsHeaders(string url, string path)
     {
         using var response = await fixture.CreateClient().GetAsync(url);
@@ -23,9 +24,23 @@ public class ContentTests(FixtureApp fixture)
         await Assert.That(Convert.ToHexString(await response.Content.ReadAsByteArrayAsync())).IsEqualTo(Convert.ToHexString(expected));
         await Assert.That(response.Content.Headers.ContentType?.MediaType).IsEqualTo(FixtureHandlers.FileContentType);
         await Assert.That(response.Content.Headers.ContentLength).IsEqualTo(expected.Length);
-        await Assert.That(response.Content.Headers.ContentDisposition?.FileName).IsEqualTo(Path.GetFileName(path));
+        await Assert.That(response.Content.Headers.ContentDisposition?.FileNameStar).IsEqualTo(Path.GetFileName(path));
         await Assert.That(response.Headers.GetValues("X-Revision").Single()).IsEqualTo("3");
     }
+
+    [Test]
+    [Arguments("a%2Fb", "a/b")]
+    [Arguments("a%2fb/c", "a/b/c")]
+    [Arguments("..x/y.", "..x/y.")]
+    public async Task CatchAll_ReadsEncodedSlashes(string value, string expected) =>
+        await Assert.That(PathParameters.CatchAll(value)).IsEqualTo(expected);
+
+    [Test]
+    [Arguments("..%2Fx")]
+    [Arguments("a%2F.%2Fb")]
+    [Arguments("a/..")]
+    public async Task CatchAll_RefusesDotSegments(string value) =>
+        await Assert.That(() => PathParameters.CatchAll(value)).Throws<BadHttpRequestException>();
 
     [Test]
     public async Task FileHead_SendsHeadersWithoutABody()

@@ -2,7 +2,7 @@
 
 Generated from `src/typespec-csharp/test/fixtures/widgets.tsp` by the emitter's tests; do not edit.
 
-The content type decides how a body is written. `bytes` with a non-JSON content type is a `System.IO.Stream` the runtime copies to the response as it reads it (never buffered) and then disposes; a `text/*` `string` is written as is. A literal content type is a constant; `@header contentType: string` leaves it to the handler (a `ContentType` member). Each `@header` of a response is a member of its variant, optional ones last and defaulting to null (unset = not sent); a string literal header is a constant. `{+path}` maps to a catch-all route (`a%2Fb`, as generated clients send it, binds as `a/b`; a `.` or `..` segment is a binding failure), and `@head` operations answer headers only. A `bytes` request body with a non-JSON content type (`*/*` for any) is the raw request stream, unread: the handler reads it, with its own size limit, and a signature over the exact bytes still verifies.
+The content type decides how a body is written. `bytes` with a non-JSON content type is a `System.IO.Stream` the runtime copies to the response as it reads it (never buffered) and then disposes; a `text/*` `string` is written as is. A literal content type is a constant; for `bytes`, `@header contentType: string` leaves it to the handler (a `ContentType` member). Each `@header` of a response is a member of its variant, optional ones last and defaulting to null (unset = not sent); a string literal header is a constant. `{+path}` maps to a catch-all route (`a%2Fb`, as generated clients send it, binds as `a/b`; a `.` or `..` segment is a binding failure), and `@head` operations answer headers only. A `bytes` request body with a non-JSON content type (`*/*` for any) is the raw request stream, unread: the handler reads it, with its own size limit, and a signature over the exact bytes still verifies.
 
 ## Contract
 
@@ -227,10 +227,12 @@ private sealed class GetFile : IFilesGetHandler
             return Task.FromResult<FilesGetResponse>(new FilesGetResponse.NotFound(Error("FILE_NOT_FOUND", request.Path)));
         }
 
+        // SetHttpFileName writes an ASCII `filename` and an encoded `filename*`, so any name is a valid header.
+        var disposition = new Microsoft.Net.Http.Headers.ContentDispositionHeaderValue("attachment");
+        disposition.SetHttpFileName(Path.GetFileName(request.Path));
         var content = FileContent(request.Path);
         return Task.FromResult<FilesGetResponse>(new FilesGetResponse.Ok(
-            new ForwardOnlyStream(content), FileContentType, FileRevision, content.Length,
-            $"attachment; filename=\"{Path.GetFileName(request.Path)}\""));
+            new ForwardOnlyStream(content), FileContentType, FileRevision, content.Length, disposition.ToString()));
     }
 }
 

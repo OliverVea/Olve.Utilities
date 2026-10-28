@@ -5,18 +5,25 @@ namespace Olve.TypeSpec;
 /// <summary>
 /// Writes a generated response variant's binary body (<c>bytes</c> with a non-JSON content type)
 /// by copying <paramref name="content"/> to the response as it is read, so large files are never
-/// buffered. The stream is disposed once written. A declared <c>Content-Length</c> header sets the length.
+/// buffered. The stream is disposed once written, or when the response is if writing never starts.
+/// A declared <c>Content-Length</c> header sets the length.
 /// </summary>
-public sealed class StreamResponse(Stream content, string contentType, int status) : IResult
+public sealed class StreamResponse(Stream content, string contentType, int status) : IResult, IAsyncDisposable
 {
     /// <inheritdoc />
     public async Task ExecuteAsync(HttpContext httpContext)
     {
-        await using (content)
+        await using (this)
         {
             httpContext.Response.StatusCode = status;
             httpContext.Response.ContentType = contentType;
             await content.CopyToAsync(httpContext.Response.Body, httpContext.RequestAborted);
         }
     }
+
+    private int _disposed;
+
+    /// <summary>Disposes the stream, once.</summary>
+    public ValueTask DisposeAsync() =>
+        Interlocked.Exchange(ref _disposed, 1) == 0 ? content.DisposeAsync() : ValueTask.CompletedTask;
 }
