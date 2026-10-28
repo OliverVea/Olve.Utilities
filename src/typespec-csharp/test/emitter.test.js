@@ -123,6 +123,7 @@ test("unsupported shapes are reported, not silently mistyped", async () => {
   const { diagnostics, files } = await emit("unsupported");
   assert.deepEqual(diagnosticCodes(diagnostics).sort(), [
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'ids': array parameter 'id' must be a string list in the query with explode: false.",
+    "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'meta': a {+…} path parameter must be the route's only one, and its last segment.",
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'note': a text/plain body must be JSON, or bytes (read raw).",
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'range': status code ranges and default responses are not supported.",
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'session': cookie parameter 'sid' is not supported.",

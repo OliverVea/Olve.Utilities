@@ -88,3 +88,7 @@ model ClientError {
   @header("Last-Modified") lastModified: utcDateTime;
   @body body: A;
 };
+
+// A {+…} path parameter before another segment (ASP.NET has catch-alls only at the end).
+#suppress "@typespec/openapi3/path-reserved-expansion" "Fixture"
+@route("/docs/{+path}/meta") @get op meta(@path path: string): A;
