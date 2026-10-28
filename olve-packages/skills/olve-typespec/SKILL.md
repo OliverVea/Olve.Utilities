@@ -15,7 +15,7 @@ spec/main.tsp ── tsp compile ──► artifacts/generated/<Prefix>{Models,A
                             └──► openapi.json ──► clients (Hey API, …)
 ```
 
-`<Prefix>` is the service namespace's name (`namespace Widgets;` → `WidgetsApi`, `AddWidgetsApi`, …) unless `prefix` is set. The generated code relies on `Olve.TypeSpec`: `IOperationHandler<TRequest, TResponse>`, `IOperationResponse`, `ApiOperation`, `IApiErrorWriter`, `RequestValidation`, the binding-failure middleware, `IServerSentEvent` / `ServerSentEvent<T>` / `ServerSentEventsResult<T>`, `TypeSpecApiExtensions`.
+`<Prefix>` is the service namespace's name (`namespace Widgets;` → `WidgetsApi`, `AddWidgetsApi`, …) unless `prefix` is set. The generated code relies on `Olve.TypeSpec`: `IOperationHandler<TRequest, TResponse>`, `IOperationResponse`, `ApiOperation`, `IApiErrorWriter`, `RequestValidation`, the binding-failure middleware, `JsonResponse<T>`, `IServerSentEvent` / `ServerSentEvent<T>` / `ServerSentEventsResult<T>`, `TypeSpecApiExtensions`.
 
 ## Examples
 

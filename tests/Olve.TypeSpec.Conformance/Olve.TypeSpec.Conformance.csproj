@@ -14,6 +14,11 @@
     <UserSecretsId></UserSecretsId>
     <!-- The fixture's generated code lives in Fixture.Api; the tests here in Olve.TypeSpec.Conformance. -->
     <RootNamespace>Olve.TypeSpec.Conformance</RootNamespace>
+    <!-- The generated code must build without trim or AOT warnings and run without reflection-based
+         JSON, as it does in a service published with PublishAot (which turns these on by itself). -->
+    <IsAotCompatible>true</IsAotCompatible>
+    <EnableRequestDelegateGenerator>true</EnableRequestDelegateGenerator>
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
   </PropertyGroup>
 
   <PropertyGroup>

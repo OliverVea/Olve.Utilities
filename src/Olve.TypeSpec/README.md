@@ -25,7 +25,8 @@ npm install --save-dev @olivervea/typespec-csharp @typespec/compiler @typespec/h
 | `ApiOperation` | An operation's id and declared statuses; attached to each generated endpoint as metadata. |
 | `IApiErrorWriter` | The app's answer to binding and validation failures, in its own error body. One registration per app. |
 | `RequestValidation` | Runs the generated request-body validator before the handler. |
-| `BindingFailureMiddleware` | Answers `BadHttpRequestException` (malformed JSON, `limit=abc`, a missing parameter) through the error writer. |
+| `BindingFailureMiddleware` | Answers `BadHttpRequestException` (malformed JSON, `limit=abc`, a missing parameter) through the error writer, and a bare 400 the endpoint set without a body (how the request delegate generator reports a bad optional parameter). |
+| `JsonResponse<T>` | A response variant's JSON body with its status, serialized through the app's `JsonOptions` (no reflection, so it suits Native AOT). |
 | `IServerSentEvent`, `ServerSentEvent<T>`, `ServerSentEventsResult<T>` | SSE streams of an `@events` union: event name = the variant's `type`. |
 | `TypeSpecApiExtensions` | `AddTypeSpecApi` / `UseTypeSpecApi`, called by the generated `Add…Api` / `Use…Api`. |
 

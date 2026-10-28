@@ -86,7 +86,7 @@ public abstract record ShapesAreaResponse : IOperationResponse
         public override int Status => 200;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 200);
+        public override IResult ToHttpResult() => new JsonResponse<Area>(Body, 200);
     }
 
     public static implicit operator ShapesAreaResponse(Area body) => new Ok(body);
@@ -112,7 +112,7 @@ public abstract record ShapesGetResponse : IOperationResponse
         public override int Status => 200;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 200);
+        public override IResult ToHttpResult() => new JsonResponse<Shape>(Body, 200);
     }
 
     /// <summary>404.</summary>
@@ -122,7 +122,7 @@ public abstract record ShapesGetResponse : IOperationResponse
         public override int Status => 404;
 
         /// <inheritdoc />
-        public override IResult ToHttpResult() => TypedResults.Json(Body, statusCode: 404);
+        public override IResult ToHttpResult() => new JsonResponse<FixtureErrorEnvelope>(Body, 404);
     }
 
     public static implicit operator ShapesGetResponse(Shape body) => new Ok(body);

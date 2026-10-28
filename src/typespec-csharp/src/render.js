@@ -273,7 +273,7 @@ function renderResponseUnion(o) {
     const write = r.stream
       ? `new ServerSentEventsResult<${r.type}>(Events)`
       : r.type
-        ? `TypedResults.Json(Body, statusCode: ${r.status})`
+        ? `new JsonResponse<${r.type}>(Body, ${r.status})`
         : `TypedResults.StatusCode(${r.status})`;
     s += `\n    /// <summary>${r.status}.</summary>\n`;
     s += `    public sealed record ${name}(${field}) : ${union}\n    {\n`;
