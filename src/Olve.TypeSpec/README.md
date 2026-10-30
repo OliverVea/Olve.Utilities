@@ -264,6 +264,6 @@ The package is `IsAotCompatible` and `IsTrimmable`, and builds with the AOT anal
 
 ### What the emitter checks
 
-The emitter's conformance suite (in the Olve.Utilities repo) compiles the fixture contract above with this runtime and proves over HTTP that every operation is routed, every response validates against the contract's schema for its status, declared statuses are honoured, parameters bind and binding failures are answered as the contract says. Services only test their own behaviour.
+The emitter's conformance suite (in the Olve.Utilities repo) compiles the fixture contract above with this runtime and proves over HTTP that every operation is routed, every response validates against the contract's schema for its status, declared statuses are honoured, parameters bind and binding failures are answered as the contract says. CI also publishes the fixture app with Native AOT and checks a few requests against the binary (`tests/Olve.TypeSpec.AotSmoke`), so reflection in the runtime or the emitted code fails the build. Services only test their own behaviour.
 
 Shapes the emitter does not support are reported as `unsupported-*` warnings, never silently mistyped: untagged unions, enveloped discriminated unions, cookie parameters, multipart bodies, status code ranges, array parameters other than `explode: false` string lists in the query.

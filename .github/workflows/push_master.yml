@@ -66,12 +66,29 @@ jobs:
       - run: npm run check
         working-directory: src/typespec-csharp
 
+  aot-smoke:
+    name: Native AOT smoke test (Olve.TypeSpec)
+    if: ${{ !startsWith(github.event.head_commit.message, 'bump:') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: dotnet publish tests/Olve.TypeSpec.AotSmoke -c Release -r linux-x64 -o artifacts/aot-smoke/publish
+      - run: artifacts/aot-smoke/publish/Olve.TypeSpec.AotSmoke
+
   bump-version:
     name: Bump version and create changelog
     needs:
       - test-ubuntu
       - test-windows
       - emitter-tests
+      - aot-smoke
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.cz.outputs.version }}

@@ -56,6 +56,9 @@
     <Project Path="tests/Olve.Validation.Tests/Olve.Validation.Tests.csproj" />
     <Project Path="tests/Olve.OpenRaster.Tests/Olve.OpenRaster.Tests.csproj" />
     <Project Path="tests/Olve.TinyEXR.Tests/Olve.TinyEXR.Tests.csproj" />
+    <Project Path="tests/Olve.TypeSpec.AotSmoke/Olve.TypeSpec.AotSmoke.csproj">
+      <BuildDependency Project="tests/Olve.TypeSpec.Conformance/Olve.TypeSpec.Conformance.csproj" />
+    </Project>
     <Project Path="tests/Olve.TypeSpec.Conformance/Olve.TypeSpec.Conformance.csproj" />
     <Project Path="tests/Olve.TypeSpec.Generators.Tests/Olve.TypeSpec.Generators.Tests.csproj" />
   </Folder>
