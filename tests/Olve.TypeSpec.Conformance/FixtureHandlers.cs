@@ -42,6 +42,7 @@ public static class FixtureHandlers
     };
 
     #region list
+    [OperationHandler]
     internal sealed class ListWidgets : IWidgetsListHandler
     {
         public Task<WidgetsListResponse> HandleAsync(WidgetsListRequest request, CancellationToken cancellationToken)
@@ -69,6 +70,7 @@ public static class FixtureHandlers
     #endregion
 
     #region create
+    [OperationHandler]
     internal sealed class CreateWidget : IWidgetsCreateHandler
     {
         public Task<WidgetsCreateResponse> HandleAsync(WidgetsCreateRequest request, CancellationToken cancellationToken)
@@ -103,6 +105,7 @@ public static class FixtureHandlers
     #endregion
 
     #region update
+    [OperationHandler]
     internal sealed class UpdateWidget : IWidgetsUpdateHandler
     {
         public Task<WidgetsUpdateResponse> HandleAsync(WidgetsUpdateRequest request, CancellationToken cancellationToken)
@@ -145,6 +148,7 @@ public static class FixtureHandlers
     #endregion
 
     #region delete
+    [OperationHandler]
     internal sealed class DeleteWidget : IWidgetsDeleteHandler
     {
         public Task<WidgetsDeleteResponse> HandleAsync(WidgetsDeleteRequest request, CancellationToken cancellationToken) =>
@@ -161,6 +165,7 @@ public static class FixtureHandlers
     /// (id 2). <c>type</c> keeps only the named events (an unknown name is a 400 before streaming);
     /// <c>Last-Event-ID</c> skips ids up to it.
     /// </summary>
+    [OperationHandler]
     internal sealed class StreamWidgetEvents : IWidgetEventsStreamHandler
     {
         public static readonly Guid WidgetId = Guid.Parse("0b6f7f0e-4a52-4d0e-9d7a-5b1f0f6c2a11");
@@ -191,6 +196,7 @@ public static class FixtureHandlers
     #endregion
 
     #region parameters
+    [OperationHandler]
     internal sealed class EchoTags : ITagsEchoHandler
     {
         public Task<TagsEchoResponse> HandleAsync(TagsEchoRequest request, CancellationToken cancellationToken) =>
@@ -201,6 +207,7 @@ public static class FixtureHandlers
 
     #region files
     /// <summary>Streams <see cref="FileContent"/> from a non-seekable stream, so nothing sets the length but the handler.</summary>
+    [OperationHandler]
     internal sealed class GetFile : IFilesGetHandler
     {
         public Task<FilesGetResponse> HandleAsync(FilesGetRequest request, CancellationToken cancellationToken)
@@ -219,6 +226,7 @@ public static class FixtureHandlers
         }
     }
 
+    [OperationHandler]
     internal sealed class HeadFile : IFilesHeadHandler
     {
         public Task<FilesHeadResponse> HandleAsync(FilesHeadRequest request, CancellationToken cancellationToken) =>
@@ -234,6 +242,7 @@ public static class FixtureHandlers
     #endregion
 
     #region text
+    [OperationHandler]
     internal sealed class GetNotice : INoticesGetHandler
     {
         public Task<NoticesGetResponse> HandleAsync(NoticesGetRequest request, CancellationToken cancellationToken) =>
@@ -245,6 +254,7 @@ public static class FixtureHandlers
 
     #region raw-body
     /// <summary>Reads the raw body up to <see cref="MaxDeliveryBytes"/> and answers its SHA-256.</summary>
+    [OperationHandler]
     internal sealed class ReceiveDelivery : IDeliveriesReceiveHandler
     {
         public async Task<DeliveriesReceiveResponse> HandleAsync(DeliveriesReceiveRequest request, CancellationToken cancellationToken)
@@ -274,6 +284,7 @@ public static class FixtureHandlers
 
     #region shapes
     /// <summary>A union in the request: the handler switches on the variant records.</summary>
+    [OperationHandler]
     internal sealed class ShapeArea : IShapesAreaHandler
     {
         public Task<ShapesAreaResponse> HandleAsync(ShapesAreaRequest request, CancellationToken cancellationToken)
@@ -289,6 +300,7 @@ public static class FixtureHandlers
     }
 
     /// <summary>A union in the response: the stored data decides the variant; it converts implicitly to <c>Ok</c>.</summary>
+    [OperationHandler]
     internal sealed class GetShape : IShapesGetHandler
     {
         private static readonly Dictionary<string, Shape> Shapes = new()

@@ -135,6 +135,7 @@ public abstract record ShapesGetResponse : IOperationResponse
 
 ```csharp
 /// <summary>A union in the request: the handler switches on the variant records.</summary>
+[OperationHandler]
 internal sealed class ShapeArea : IShapesAreaHandler
 {
     public Task<ShapesAreaResponse> HandleAsync(ShapesAreaRequest request, CancellationToken cancellationToken)
@@ -150,6 +151,7 @@ internal sealed class ShapeArea : IShapesAreaHandler
 }
 
 /// <summary>A union in the response: the stored data decides the variant; it converts implicitly to <c>Ok</c>.</summary>
+[OperationHandler]
 internal sealed class GetShape : IShapesGetHandler
 {
     private static readonly Dictionary<string, Shape> Shapes = new()

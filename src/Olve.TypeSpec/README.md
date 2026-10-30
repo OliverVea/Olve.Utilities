@@ -31,6 +31,7 @@ The compile runs `tsp compile` in the contract's folder when a `.tsp`, `tspconfi
 | Type | Description |
 | --- | --- |
 | `IOperationHandler<TRequest, TResponse>` | Implements one contract operation; returns a variant of the operation's generated response union, so an undeclared status can't compile. |
+| `OperationHandlerAttribute` | Marks a class as an operation's handler: `AddOperationHandlers()` registers exactly the marked classes. |
 | `IOperationResponse` | A response variant: its status and how it writes itself. |
 | `ApiOperation` | An operation's id and declared statuses; attached to each generated endpoint as metadata. |
 | `IApiErrorWriter` | The app's answer to binding and validation failures, in its own error body. One registration per app. |
@@ -101,12 +102,13 @@ options:
       ErrorEnvelope: "Fixture.FixtureErrorEnvelope"   # a spec model the app already has a type for
 ```
 
-A handler implements the generated interface and returns one of the declared responses. A success body converts implicitly; errors are named:
+A handler is a class marked `[OperationHandler]` that implements the generated interface and returns one of the declared responses. A success body converts implicitly; errors are named:
 
 ```cs
-// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L291-L304
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L302-L316
 
 /// <summary>A union in the response: the stored data decides the variant; it converts implicitly to <c>Ok</c>.</summary>
+[OperationHandler]
 internal sealed class GetShape : IShapesGetHandler
 {
     private static readonly Dictionary<string, Shape> Shapes = new()
@@ -125,9 +127,10 @@ internal sealed class GetShape : IShapesGetHandler
 A discriminated union in a request arrives as the abstract record; the handler switches on the variant records:
 
 ```cs
-// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L276-L289
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L286-L300
 
 /// <summary>A union in the request: the handler switches on the variant records.</summary>
+[OperationHandler]
 internal sealed class ShapeArea : IShapesAreaHandler
 {
     public Task<ShapesAreaResponse> HandleAsync(ShapesAreaRequest request, CancellationToken cancellationToken)
@@ -169,7 +172,7 @@ public sealed class FixtureErrorWriter : IApiErrorWriter
 }
 ```
 
-Wiring: the generated `Add…Api` registers the JSON context and makes binding failures reach the middleware; `AddOperationHandlers()`, generated into the app by the package's source generator, registers every handler class in the assembly (transient, under its operation's interface; two handlers for one operation are a compile error, OTSP001); the app registers its `IApiErrorWriter`; the generated `Use…Api` checks every handler is registered (fail fast, not a runtime 500), adds the middleware and maps every operation. It returns the route builders, for app-side conventions such as authorization (`endpoints.ShapesGet.RequireAuthorization("read")`).
+Wiring: the generated `Add…Api` registers the JSON context and makes binding failures reach the middleware; `AddOperationHandlers()`, generated into the app by the package's source generator, registers every `[OperationHandler]` class in the assembly (transient, under its operation's interface; a class that only implements the interface, such as a decorator, isn't registered); the app registers its `IApiErrorWriter`; the generated `Use…Api` checks every handler is registered (fail fast, not a runtime 500), adds the middleware and maps every operation. It returns the route builders, for app-side conventions such as authorization (`endpoints.ShapesGet.RequireAuthorization("read")`).
 
 ```cs
 // ../../tests/Olve.TypeSpec.Conformance/FixtureApp.cs#L36-L48
@@ -217,40 +220,40 @@ interface WidgetEvents {
 The handler yields events; the runtime writes each one as a frame named by the variant's `type`, with the item's `Id` as the SSE id (`null` for heartbeats, so `Last-Event-ID` never points at one). Nothing is kept per connection: `Last-Event-ID` is an ordinary header parameter the handler reads to decide where to resume, reconnecting is the client's job, and the stream ends quietly when the client disconnects or the app stops.
 
 ```cs
-// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L156-L187
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L163-L194
 
-region
-
-ion sse
-<summary>
-A finite stream: a ping (no id), then <c>widget.changed</c> (id 1) and <c>widget.removed</c>
-(id 2). <c>type</c> keeps only the named events (an unknown name is a 400 before streaming);
-<c>Last-Event-ID</c> skips ids up to it.
-</summary>
-rnal sealed class StreamWidgetEvents : IWidgetEventsStreamHandler
-
-public static readonly Guid WidgetId = Guid.Parse("0b6f7f0e-4a52-4d0e-9d7a-5b1f0f6c2a11");
-
-public Task<WidgetEventsStreamResponse> HandleAsync(WidgetEventsStreamRequest request, CancellationToken cancellationToken)
+/// <summary>
+/// A finite stream: a ping (no id), then <c>widget.changed</c> (id 1) and <c>widget.removed</c>
+/// (id 2). <c>type</c> keeps only the named events (an unknown name is a 400 before streaming);
+/// <c>Last-Event-ID</c> skips ids up to it.
+/// </summary>
+[OperationHandler]
+internal sealed class StreamWidgetEvents : IWidgetEventsStreamHandler
 {
-    if (request.Type?.FirstOrDefault(t => !WidgetEvent.EventTypes.Contains(t)) is { } unknown)
+    public static readonly Guid WidgetId = Guid.Parse("0b6f7f0e-4a52-4d0e-9d7a-5b1f0f6c2a11");
+
+    public Task<WidgetEventsStreamResponse> HandleAsync(WidgetEventsStreamRequest request, CancellationToken cancellationToken)
     {
-        return Task.FromResult<WidgetEventsStreamResponse>(
-            new WidgetEventsStreamResponse.BadRequest(FixtureError.Create("UNKNOWN_EVENT", $"Unknown event type '{unknown}'.")));
+        if (request.Type?.FirstOrDefault(t => !WidgetEvent.EventTypes.Contains(t)) is { } unknown)
+        {
+            return Task.FromResult<WidgetEventsStreamResponse>(
+                new WidgetEventsStreamResponse.BadRequest(FixtureError.Create("UNKNOWN_EVENT", $"Unknown event type '{unknown}'.")));
+        }
+
+        var after = long.TryParse(request.LastEventId, out var id) ? id : 0;
+        var events = Events()
+            .Where(e => request.Type is null || request.Type.Contains(e.Data.EventType))
+            .Where(e => e.Id is null || long.Parse(e.Id, System.Globalization.CultureInfo.InvariantCulture) > after);
+        return Task.FromResult<WidgetEventsStreamResponse>(new WidgetEventsStreamResponse.Ok(events.ToAsyncEnumerable()));
     }
 
-    var after = long.TryParse(request.LastEventId, out var id) ? id : 0;
-    var events = Events()
-        .Where(e => request.Type is null || request.Type.Contains(e.Data.EventType))
-        .Where(e => e.Id is null || long.Parse(e.Id, System.Globalization.CultureInfo.InvariantCulture) > after);
-    return Task.FromResult<WidgetEventsStreamResponse>(new WidgetEventsStreamResponse.Ok(events.ToAsyncEnumerable()));
+    private static IEnumerable<ServerSentEvent<WidgetEvent>> Events()
+    {
+        yield return new(new Ping { At = DateTimeOffset.UnixEpoch });
+        yield return new(new WidgetChanged { At = DateTimeOffset.UnixEpoch, WidgetId = WidgetId, Name = "sample", Shape = new Square { Side = 2 } }, "1");
+        yield return new(new WidgetRemoved { At = DateTimeOffset.UnixEpoch, WidgetId = WidgetId }, "2");
+    }
 }
-
-private static IEnumerable<ServerSentEvent<WidgetEvent>> Events()
-{
-    yield return new(new Ping { At = DateTimeOffset.UnixEpoch });
-    yield return new(new WidgetChanged { At = DateTimeOffset.UnixEpoch, WidgetId = WidgetId, Name = "sample", Shape = new Square { Side = 2 } }, "1");
-    yield return new(new WidgetRemoved { At = DateTimeOffset.UnixEpoch, WidgetId = WidgetId }, "2");
 ```
 
 ### Performance and AOT
