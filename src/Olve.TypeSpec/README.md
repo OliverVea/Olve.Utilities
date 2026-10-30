@@ -14,6 +14,16 @@ dotnet add package Olve.TypeSpec
 npm install --save-dev @olivervea/typespec-csharp @typespec/compiler @typespec/http
 ```
 
+The package's MSBuild targets compile the contract before the build and compile the C# it emits. Point them at the contract's entry file and at the folder its `tspconfig.yaml` sends `@olivervea/typespec-csharp`'s output to (`emitter-output-dir`):
+
+```xml
+<ItemGroup>
+  <TypeSpecContract Include="../spec/main.tsp" GeneratedDir="../../artifacts/generated/" />
+</ItemGroup>
+```
+
+The compile runs `tsp compile` in the contract's folder when a `.tsp`, `tspconfig.yaml`, `package.json` or lockfile changed, and installs its packages first when `node_modules` is missing: with bun when the folder has a `bun.lock`, otherwise npm. `TypeSpecInstallCommand` and `TypeSpecCompileCommand` override the commands. `-p:SkipSpecGen=true` compiles already-emitted files without node, for a Docker stage or a CI step that compiled the contract earlier.
+
 ---
 
 ## Overview
@@ -94,10 +104,10 @@ options:
 A handler implements the generated interface and returns one of the declared responses. A success body converts implicitly; errors are named:
 
 ```cs
-// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L307-L320
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L291-L304
 
 /// <summary>A union in the response: the stored data decides the variant; it converts implicitly to <c>Ok</c>.</summary>
-private sealed class GetShape : IShapesGetHandler
+internal sealed class GetShape : IShapesGetHandler
 {
     private static readonly Dictionary<string, Shape> Shapes = new()
     {
@@ -115,10 +125,10 @@ private sealed class GetShape : IShapesGetHandler
 A discriminated union in a request arrives as the abstract record; the handler switches on the variant records:
 
 ```cs
-// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L292-L305
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L276-L289
 
 /// <summary>A union in the request: the handler switches on the variant records.</summary>
-private sealed class ShapeArea : IShapesAreaHandler
+internal sealed class ShapeArea : IShapesAreaHandler
 {
     public Task<ShapesAreaResponse> HandleAsync(ShapesAreaRequest request, CancellationToken cancellationToken)
     {
@@ -159,19 +169,19 @@ public sealed class FixtureErrorWriter : IApiErrorWriter
 }
 ```
 
-Wiring: the generated `Add…Api` registers the JSON context and makes binding failures reach the middleware; the app registers its handlers and its `IApiErrorWriter`; the generated `Use…Api` checks every handler is registered (fail fast, not a runtime 500), adds the middleware and maps every operation. It returns the route builders, for app-side conventions such as authorization (`endpoints.ShapesGet.RequireAuthorization("read")`).
+Wiring: the generated `Add…Api` registers the JSON context and makes binding failures reach the middleware; `AddOperationHandlers()`, generated into the app by the package's source generator, registers every handler class in the assembly (transient, under its operation's interface; two handlers for one operation are a compile error, OTSP001); the app registers its `IApiErrorWriter`; the generated `Use…Api` checks every handler is registered (fail fast, not a runtime 500), adds the middleware and maps every operation. It returns the route builders, for app-side conventions such as authorization (`endpoints.ShapesGet.RequireAuthorization("read")`).
 
 ```cs
 // ../../tests/Olve.TypeSpec.Conformance/FixtureApp.cs#L36-L48
 
-/// <summary>Builds (but doesn't start) the fixture app with the given handler registrations.</summary>
-public static WebApplication Build(Action<IServiceCollection> registerHandlers)
+/// <summary>Builds (but doesn't start) the fixture app; <paramref name="adjust"/> changes its services first.</summary>
+public static WebApplication Build(Action<IServiceCollection>? adjust = null)
 {
     var builder = WebApplication.CreateSlimBuilder(new WebApplicationOptions { EnvironmentName = "Testing" });
     builder.WebHost.UseTestServer();
-    builder.Services.AddFixtureApi();
+    builder.Services.AddFixtureApi().AddOperationHandlers();
     builder.Services.AddSingleton<IApiErrorWriter, FixtureErrorWriter>();
-    registerHandlers(builder.Services);
+    adjust?.Invoke(builder.Services);
 
     var app = builder.Build();
     app.UseFixtureApi();
@@ -207,7 +217,7 @@ interface WidgetEvents {
 The handler yields events; the runtime writes each one as a frame named by the variant's `type`, with the item's `Id` as the SSE id (`null` for heartbeats, so `Last-Event-ID` never points at one). Nothing is kept per connection: `Last-Event-ID` is an ordinary header parameter the handler reads to decide where to resume, reconnecting is the client's job, and the stream ends quietly when the client disconnects or the app stops.
 
 ```cs
-// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L172-L203
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L156-L187
 
 region
 
@@ -217,7 +227,7 @@ A finite stream: a ping (no id), then <c>widget.changed</c> (id 1) and <c>widget
 (id 2). <c>type</c> keeps only the named events (an unknown name is a 400 before streaming);
 <c>Last-Event-ID</c> skips ids up to it.
 </summary>
-ate sealed class StreamWidgetEvents : IWidgetEventsStreamHandler
+rnal sealed class StreamWidgetEvents : IWidgetEventsStreamHandler
 
 public static readonly Guid WidgetId = Guid.Parse("0b6f7f0e-4a52-4d0e-9d7a-5b1f0f6c2a11");
 

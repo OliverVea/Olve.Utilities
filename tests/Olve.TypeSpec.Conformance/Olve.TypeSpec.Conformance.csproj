@@ -66,6 +66,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Olve.TypeSpec\Olve.TypeSpec.csproj" />
+    <!-- AddOperationHandlers, as the Olve.TypeSpec package attaches it. -->
+    <ProjectReference Include="..\..\src\Olve.TypeSpec.Generators\Olve.TypeSpec.Generators.csproj"
+                      PrivateAssets="all"
+                      ReferenceOutputAssembly="false"
+                      OutputItemType="Analyzer" />
   </ItemGroup>
 
 </Project>

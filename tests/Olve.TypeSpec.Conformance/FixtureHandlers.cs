@@ -20,22 +20,6 @@ public static class FixtureHandlers
     public const string Invalid = "invalid";
     public const string Queued = "queued";
 
-    public static void Register(IServiceCollection services)
-    {
-        services.AddSingleton<IWidgetsListHandler, ListWidgets>();
-        services.AddSingleton<IWidgetsCreateHandler, CreateWidget>();
-        services.AddSingleton<IWidgetsUpdateHandler, UpdateWidget>();
-        services.AddSingleton<IWidgetsDeleteHandler, DeleteWidget>();
-        services.AddSingleton<IShapesGetHandler, GetShape>();
-        services.AddSingleton<IShapesAreaHandler, ShapeArea>();
-        services.AddSingleton<IWidgetEventsStreamHandler, StreamWidgetEvents>();
-        services.AddSingleton<ITagsEchoHandler, EchoTags>();
-        services.AddSingleton<IFilesGetHandler, GetFile>();
-        services.AddSingleton<IFilesHeadHandler, HeadFile>();
-        services.AddSingleton<INoticesGetHandler, GetNotice>();
-        services.AddSingleton<IDeliveriesReceiveHandler, ReceiveDelivery>();
-    }
-
     /// <summary>A file's content: its path, so tests can see what the route bound.</summary>
     public static byte[] FileContent(string path) => System.Text.Encoding.UTF8.GetBytes($"content of {path}");
 
@@ -58,7 +42,7 @@ public static class FixtureHandlers
     };
 
     #region list
-    private sealed class ListWidgets : IWidgetsListHandler
+    internal sealed class ListWidgets : IWidgetsListHandler
     {
         public Task<WidgetsListResponse> HandleAsync(WidgetsListRequest request, CancellationToken cancellationToken)
         {
@@ -85,7 +69,7 @@ public static class FixtureHandlers
     #endregion
 
     #region create
-    private sealed class CreateWidget : IWidgetsCreateHandler
+    internal sealed class CreateWidget : IWidgetsCreateHandler
     {
         public Task<WidgetsCreateResponse> HandleAsync(WidgetsCreateRequest request, CancellationToken cancellationToken)
         {
@@ -119,7 +103,7 @@ public static class FixtureHandlers
     #endregion
 
     #region update
-    private sealed class UpdateWidget : IWidgetsUpdateHandler
+    internal sealed class UpdateWidget : IWidgetsUpdateHandler
     {
         public Task<WidgetsUpdateResponse> HandleAsync(WidgetsUpdateRequest request, CancellationToken cancellationToken)
         {
@@ -161,7 +145,7 @@ public static class FixtureHandlers
     #endregion
 
     #region delete
-    private sealed class DeleteWidget : IWidgetsDeleteHandler
+    internal sealed class DeleteWidget : IWidgetsDeleteHandler
     {
         public Task<WidgetsDeleteResponse> HandleAsync(WidgetsDeleteRequest request, CancellationToken cancellationToken) =>
             Task.FromResult<WidgetsDeleteResponse>(request.Id == Missing
@@ -177,7 +161,7 @@ public static class FixtureHandlers
     /// (id 2). <c>type</c> keeps only the named events (an unknown name is a 400 before streaming);
     /// <c>Last-Event-ID</c> skips ids up to it.
     /// </summary>
-    private sealed class StreamWidgetEvents : IWidgetEventsStreamHandler
+    internal sealed class StreamWidgetEvents : IWidgetEventsStreamHandler
     {
         public static readonly Guid WidgetId = Guid.Parse("0b6f7f0e-4a52-4d0e-9d7a-5b1f0f6c2a11");
 
@@ -207,7 +191,7 @@ public static class FixtureHandlers
     #endregion
 
     #region parameters
-    private sealed class EchoTags : ITagsEchoHandler
+    internal sealed class EchoTags : ITagsEchoHandler
     {
         public Task<TagsEchoResponse> HandleAsync(TagsEchoRequest request, CancellationToken cancellationToken) =>
             Task.FromResult<TagsEchoResponse>(new TagsEchoResponse.Ok(request.Names));
@@ -217,7 +201,7 @@ public static class FixtureHandlers
 
     #region files
     /// <summary>Streams <see cref="FileContent"/> from a non-seekable stream, so nothing sets the length but the handler.</summary>
-    private sealed class GetFile : IFilesGetHandler
+    internal sealed class GetFile : IFilesGetHandler
     {
         public Task<FilesGetResponse> HandleAsync(FilesGetRequest request, CancellationToken cancellationToken)
         {
@@ -235,7 +219,7 @@ public static class FixtureHandlers
         }
     }
 
-    private sealed class HeadFile : IFilesHeadHandler
+    internal sealed class HeadFile : IFilesHeadHandler
     {
         public Task<FilesHeadResponse> HandleAsync(FilesHeadRequest request, CancellationToken cancellationToken) =>
             Task.FromResult<FilesHeadResponse>(request.Path.EndsWith(Missing, StringComparison.Ordinal)
@@ -250,7 +234,7 @@ public static class FixtureHandlers
     #endregion
 
     #region text
-    private sealed class GetNotice : INoticesGetHandler
+    internal sealed class GetNotice : INoticesGetHandler
     {
         public Task<NoticesGetResponse> HandleAsync(NoticesGetRequest request, CancellationToken cancellationToken) =>
             Task.FromResult<NoticesGetResponse>(request.Busy == true
@@ -261,7 +245,7 @@ public static class FixtureHandlers
 
     #region raw-body
     /// <summary>Reads the raw body up to <see cref="MaxDeliveryBytes"/> and answers its SHA-256.</summary>
-    private sealed class ReceiveDelivery : IDeliveriesReceiveHandler
+    internal sealed class ReceiveDelivery : IDeliveriesReceiveHandler
     {
         public async Task<DeliveriesReceiveResponse> HandleAsync(DeliveriesReceiveRequest request, CancellationToken cancellationToken)
         {
@@ -290,7 +274,7 @@ public static class FixtureHandlers
 
     #region shapes
     /// <summary>A union in the request: the handler switches on the variant records.</summary>
-    private sealed class ShapeArea : IShapesAreaHandler
+    internal sealed class ShapeArea : IShapesAreaHandler
     {
         public Task<ShapesAreaResponse> HandleAsync(ShapesAreaRequest request, CancellationToken cancellationToken)
         {
@@ -305,7 +289,7 @@ public static class FixtureHandlers
     }
 
     /// <summary>A union in the response: the stored data decides the variant; it converts implicitly to <c>Ok</c>.</summary>
-    private sealed class GetShape : IShapesGetHandler
+    internal sealed class GetShape : IShapesGetHandler
     {
         private static readonly Dictionary<string, Shape> Shapes = new()
         {

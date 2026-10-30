@@ -218,7 +218,7 @@ DeliveriesReceive = app.MapPost("/api/deliveries", async (
 
 ```csharp
 /// <summary>Streams <see cref="FileContent"/> from a non-seekable stream, so nothing sets the length but the handler.</summary>
-private sealed class GetFile : IFilesGetHandler
+internal sealed class GetFile : IFilesGetHandler
 {
     public Task<FilesGetResponse> HandleAsync(FilesGetRequest request, CancellationToken cancellationToken)
     {
@@ -236,7 +236,7 @@ private sealed class GetFile : IFilesGetHandler
     }
 }
 
-private sealed class HeadFile : IFilesHeadHandler
+internal sealed class HeadFile : IFilesHeadHandler
 {
     public Task<FilesHeadResponse> HandleAsync(FilesHeadRequest request, CancellationToken cancellationToken) =>
         Task.FromResult<FilesHeadResponse>(request.Path.EndsWith(Missing, StringComparison.Ordinal)
@@ -251,7 +251,7 @@ private sealed class ForwardOnlyStream(byte[] content) : MemoryStream(content)
 ```
 
 ```csharp
-private sealed class GetNotice : INoticesGetHandler
+internal sealed class GetNotice : INoticesGetHandler
 {
     public Task<NoticesGetResponse> HandleAsync(NoticesGetRequest request, CancellationToken cancellationToken) =>
         Task.FromResult<NoticesGetResponse>(request.Busy == true
@@ -262,7 +262,7 @@ private sealed class GetNotice : INoticesGetHandler
 
 ```csharp
 /// <summary>Reads the raw body up to <see cref="MaxDeliveryBytes"/> and answers its SHA-256.</summary>
-private sealed class ReceiveDelivery : IDeliveriesReceiveHandler
+internal sealed class ReceiveDelivery : IDeliveriesReceiveHandler
 {
     public async Task<DeliveriesReceiveResponse> HandleAsync(DeliveriesReceiveRequest request, CancellationToken cancellationToken)
     {

@@ -47,11 +47,7 @@ public class GeneratedSurfaceTests(FixtureApp fixture)
     [Test]
     public async Task UseFixtureApi_WithAMissingHandler_Throws()
     {
-        var build = () => FixtureApp.Build(services =>
-        {
-            FixtureHandlers.Register(services);
-            services.RemoveAll<IShapesGetHandler>();
-        });
+        var build = () => FixtureApp.Build(services => services.RemoveAll<IShapesGetHandler>());
 
         await Assert.That(build).Throws<InvalidOperationException>().WithMessageContaining(nameof(IShapesGetHandler));
     }

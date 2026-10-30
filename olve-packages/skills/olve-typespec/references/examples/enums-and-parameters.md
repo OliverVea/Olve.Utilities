@@ -85,7 +85,7 @@ internal static class FixtureParameters
 ## Hand-written handlers
 
 ```csharp
-private sealed class ListWidgets : IWidgetsListHandler
+internal sealed class ListWidgets : IWidgetsListHandler
 {
     public Task<WidgetsListResponse> HandleAsync(WidgetsListRequest request, CancellationToken cancellationToken)
     {
@@ -111,7 +111,7 @@ private sealed class ListWidgets : IWidgetsListHandler
 ```
 
 ```csharp
-private sealed class EchoTags : ITagsEchoHandler
+internal sealed class EchoTags : ITagsEchoHandler
 {
     public Task<TagsEchoResponse> HandleAsync(TagsEchoRequest request, CancellationToken cancellationToken) =>
         Task.FromResult<TagsEchoResponse>(new TagsEchoResponse.Ok(request.Names));

@@ -36,7 +36,7 @@ options:
       ErrorEnvelope: "MyService.Api.ErrorEnvelope"
 ```
 
-Generated files belong in a gitignored folder the service's project compiles; an MSBuild target can run `tsp compile` before the build (`Inputs` the `.tsp` files, `Outputs` the `.g.cs`).
+Generated files belong in a gitignored folder the service's project compiles; `Olve.TypeSpec`'s MSBuild targets run `tsp compile` before the build (`<TypeSpecContract Include="spec/main.tsp" GeneratedDir="…" />`, see its README).
 
 ## What the contract gives you
 

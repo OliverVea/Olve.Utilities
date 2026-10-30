@@ -5,7 +5,7 @@ namespace Olve.TypeSpec.Conformance;
 
 /// <summary>
 /// The widgets fixture's generated API, wired exactly as a service wires its own
-/// (<c>AddFixtureApi</c> + handler registrations + <c>UseFixtureApi</c>) and hosted on a
+/// (<c>AddFixtureApi</c> + <c>AddOperationHandlers</c> + <c>UseFixtureApi</c>) and hosted on a
 /// <see cref="TestServer"/>. Shared by the tests; the handlers are stateless.
 /// </summary>
 public sealed class FixtureApp : IAsyncInitializer, IAsyncDisposable
@@ -20,7 +20,7 @@ public sealed class FixtureApp : IAsyncInitializer, IAsyncDisposable
 
     public async Task InitializeAsync()
     {
-        _app = Build(FixtureHandlers.Register);
+        _app = Build();
         await _app.StartAsync();
     }
 
@@ -33,14 +33,14 @@ public sealed class FixtureApp : IAsyncInitializer, IAsyncDisposable
     }
 
     #region wiring
-    /// <summary>Builds (but doesn't start) the fixture app with the given handler registrations.</summary>
-    public static WebApplication Build(Action<IServiceCollection> registerHandlers)
+    /// <summary>Builds (but doesn't start) the fixture app; <paramref name="adjust"/> changes its services first.</summary>
+    public static WebApplication Build(Action<IServiceCollection>? adjust = null)
     {
         var builder = WebApplication.CreateSlimBuilder(new WebApplicationOptions { EnvironmentName = "Testing" });
         builder.WebHost.UseTestServer();
-        builder.Services.AddFixtureApi();
+        builder.Services.AddFixtureApi().AddOperationHandlers();
         builder.Services.AddSingleton<IApiErrorWriter, FixtureErrorWriter>();
-        registerHandlers(builder.Services);
+        adjust?.Invoke(builder.Services);
 
         var app = builder.Build();
         app.UseFixtureApi();
