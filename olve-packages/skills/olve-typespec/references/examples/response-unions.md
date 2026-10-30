@@ -151,6 +151,7 @@ public abstract record WidgetsUpdateResponse : IOperationResponse
 The conformance suite's handlers answer magic ids so its tests can drive every variant; a real handler would look up the id.
 
 ```csharp
+[OperationHandler]
 internal sealed class CreateWidget : IWidgetsCreateHandler
 {
     public Task<WidgetsCreateResponse> HandleAsync(WidgetsCreateRequest request, CancellationToken cancellationToken)
@@ -184,6 +185,7 @@ internal sealed class CreateWidget : IWidgetsCreateHandler
 ```
 
 ```csharp
+[OperationHandler]
 internal sealed class UpdateWidget : IWidgetsUpdateHandler
 {
     public Task<WidgetsUpdateResponse> HandleAsync(WidgetsUpdateRequest request, CancellationToken cancellationToken)
@@ -225,6 +227,7 @@ internal sealed class UpdateWidget : IWidgetsUpdateHandler
 ```
 
 ```csharp
+[OperationHandler]
 internal sealed class DeleteWidget : IWidgetsDeleteHandler
 {
     public Task<WidgetsDeleteResponse> HandleAsync(WidgetsDeleteRequest request, CancellationToken cancellationToken) =>

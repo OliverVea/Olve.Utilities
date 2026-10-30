@@ -6,7 +6,7 @@ namespace Olve.TypeSpec.Generators.Tests;
 
 /// <summary>
 /// Runs <see cref="OperationHandlerGenerator"/> over a C# snippet in memory. Snippets are hermetic: the
-/// prelude declares the handler interface and a minimal <c>IServiceCollection</c>, so the generated
+/// prelude declares the handler interface, the attribute and a minimal <c>IServiceCollection</c>, so the generated
 /// source compiles without the runtime or DI assemblies.
 /// </summary>
 internal static class GeneratorRunner
@@ -22,6 +22,9 @@ internal static class GeneratorRunner
             {
                 Task<TResponse> HandleAsync(TRequest request, CancellationToken cancellationToken);
             }
+
+            [System.AttributeUsage(System.AttributeTargets.Class, Inherited = false)]
+            public sealed class OperationHandlerAttribute : System.Attribute;
         }
 
         namespace Microsoft.Extensions.DependencyInjection
@@ -34,6 +37,10 @@ internal static class GeneratorRunner
             }
         }
 
+        """;
+
+    /// <summary>Two operations, declared the way the emitter declares them.</summary>
+    public const string Api = """
         namespace Api
         {
             public sealed record GetRequest;
