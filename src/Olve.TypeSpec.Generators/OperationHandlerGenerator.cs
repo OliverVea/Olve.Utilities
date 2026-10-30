@@ -12,8 +12,9 @@ namespace Olve.TypeSpec.Generators;
 /// <summary>
 ///     Generates <c>services.AddOperationHandlers()</c>: one transient registration per <c>[OperationHandler]</c>
 ///     class, under each generated per-operation handler interface (an interface deriving directly from
-///     <c>Olve.TypeSpec.IOperationHandler&lt;,&gt;</c>) it implements. Every operation interface declared in the
-///     assembly needs exactly one handler. Emits nothing when the assembly declares no operations and marks no
+///     <c>Olve.TypeSpec.IOperationHandler&lt;,&gt;</c>) it implements. When the assembly calls
+///     <c>AddOperationHandlers</c>, every operation interface it declares needs a handler; an assembly that registers
+///     its handlers itself doesn't call it and relies on the startup check. Emits nothing when the assembly declares no operations and marks no
 ///     handlers, so assemblies that see another's internals (tests) don't get a second, ambiguous copy.
 /// </summary>
 [Generator(LanguageNames.CSharp)]
@@ -45,7 +46,7 @@ public sealed class OperationHandlerGenerator : IIncrementalGenerator
     private static readonly DiagnosticDescriptor MissingHandlerRule = Rule(
         "OTSP005",
         "An operation has no handler",
-        "No [OperationHandler] class implements '{0}'");
+        "No [OperationHandler] class implements '{0}', and AddOperationHandlers registers only those");
 
     private static DiagnosticDescriptor Rule(string id, string title, string message) =>
         new(id, title, message, "Usage", DiagnosticSeverity.Error, isEnabledByDefault: true);
@@ -66,7 +67,21 @@ public sealed class OperationHandlerGenerator : IIncrementalGenerator
             .Where(static operation => operation is not null)
             .Collect();
 
-        context.RegisterSourceOutput(handlers.Combine(operations), static (spc, found) => Emit(spc, found.Left, found.Right!));
+        // By name: the call binds only to this generator's own output, which the semantic model doesn't see.
+        var called = context.SyntaxProvider
+            .CreateSyntaxProvider(
+                static (node, _) => node is InvocationExpressionSyntax
+                {
+                    Expression: MemberAccessExpressionSyntax { Name.Identifier.ValueText: "AddOperationHandlers" }
+                        or IdentifierNameSyntax { Identifier.ValueText: "AddOperationHandlers" },
+                },
+                static (_, _) => true)
+            .Collect()
+            .Select(static (calls, _) => calls.Length > 0);
+
+        context.RegisterSourceOutput(
+            handlers.Combine(operations).Combine(called),
+            static (spc, found) => Emit(spc, found.Left.Left, found.Left.Right!, found.Right));
     }
 
     private static HandlerInfo DescribeHandler(GeneratorAttributeSyntaxContext ctx)
@@ -119,7 +134,7 @@ public sealed class OperationHandlerGenerator : IIncrementalGenerator
         return true;
     }
 
-    private static void Emit(SourceProductionContext spc, ImmutableArray<HandlerInfo> found, ImmutableArray<OperationInfo> operations)
+    private static void Emit(SourceProductionContext spc, ImmutableArray<HandlerInfo> found, ImmutableArray<OperationInfo> operations, bool called)
     {
         // A partial class is found once per marked declaration.
         var handlers = found
@@ -161,7 +176,7 @@ public sealed class OperationHandlerGenerator : IIncrementalGenerator
             }
         }
 
-        foreach (var operation in operations.GroupBy(o => o.Name).Select(g => g.First()))
+        foreach (var operation in called ? operations.GroupBy(o => o.Name).Select(g => g.First()) : Enumerable.Empty<OperationInfo>())
         {
             if (!registrations.ContainsKey(operation.Name))
             {

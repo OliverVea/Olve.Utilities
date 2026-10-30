@@ -192,6 +192,8 @@ public static WebApplication Build(Action<IServiceCollection>? adjust = null)
 }
 ```
 
+The generator's checks are build errors: two handlers for one operation (OTSP001), a private or protected handler (OTSP002), a marked class that implements no operation (OTSP003) or can't be instantiated (OTSP004), and, when the assembly calls `AddOperationHandlers()`, an operation without a marked handler (OTSP005). To register handlers yourself, don't call `AddOperationHandlers()`: register each handler interface with any lifetime, and `Use…Api` still refuses to start while one is missing. To change one handler, mark it as usual and register it again after `AddOperationHandlers()`; the last registration wins.
+
 ### Server-sent events
 
 An operation returning `SSEStream<Events>` of an `@events` union (every variant a JSON model whose `type` literal is its event name) gets a response union whose `Ok` carries `IAsyncEnumerable<ServerSentEvent<Events>>`:

@@ -13,8 +13,15 @@ public class OperationHandlerGeneratorTests
 
     private static readonly string ListThings = List("[OperationHandler] internal sealed class ListThings : IThingsListHandler");
 
-    private static string App(params string[] members) =>
-        GeneratorRunner.Api + "namespace App { using Api; using Olve.TypeSpec; using System.Threading; using System.Threading.Tasks;\n" +
+    private const string Wiring =
+        "public static class Startup { public static void Wire(Microsoft.Extensions.DependencyInjection.IServiceCollection services) => services.AddOperationHandlers(); }\n";
+
+    /// <summary>An app that wires its handlers with <c>AddOperationHandlers</c>.</summary>
+    private static string App(params string[] members) => Manual(Wiring + string.Concat(members));
+
+    /// <summary>An app that doesn't call <c>AddOperationHandlers</c>.</summary>
+    private static string Manual(params string[] members) =>
+        GeneratorRunner.Api + "namespace App { using Api; using Microsoft.Extensions.DependencyInjection; using Olve.TypeSpec; using System.Threading; using System.Threading.Tasks;\n" +
         string.Concat(members) + "}";
 
     private static IEnumerable<string> Ids(IEnumerable<Microsoft.CodeAnalysis.Diagnostic> diagnostics) => diagnostics.Select(d => d.Id);
@@ -55,6 +62,31 @@ public class OperationHandlerGeneratorTests
         await Assert.That(Ids(diagnostics)).IsEquivalentTo(["OTSP005"]);
         await Assert.That(diagnostics[0].GetMessage()).Contains("Api.IThingsGetHandler");
         await Assert.That(generated).DoesNotContain("GetThing");
+    }
+
+    [Test]
+    public async Task OperationWithoutMarkedHandler_IsNotReported_WhenTheAppDoesNotCallAddOperationHandlers()
+    {
+        var (diagnostics, generated, errors) = GeneratorRunner.Run(Manual(
+            Get("public sealed class GetThing : IThingsGetHandler"),
+            List("public sealed class ListThings : IThingsListHandler"),
+            "public static class Startup { public static void Wire(Microsoft.Extensions.DependencyInjection.IServiceCollection services) =>\n" +
+            "    Microsoft.Extensions.DependencyInjection.ServiceCollectionServiceExtensions.AddTransient<IThingsGetHandler, GetThing>(services); }\n"));
+
+        await Assert.That(diagnostics).IsEmpty();
+        await Assert.That(errors).IsEmpty();
+        await Assert.That(generated).IsNull();
+    }
+
+    [Test]
+    public async Task MarkedHandlers_AreGenerated_WhenTheAppDoesNotCallAddOperationHandlers()
+    {
+        var (diagnostics, generated, _) = GeneratorRunner.Run(Manual(
+            Get("public sealed class GetThing : IThingsGetHandler"),
+            ListThings));
+
+        await Assert.That(diagnostics).IsEmpty();
+        await Assert.That(generated).Contains("global::App.ListThings");
     }
 
     [Test]
