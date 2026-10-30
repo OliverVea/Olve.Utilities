@@ -1,3 +1,12 @@
+## v0.61.0 (2026-10-30)
+
+### Feat
+
+- **typespec**: OTSP005 only when the app calls AddOperationHandlers
+- **typespec**: AddOperationHandlers registers [OperationHandler] classes
+- **typespec**: AddOperationHandlers also finds record class handlers
+- **typespec**: TypeSpecContract MSBuild targets and the AddOperationHandlers source generator
+
 ## v0.60.0 (2026-10-28)
 
 ### Feat
