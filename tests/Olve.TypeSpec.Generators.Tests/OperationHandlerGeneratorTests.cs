@@ -37,6 +37,21 @@ public class OperationHandlerGeneratorTests
     }
 
     [Test]
+    public async Task RecordHandler_IsRegistered_RecordStructIsNot()
+    {
+        var (diagnostics, generated, errors) = GeneratorRunner.Run(
+            "namespace App { using Api; using System.Threading; using System.Threading.Tasks;\n" +
+            Handler("public sealed record GetThing : IThingsGetHandler", "GetRequest", "GetResponse") +
+            Handler("public record struct ListThings : IThingsListHandler", "ListRequest", "ListResponse") +
+            "}");
+
+        await Assert.That(diagnostics).IsEmpty();
+        await Assert.That(errors).IsEmpty();
+        await Assert.That(generated).Contains("global::App.GetThing");
+        await Assert.That(generated).DoesNotContain("ListThings");
+    }
+
+    [Test]
     public async Task AbstractAndGenericClasses_AreNotHandlers()
     {
         var (diagnostics, generated, _) = GeneratorRunner.Run(

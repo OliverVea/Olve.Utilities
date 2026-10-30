@@ -40,7 +40,7 @@ public sealed class OperationHandlerGenerator : IIncrementalGenerator
     {
         var handlers = context.SyntaxProvider
             .CreateSyntaxProvider(
-                static (node, _) => node is ClassDeclarationSyntax { BaseList: not null },
+                static (node, _) => node is ClassDeclarationSyntax { BaseList: not null } or RecordDeclarationSyntax { BaseList: not null },
                 static (ctx, ct) => Describe(ctx, ct))
             .Where(static handler => handler is not null)
             .Collect();
@@ -50,7 +50,7 @@ public sealed class OperationHandlerGenerator : IIncrementalGenerator
 
     private static HandlerInfo? Describe(GeneratorSyntaxContext ctx, CancellationToken ct)
     {
-        if (ctx.SemanticModel.GetDeclaredSymbol(ctx.Node, ct) is not INamedTypeSymbol type
+        if (ctx.SemanticModel.GetDeclaredSymbol(ctx.Node, ct) is not INamedTypeSymbol { TypeKind: TypeKind.Class } type
             || type.IsAbstract || type.IsStatic || type.IsGenericType)
         {
             return null;
@@ -66,7 +66,7 @@ public sealed class OperationHandlerGenerator : IIncrementalGenerator
             return null;
         }
 
-        var location = ctx.Node is ClassDeclarationSyntax declaration ? declaration.Identifier.GetLocation() : ctx.Node.GetLocation();
+        var location = ((TypeDeclarationSyntax)ctx.Node).Identifier.GetLocation();
         return new HandlerInfo(
             type.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat),
             type.ToDisplayString(),
