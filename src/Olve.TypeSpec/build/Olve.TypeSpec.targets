@@ -1,0 +1,61 @@
+<Project>
+
+  <!--
+    Compiles the project's TypeSpec contract before the C# compile and compiles the C# it emits:
+
+      <TypeSpecContract Include="../spec/main.tsp" GeneratedDir="../artifacts/generated/" />
+
+    GeneratedDir is where tspconfig.yaml sends @olivervea/typespec-csharp's output (emitter-output-dir).
+    The compile runs `tsp compile` in the contract's folder when a .tsp, tspconfig.yaml, package.json or
+    lockfile changed, installing its packages first if node_modules is missing: with bun when the folder
+    has a bun.lock, otherwise npm. Override with TypeSpecInstallCommand / TypeSpecCompileCommand.
+    -p:SkipSpecGen=true compiles already-emitted files without node (a Docker stage, a split CI step).
+  -->
+
+  <Target Name="_TypeSpecResolve" Condition="'@(TypeSpecContract)' != ''">
+    <Error Condition="@(TypeSpecContract->Count()) &gt; 1" Text="Only one TypeSpecContract per project: @(TypeSpecContract)." />
+    <Error Condition="'%(TypeSpecContract.GeneratedDir)' == ''" Text="TypeSpecContract '@(TypeSpecContract)' needs GeneratedDir: the emitter-output-dir of @olivervea/typespec-csharp in its tspconfig.yaml." />
+    <PropertyGroup>
+      <_TypeSpecContractFile>@(TypeSpecContract->'%(FullPath)')</_TypeSpecContractFile>
+      <_TypeSpecContractDir>@(TypeSpecContract->'%(RootDir)%(Directory)')</_TypeSpecContractDir>
+      <_TypeSpecGeneratedDir>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', '%(TypeSpecContract.GeneratedDir)'))</_TypeSpecGeneratedDir>
+      <_TypeSpecStamp>$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(BaseIntermediateOutputPath)', 'typespec.stamp'))</_TypeSpecStamp>
+      <_TypeSpecUsesBun Condition="Exists('$(_TypeSpecContractDir)bun.lock')">true</_TypeSpecUsesBun>
+      <TypeSpecInstallCommand Condition="'$(TypeSpecInstallCommand)' == '' And '$(_TypeSpecUsesBun)' == 'true'">bun install --frozen-lockfile</TypeSpecInstallCommand>
+      <TypeSpecInstallCommand Condition="'$(TypeSpecInstallCommand)' == ''">npm ci --no-audit --no-fund</TypeSpecInstallCommand>
+      <TypeSpecCompileCommand Condition="'$(TypeSpecCompileCommand)' == '' And '$(_TypeSpecUsesBun)' == 'true'">bunx tsp compile "$(_TypeSpecContractFile)"</TypeSpecCompileCommand>
+      <TypeSpecCompileCommand Condition="'$(TypeSpecCompileCommand)' == ''">npx --no-install tsp compile "$(_TypeSpecContractFile)"</TypeSpecCompileCommand>    </PropertyGroup>
+    <ItemGroup>
+      <_TypeSpecInput Include="$(_TypeSpecContractDir)**/*.tsp;$(_TypeSpecContractDir)tspconfig.yaml;$(_TypeSpecContractDir)package.json;$(_TypeSpecContractDir)bun.lock;$(_TypeSpecContractDir)package-lock.json"
+                      Exclude="$(_TypeSpecContractDir)node_modules/**" />
+      <!-- A missing input would make the compile run on every build. -->
+      <_TypeSpecInput Remove="@(_TypeSpecInput)" Condition="!Exists('%(FullPath)')" />
+      <_TypeSpecExisting Include="$(_TypeSpecGeneratedDir)*.g.cs" />
+    </ItemGroup>
+    <!-- Emitted files gone (a clean of the generated folder) but the stamp kept: compile again. -->
+    <Delete Condition="'@(_TypeSpecExisting)' == ''" Files="$(_TypeSpecStamp)" />
+  </Target>
+
+  <Target Name="TypeSpecInstall" DependsOnTargets="_TypeSpecResolve"
+          Condition="'@(TypeSpecContract)' != '' And '$(SkipSpecGen)' != 'true' And '$(DesignTimeBuild)' != 'true'">
+    <Exec Condition="!Exists('$(_TypeSpecContractDir)node_modules')" Command="$(TypeSpecInstallCommand)" WorkingDirectory="$(_TypeSpecContractDir)" />
+  </Target>
+
+  <Target Name="TypeSpecCompile" BeforeTargets="CoreCompile" DependsOnTargets="TypeSpecInstall"
+          Condition="'@(TypeSpecContract)' != '' And '$(SkipSpecGen)' != 'true' And '$(DesignTimeBuild)' != 'true'"
+          Inputs="@(_TypeSpecInput)" Outputs="$(_TypeSpecStamp)">
+    <Exec Command="$(TypeSpecCompileCommand)" WorkingDirectory="$(_TypeSpecContractDir)" />
+    <Touch Files="$(_TypeSpecStamp)" AlwaysCreate="true" />
+  </Target>
+
+  <Target Name="TypeSpecIncludeGenerated" BeforeTargets="CoreCompile" AfterTargets="TypeSpecCompile" DependsOnTargets="_TypeSpecResolve"
+          Condition="'@(TypeSpecContract)' != ''">
+    <ItemGroup>
+      <_TypeSpecEmitted Include="$(_TypeSpecGeneratedDir)*.g.cs" />
+      <Compile Remove="@(_TypeSpecEmitted)" />
+      <Compile Include="@(_TypeSpecEmitted)" />
+    </ItemGroup>
+    <Error Condition="'@(_TypeSpecEmitted)' == '' And '$(DesignTimeBuild)' != 'true'" Text="No generated C# in $(_TypeSpecGeneratedDir): it must match the emitter-output-dir in tspconfig.yaml (with -p:SkipSpecGen=true, compile the contract first)." />
+  </Target>
+
+</Project>

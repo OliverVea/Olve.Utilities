@@ -141,7 +141,7 @@ WidgetEventsStream = app.MapGet("/api/widget-events", async (
 /// (id 2). <c>type</c> keeps only the named events (an unknown name is a 400 before streaming);
 /// <c>Last-Event-ID</c> skips ids up to it.
 /// </summary>
-private sealed class StreamWidgetEvents : IWidgetEventsStreamHandler
+internal sealed class StreamWidgetEvents : IWidgetEventsStreamHandler
 {
     public static readonly Guid WidgetId = Guid.Parse("0b6f7f0e-4a52-4d0e-9d7a-5b1f0f6c2a11");
 

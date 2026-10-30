@@ -18,7 +18,30 @@
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="\"/>
+    <!-- build/, not buildTransitive/: only the project that owns the contract compiles it. -->
+    <None Include="build/Olve.TypeSpec.targets" Pack="true" PackagePath="build/"/>
   </ItemGroup>
+
+  <!-- The generator behind AddOperationHandlers, packed for consumers. -->
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_PackOperationHandlerGenerator</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <Target Name="_PackOperationHandlerGenerator">
+    <!-- RemoveProperties: the ambient net10.0 must not reach the netstandard2.0 build (NETSDK1005),
+         nor `dotnet pack`'s NoBuild=true (NETSDK1085). -->
+    <MSBuild Projects="..\Olve.TypeSpec.Generators\Olve.TypeSpec.Generators.csproj"
+             Targets="Build"
+             Properties="Configuration=$(Configuration)"
+             RemoveProperties="TargetFramework;NoBuild">
+      <Output TaskParameter="TargetOutputs" ItemName="_OperationHandlerGeneratorOutput" />
+    </MSBuild>
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="@(_OperationHandlerGeneratorOutput)"
+                              Condition="'%(Extension)' == '.dll'"
+                              PackagePath="analyzers/dotnet/cs" />
+    </ItemGroup>
+  </Target>
 
   <ItemGroup>
     <ProjectReference Include="..\Olve.Results\Olve.Results.csproj" />
