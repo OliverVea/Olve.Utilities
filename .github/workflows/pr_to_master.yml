@@ -73,6 +73,21 @@ jobs:
       - run: npm run check
         working-directory: src/typespec-csharp
 
+  aot-smoke:
+    name: Native AOT smoke test (Olve.TypeSpec)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: dotnet publish tests/Olve.TypeSpec.AotSmoke -c Release -r linux-x64 -o artifacts/aot-smoke/publish
+      - run: artifacts/aot-smoke/publish/Olve.TypeSpec.AotSmoke
+
   verify-docs:
     name: Verify code snippets
     runs-on: ubuntu-latest

@@ -56,9 +56,10 @@ Unsupported shapes are reported as `@olivervea/typespec-csharp/unsupported-type`
 
 ## Conformance
 
-The emitter is proven once, in this repository: `test/emitter.test.js` snapshots the output of `test/fixtures/widgets.tsp`, and `tests/Olve.TypeSpec.Conformance` (.NET) compiles that output with the runtime, hosts it with trivial handlers and checks every operation and response over HTTP against the fixture's OpenAPI document. Services built on it test only their own behaviour.
+The emitter is proven once, in this repository: `test/emitter.test.js` snapshots the output of `test/fixtures/widgets.tsp`, and `tests/Olve.TypeSpec.Conformance` (.NET) compiles that output with the runtime, hosts it with trivial handlers and checks every operation and response over HTTP against the fixture's OpenAPI document; `tests/Olve.TypeSpec.AotSmoke` publishes the same app with Native AOT and checks a few requests against the binary. Services built on it test only their own behaviour.
 
 ```bash
 npm test                                   # snapshots; UPDATE_SNAPSHOTS=1 npm test to accept new output
 dotnet test --project tests/Olve.TypeSpec.Conformance   # from the repo root
+dotnet publish tests/Olve.TypeSpec.AotSmoke -c Release -r linux-x64 -o artifacts/aot-smoke/publish && artifacts/aot-smoke/publish/Olve.TypeSpec.AotSmoke
 ```

@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!--
+    The conformance fixture's generated API and handlers, published with Native AOT and run on Kestrel:
+    a reflection regression in the Olve.TypeSpec runtime or the emitted code fails here, not in a service.
+    CI: dotnet publish -c Release -r linux-x64, then run the binary (exit code 0 = every request answered as expected).
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsPackable>false</IsPackable>
+    <UserSecretsId></UserSecretsId>
+    <RootNamespace>Olve.TypeSpec.AotSmoke</RootNamespace>
+    <PublishAot>true</PublishAot>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../'))</RepoRoot>
+    <EmitterDir>$(RepoRoot)src/typespec-csharp/</EmitterDir>
+    <ConformanceDir>$(RepoRoot)tests/Olve.TypeSpec.Conformance/</ConformanceDir>
+    <!-- Its own copy, so a solution build never writes the conformance project's files concurrently. -->
+    <FixtureOutDir>$(RepoRoot)artifacts/aot-smoke/</FixtureOutDir>
+    <FixtureGeneratedDir>$(FixtureOutDir)generated/</FixtureGeneratedDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Include="Fixture.Api" />
+    <Compile Include="$(ConformanceDir)FixtureHandlers.cs;$(ConformanceDir)FixtureErrors.cs" Link="Fixture/%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FixtureInput Include="$(EmitterDir)src/**/*.js;$(EmitterDir)package.json;$(EmitterDir)test/fixtures/widgets.tsp;$(ConformanceDir)emit-fixture.js" />
+    <FixtureOutput Include="$(FixtureGeneratedDir)FixtureApi.g.cs;$(FixtureGeneratedDir)FixtureModels.g.cs;$(FixtureGeneratedDir)FixtureJsonContext.g.cs" />
+  </ItemGroup>
+
+  <Target Name="InstallEmitter" BeforeTargets="EmitFixture" Condition="!Exists('$(EmitterDir)node_modules')">
+    <Exec Command="npm ci --no-audit --no-fund" WorkingDirectory="$(EmitterDir)" />
+  </Target>
+
+  <Target Name="EmitFixture" BeforeTargets="BeforeBuild" Inputs="@(FixtureInput)" Outputs="@(FixtureOutput)">
+    <Exec Command="node &quot;$(ConformanceDir)emit-fixture.js&quot; &quot;$(FixtureOutDir)&quot;" WorkingDirectory="$(ConformanceDir)" />
+    <Touch Files="@(FixtureOutput)" />
+  </Target>
+
+  <Target Name="IncludeFixture" AfterTargets="EmitFixture" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <Compile Remove="$(FixtureGeneratedDir)*.g.cs" />
+      <Compile Include="$(FixtureGeneratedDir)*.g.cs" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Olve.TypeSpec\Olve.TypeSpec.csproj" />
+    <ProjectReference Include="..\..\src\Olve.TypeSpec.Generators\Olve.TypeSpec.Generators.csproj"
+                      PrivateAssets="all"
+                      ReferenceOutputAssembly="false"
+                      OutputItemType="Analyzer" />
+  </ItemGroup>
+
+</Project>
