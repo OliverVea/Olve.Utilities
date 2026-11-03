@@ -156,6 +156,7 @@ jobs:
           - id: Olve.OpenRaster
           - id: Olve.TinyEXR
           - id: Olve.TypeSpec
+          - id: Olve.Fuzzy
 
     steps:
       - uses: actions/checkout@v6
