@@ -30,6 +30,7 @@
     <Project Path="benchmarks/Olve.Utilities.Benchmarks/Olve.Utilities.Benchmarks.csproj" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/Olve.Fuzzy/Olve.Fuzzy.csproj" />
     <Project Path="src/Olve.Logging/Olve.Logging.csproj" />
     <Project Path="src/Olve.MinimalApi/Olve.MinimalApi.csproj" />
     <Project Path="src/Olve.OpenRaster/Olve.OpenRaster.csproj" />
@@ -46,6 +47,7 @@
     <Project Path="src/Olve.Validation/Olve.Validation.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Olve.Fuzzy.Tests/Olve.Fuzzy.Tests.csproj" />
     <Project Path="tests/Olve.MinimalApi.Tests/Olve.MinimalApi.Tests.csproj" />
     <Project Path="tests/Olve.Operations.Tests/Olve.Operations.Tests.csproj" />
     <Project Path="tests/Olve.Paths.Tests/Olve.Paths.Tests.csproj" />

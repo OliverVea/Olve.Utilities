@@ -1,4 +1,10 @@
 items:
+- name: Olve.Fuzzy
+  items:
+    - name: Overview
+      href: ../src/Olve.Fuzzy/README.md
+    - name: API
+      href: api/Olve.Fuzzy.yml
 - name: Olve.MinimalApi
   items:
     - name: Overview
