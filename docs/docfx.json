@@ -63,6 +63,12 @@
           "files": [
             "**/Olve.TypeSpec.csproj"
           ]
+        },
+        {
+          "src": "../src/Olve.Fuzzy",
+          "files": [
+            "**/Olve.Fuzzy.csproj"
+          ]
         }
       ],
       "dest": "api"

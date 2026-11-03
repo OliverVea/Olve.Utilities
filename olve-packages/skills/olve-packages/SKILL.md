@@ -26,6 +26,7 @@ API docs: https://olivervea.github.io/Olve.Utilities/
 | **Olve.TypeSpec** | Runtime for the `@olivervea/typespec-csharp` emitter: spec-first minimal APIs from a TypeSpec contract (see `olve-typespec`) |
 | **Olve.OpenRaster** | Read-only access to OpenRaster (.ora) layered image files |
 | **Olve.TinyEXR** | P/Invoke bindings for tinyexr OpenEXR library |
+| **Olve.Fuzzy** | Fuzzy logic with a fluent rule syntax: member functions, rules, centroid defuzzification (formerly FluentFuzzy) |
 
 ## Dependency Graph
 
@@ -52,6 +53,8 @@ Olve.OpenRaster
 └── Olve.Results
 
 Olve.TinyEXR (standalone, native interop)
+
+Olve.Fuzzy (standalone)
 ```
 
 ## Installation
