@@ -1,3 +1,9 @@
+## v0.62.0 (2026-11-05)
+
+### Feat
+
+- **typespec**: @id types uuid scalars as Id<T>
+
 ## v0.61.0 (2026-10-30)
 
 ### Feat
