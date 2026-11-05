@@ -129,6 +129,7 @@ test("unsupported shapes are reported, not silently mistyped", async () => {
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'session': cookie parameter 'sid' is not supported.",
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'stamped': response header 'Last-Modified' must be a string, an integer or a string literal.",
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'tags': array parameter 'tag' must be a string list in the query with explode: false.",
+    "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'things': array parameter 'id' must be a string list in the query with explode: false.",
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'ticks': event 'tick' of 'Ticks' must be a model with `type: \"tick\"`.",
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'upload': multipart bodies are not supported.",
     "warning @olivervea/typespec-csharp/unsupported-operation: Operation 'xml': a application/xml response must be JSON, text/* string or bytes.",
