@@ -5,6 +5,7 @@ import "@typespec/http";
 import "@typespec/streams";
 import "@typespec/events";
 import "@typespec/sse";
+import "@olivervea/typespec-csharp";
 
 using Http;
 using SSE;
@@ -23,6 +24,15 @@ model A {
 @route("/tags") @get op tags(@query(#{ explode: true }) tag?: string[]): A;
 
 @route("/ids") @get op ids(@query(#{ explode: false }) id?: int32[]): A;
+
+// A list of typed ids (`@id`): explode:false lists are strings only.
+model Thing {}
+
+@format("uuid")
+@Olve.CSharp.id(Thing)
+scalar ThingId extends string;
+
+@route("/things") @get op things(@query(#{ explode: false }) id?: ThingId[]): A;
 
 // An SSE event whose `type` disagrees with its event name.
 model Tick {
