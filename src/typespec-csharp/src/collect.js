@@ -4,7 +4,6 @@
 import {
   getDiscriminatedUnion,
   getDoc,
-  getFormat,
   getMaxItems,
   getMaxLength,
   getMaxValue,
@@ -26,6 +25,7 @@ import {
 } from "@typespec/http";
 import { getContentType, isEvents } from "@typespec/events";
 import { getStreamOf } from "@typespec/streams";
+import { getIdTag, isUuid } from "./decorators.js";
 import { reportDiagnostic } from "./lib.js";
 import { camel, ordinal, pascal } from "./names.js";
 
@@ -76,6 +76,9 @@ const VALUE_TYPES = new Set([
   "System.Text.Json.JsonElement",
 ]);
 const JSON_ELEMENT = "System.Text.Json.JsonElement";
+// `@id` scalars: Olve.Utilities' typed id, a struct.
+const TYPED_ID = "Olve.Utilities.Ids.Id<";
+const isValueType = (t) => VALUE_TYPES.has(t) || t.startsWith(TYPED_ID);
 const STREAM = "System.IO.Stream";
 const EVENT_STREAM = "text/event-stream";
 const isJsonContentType = (ct) => ct === "application/json" || /^application\/[^;]*\+json$/.test(ct);
@@ -199,9 +202,12 @@ export function collect(program, options = {}) {
   // ---- types -------------------------------------------------------------------------------
 
   function scalarType(type, prop) {
-    const format = (prop && getFormat(program, prop)) ?? getFormat(program, type);
+    if (isUuid(program, type, prop)) {
+      const tag = getIdTag(program, type, prop);
+      // T is the tagged model's C# type (registering it, so Id<T> always compiles), or the app's own.
+      return tag ? `${TYPED_ID}${tag.csharp ?? modelType(tag.of, READ, tag.of.name)}>` : "Guid";
+    }
     for (let s = type; s; s = s.baseScalar) {
-      if (s.name === "string" && (format === "uuid" || getFormat(program, s) === "uuid")) return "Guid";
       if (s.namespace?.name === "TypeSpec" && SCALARS[s.name]) return SCALARS[s.name];
     }
     warnType(type, `scalar '${type.name}'`);
@@ -494,7 +500,7 @@ export function collect(program, options = {}) {
   for (const typeName of bodyTypes) {
     const model = models.get(typeName);
     if (!model) continue;
-    const rules = model.props.flatMap((p) => rulesFor(p, (t) => VALUE_TYPES.has(t) || enums.has(t)));
+    const rules = model.props.flatMap((p) => rulesFor(p, (t) => isValueType(t) || enums.has(t)));
     if (rules.length) validators.push({ name: `${typeName}Validator`, model: typeName, rules });
   }
   for (const o of operations)
@@ -525,7 +531,7 @@ export function collect(program, options = {}) {
     validators,
     jsonTypes: [...jsonTypes]
       .map((t) => t.replace(/\?$/, ""))
-      .filter((t) => !VALUE_TYPES.has(t))
+      .filter((t) => !isValueType(t))
       .sort(ordinal),
   };
 }

@@ -22,5 +22,6 @@ namespace Fixture.Api;
 [JsonSerializable(typeof(Widget))]
 [JsonSerializable(typeof(WidgetCreate))]
 [JsonSerializable(typeof(WidgetEvent))]
+[JsonSerializable(typeof(WidgetLink))]
 [JsonSerializable(typeof(WidgetWritable))]
 public partial class FixtureJsonContext : JsonSerializerContext;

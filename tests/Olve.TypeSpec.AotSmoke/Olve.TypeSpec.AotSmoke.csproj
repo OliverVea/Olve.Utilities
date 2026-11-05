@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <FixtureInput Include="$(EmitterDir)src/**/*.js;$(EmitterDir)package.json;$(EmitterDir)test/fixtures/widgets.tsp;$(ConformanceDir)emit-fixture.js" />
+    <FixtureInput Include="$(EmitterDir)src/**/*.js;$(EmitterDir)lib/**/*.tsp;$(EmitterDir)package.json;$(EmitterDir)test/fixtures/widgets.tsp;$(ConformanceDir)emit-fixture.js" />
     <FixtureOutput Include="$(FixtureGeneratedDir)FixtureApi.g.cs;$(FixtureGeneratedDir)FixtureModels.g.cs;$(FixtureGeneratedDir)FixtureJsonContext.g.cs" />
   </ItemGroup>
 
@@ -51,6 +51,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Olve.TypeSpec\Olve.TypeSpec.csproj" />
+    <!-- Id<T>: the fixture's @id scalars. -->
+    <ProjectReference Include="..\..\src\Olve.Utilities\Olve.Utilities.csproj" />
     <ProjectReference Include="..\..\src\Olve.TypeSpec.Generators\Olve.TypeSpec.Generators.csproj"
                       PrivateAssets="all"
                       ReferenceOutputAssembly="false"

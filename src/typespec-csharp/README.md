@@ -50,9 +50,31 @@ Generated files belong in a gitignored folder the service's project compiles; `O
 - **Response headers.** Each `@header` of a response is a member of its variant (optional ones last, null = not sent); string literal headers are constants. `@head` operations answer headers only.
 - **Catch-all paths.** `@route("{+path}")` as the last segment maps to `{**path}`. OpenAPI can't express reserved expansion (suppress `@typespec/openapi3/path-reserved-expansion`), so generated clients send `a%2Fb`; the binding accepts it as `a/b` and refuses a `.` or `..` segment (a binding failure).
 - **Raw request bodies.** A `bytes` body with a non-JSON content type (`@header contentType: "*/*"` for any) is the request stream, unread, so a webhook signature over the exact bytes verifies. The handler reads it with its own size limit.
+- **Typed ids (opt-in).** A uuid is `Guid` unless tagged. `@id(Model)` on a uuid-format string scalar makes every property and path/query parameter of that scalar Olve.Utilities' `Id<T>` (nullable and arrays included); `T` is the model's generated record, or the C# type given as the second argument. See [Typed ids](#typed-ids).
 - **Validation.** Constraints on a request body become a validator that runs before the handler; failures and binding failures are answered by the app's `IApiErrorWriter`, in the contract's terms (the matched operation's declared statuses are at hand).
 
 Unsupported shapes are reported as `@olivervea/typespec-csharp/unsupported-type` or `unsupported-operation` warnings and emitted as `JsonElement` or skipped, never silently mistyped: untagged unions, enveloped discriminated unions, cookie parameters, multipart bodies, status code ranges, array parameters other than `explode: false` string lists in the query, non-JSON request bodies other than `bytes`, non-JSON responses other than `bytes` and `text/*` `string`, response headers other than strings, integers and string literals. `test/fixtures/unsupported.tsp` holds one operation per shape and the snapshot test asserts each diagnostic; none of them is blocked by the design, they are simply not needed yet. Validation covers the top-level request body only.
+
+## Typed ids
+
+The emitter's decorators live in its own TypeSpec library; other emitters ignore them. Tag a uuid-format string scalar once:
+
+```tsp
+import "@olivervea/typespec-csharp";
+
+using Olve.CSharp;
+
+@format("uuid")
+scalar Uuid extends string;
+
+@id(Character) scalar CharacterId extends Uuid; // Id<Character>
+@id(Place, "MyApp.Persistence.PlaceRecord") scalar PlaceId extends Uuid; // Id<MyApp.Persistence.PlaceRecord>
+```
+
+- Every property and path/query parameter of `CharacterId` emits as `Olve.Utilities.Ids.Id<Character>`, `?` and arrays included. The app references [Olve.Utilities](https://www.nuget.org/packages/Olve.Utilities).
+- `@id` can also tag one property or parameter. To keep the main spec free of C# hints, apply it from a separate file: `@@id(CharacterId, Character);`.
+- The wire is unchanged: a uuid string. `@id` doesn't imply the format, so keep `@format("uuid")` (on a base scalar, as above) for OpenAPI and other clients. A value that isn't a uuid is a binding failure.
+- `@id` on anything but a uuid-format string is an error (`id-not-uuid`): `Id<T>` is backed by a `Guid`. `explode: false` query lists of ids are reported as unsupported.
 
 ## Conformance
 

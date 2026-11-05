@@ -17,12 +17,22 @@ export const $lib = createTypeSpecLibrary({
         default: paramMessage`Unsupported type shape (${"shape"}); emitted as System.Text.Json.JsonElement.`,
       },
     },
+    "id-not-uuid": {
+      severity: "error",
+      messages: {
+        default:
+          '@id needs a uuid-format string (`@format("uuid") scalar … extends string`): Id<T> is backed by a Guid.',
+      },
+    },
     "unsupported-operation": {
       severity: "warning",
       messages: {
         default: paramMessage`Operation '${"operation"}': ${"reason"}.`,
       },
     },
+  },
+  state: {
+    id: { description: "@id tags: scalar or property → { of: Model, csharp?: string }" },
   },
   emitter: {
     options: {

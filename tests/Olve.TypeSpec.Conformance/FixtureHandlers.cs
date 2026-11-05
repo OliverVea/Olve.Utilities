@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Olve.Utilities.Ids;
 
 namespace Olve.TypeSpec.Conformance;
 
@@ -205,6 +206,25 @@ public static class FixtureHandlers
 
     #endregion
 
+    #region typed-ids
+    /// <summary>Echoes the link from the path's widget; <c>after</c> goes first in <c>to</c>. Without a stored id, the path's id is it.</summary>
+    [OperationHandler]
+    internal sealed class CreateWidgetLink : IWidgetLinksCreateHandler
+    {
+        public Task<WidgetLinksCreateResponse> HandleAsync(WidgetLinksCreateRequest request, CancellationToken cancellationToken)
+        {
+            var link = request.Body with
+            {
+                From = request.From,
+                To = request.After is { } after ? [after, .. request.Body.To] : request.Body.To,
+                Stored = request.Body.Stored ?? new Id<WidgetRecord>(request.From.Value),
+            };
+            return Task.FromResult<WidgetLinksCreateResponse>(link);
+        }
+    }
+
+    #endregion
+
     #region files
     /// <summary>Streams <see cref="FileContent"/> from a non-seekable stream, so nothing sets the length but the handler.</summary>
     [OperationHandler]
@@ -316,3 +336,6 @@ public static class FixtureHandlers
     }
     #endregion
 }
+
+/// <summary>The app's own widget record: the <c>T</c> of the contract's <c>StoredWidgetId</c>.</summary>
+public sealed record WidgetRecord;

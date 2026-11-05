@@ -20,6 +20,7 @@ public static class FixtureApi
         typeof(IShapesGetHandler),
         typeof(ITagsEchoHandler),
         typeof(IWidgetEventsStreamHandler),
+        typeof(IWidgetLinksCreateHandler),
         typeof(IWidgetsCreateHandler),
         typeof(IWidgetsDeleteHandler),
         typeof(IWidgetsListHandler),
@@ -106,6 +107,18 @@ public static class FixtureApi
             .WithName("WidgetEvents_stream")
             .WithMetadata(FixtureOperations.WidgetEventsStream)
             .Produces<WidgetEvent>(200, "text/event-stream")
+            .Produces<FixtureErrorEnvelope>(400),
+        WidgetLinksCreate = app.MapPost("/api/widget-links/{from}", async (
+                [FromServices] IWidgetLinksCreateHandler handler,
+                [FromRoute(Name = "from")] Olve.Utilities.Ids.Id<Widget> from,
+                [FromQuery(Name = "after")] Olve.Utilities.Ids.Id<Widget>? after,
+                [FromBody] WidgetLink body,
+                CancellationToken ct) =>
+                (await handler.HandleAsync(new WidgetLinksCreateRequest(from, after, body), ct)).ToHttpResult())
+            .WithName("WidgetLinks_create")
+            .WithMetadata(FixtureOperations.WidgetLinksCreate)
+            .WithRequestValidation<WidgetLink, WidgetLinkValidator>(FixtureOperations.WidgetLinksCreate)
+            .Produces<WidgetLink>(200)
             .Produces<FixtureErrorEnvelope>(400),
         WidgetsCreate = app.MapPost("/api/widgets", async (
                 [FromServices] IWidgetsCreateHandler handler,

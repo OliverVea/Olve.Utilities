@@ -51,7 +51,7 @@ The compile runs `tsp compile` in the contract's folder when a `.tsp`, `tspconfi
 The examples below are the conformance suite's fixture (`tests/Olve.TypeSpec.Conformance`), which the emitter's tests keep current. The contract is a `.tsp` file:
 
 ```ts
-// ../typespec-csharp/test/fixtures/widgets.tsp#L28-L43
+// ../typespec-csharp/test/fixtures/widgets.tsp#L30-L45
 
 model Circle {
   kind: "circle";
@@ -72,7 +72,7 @@ union Shape {
 ```
 
 ```ts
-// ../typespec-csharp/test/fixtures/widgets.tsp#L137-L148
+// ../typespec-csharp/test/fixtures/widgets.tsp#L139-L150
 
 /** The area of a shape. */
 model Area {
@@ -105,7 +105,7 @@ options:
 A handler is a class marked `[OperationHandler]` that implements the generated interface and returns one of the declared responses. A success body converts implicitly; errors are named:
 
 ```cs
-// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L302-L316
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L322-L336
 
 /// <summary>A union in the response: the stored data decides the variant; it converts implicitly to <c>Ok</c>.</summary>
 [OperationHandler]
@@ -127,7 +127,7 @@ internal sealed class GetShape : IShapesGetHandler
 A discriminated union in a request arrives as the abstract record; the handler switches on the variant records:
 
 ```cs
-// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L286-L300
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L306-L320
 
 /// <summary>A union in the request: the handler switches on the variant records.</summary>
 [OperationHandler]
@@ -194,12 +194,34 @@ public static WebApplication Build(Action<IServiceCollection>? adjust = null)
 
 The generator's checks are build errors: two handlers for one operation (OTSP001), a private or protected handler (OTSP002), a marked class that implements no operation (OTSP003) or can't be instantiated (OTSP004), and, when the assembly calls `AddOperationHandlers()`, an operation without a marked handler (OTSP005). To register handlers yourself, don't call `AddOperationHandlers()`: register each handler interface with any lifetime, and `Use…Api` still refuses to start while one is missing. To change one handler, mark it as usual and register it again after `AddOperationHandlers()`; the last registration wins.
 
+### Typed ids
+
+A contract opts into Olve.Utilities' `Id<T>` with the emitter's `@id` decorator (`import "@olivervea/typespec-csharp"`, `using Olve.CSharp;`). Untagged uuids stay `Guid`. `Id<T>` binds from the path and query (`IParsable`) and is written as a plain uuid string:
+
+```ts
+// ../typespec-csharp/test/fixtures/widgets.tsp#L162-L172
+
+/** A uuid on the wire. */
+@format("uuid")
+scalar Uuid extends string;
+
+/** A widget's id: `Id<Widget>` in C#, a uuid string on the wire. */
+@id(Widget)
+scalar WidgetId extends Uuid;
+
+/** A widget's id typed as the app's own record (`Id<WidgetRecord>`). */
+@id(Widget, "Olve.TypeSpec.Conformance.WidgetRecord")
+scalar StoredWidgetId extends Uuid;
+```
+
+The service references Olve.Utilities. See the emitter's README for the details.
+
 ### Server-sent events
 
 An operation returning `SSEStream<Events>` of an `@events` union (every variant a JSON model whose `type` literal is its event name) gets a response union whose `Ok` carries `IAsyncEnumerable<ServerSentEvent<Events>>`:
 
 ```ts
-// ../typespec-csharp/test/fixtures/widgets.tsp#L185-L200
+// ../typespec-csharp/test/fixtures/widgets.tsp#L216-L231
 
 /** The widget event stream. */
 @TypeSpec.Events.events
@@ -222,7 +244,7 @@ interface WidgetEvents {
 The handler yields events; the runtime writes each one as a frame named by the variant's `type`, with the item's `Id` as the SSE id (`null` for heartbeats, so `Last-Event-ID` never points at one). Nothing is kept per connection: `Last-Event-ID` is an ordinary header parameter the handler reads to decide where to resume, reconnecting is the client's job, and the stream ends quietly when the client disconnects or the app stops.
 
 ```cs
-// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L163-L194
+// ../../tests/Olve.TypeSpec.Conformance/FixtureHandlers.cs#L164-L195
 
 /// <summary>
 /// A finite stream: a ping (no id), then <c>widget.changed</c> (id 1) and <c>widget.removed</c>

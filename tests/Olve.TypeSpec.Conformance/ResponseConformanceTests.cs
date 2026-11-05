@@ -74,6 +74,13 @@ public class ResponseConformanceTests(FixtureApp fixture)
         // GET /api/tags (a required explode:false list)
         yield return () => new("Tags_echo", "a comma list", 200, c => c.GetAsync("/api/tags?names=a,b"));
 
+        // POST /api/widget-links/{from} (typed ids: Id<T> in the path, query and body)
+        yield return () => new("WidgetLinks_create", "every id", 200, c => c.PostAsync($"/api/widget-links/{Ids.A}?after={Ids.B}", Json(
+            LinkBody(extra: $$""" "replaces":null,"stored":"{{Ids.C}}", """))));
+        yield return () => new("WidgetLinks_create", "validator failure (empty label)", 400, c => c.PostAsync($"/api/widget-links/{Ids.A}", Json(LinkBody(label: ""))));
+        yield return () => new("WidgetLinks_create", "id not a uuid in the body (binding failure)", 400, c => c.PostAsync($"/api/widget-links/{Ids.A}", Json(LinkBody(to: "\"w1\""))));
+        yield return () => new("WidgetLinks_create", "id not a uuid in the path (binding failure)", 400, c => c.PostAsync("/api/widget-links/w1", Json(LinkBody())));
+
         // GET /api/widget-events (an SSE stream: every event's data against its event's schema)
         yield return () => new("WidgetEvents_stream", "every event", 200, c => c.GetAsync("/api/widget-events"));
         yield return () => new("WidgetEvents_stream", "filtered by an explode:false list", 200, c => c.GetAsync("/api/widget-events?type=widget.changed,ping"));
@@ -139,6 +146,18 @@ public class ResponseConformanceTests(FixtureApp fixture)
         string shape = """{"kind":"circle","radius":1}""",
         string extra = "") =>
         $$"""{"serial":"{{serial}}","name":"{{name}}","priority":2,"description":"d",{{extra}}"createdAt":"2026-01-01T00:00:00Z","shape":{{shape}}}""";
+
+    /// <summary>Fixed uuids for typed-id requests.</summary>
+    public static class Ids
+    {
+        public const string A = "0b5c1d36-0f5e-4a8e-9b1a-6f3a2c1d0e01";
+        public const string B = "0b5c1d36-0f5e-4a8e-9b1a-6f3a2c1d0e02";
+        public const string C = "0b5c1d36-0f5e-4a8e-9b1a-6f3a2c1d0e03";
+    }
+
+    /// <summary>A request body for WidgetLinks_create; <paramref name="to"/> is the JSON inside the array, <paramref name="extra"/> is spliced in verbatim.</summary>
+    public static string LinkBody(string label = "l", string? to = null, string extra = "") =>
+        $$"""{"from":"{{Ids.C}}","to":[{{to ?? $"\"{Ids.C}\""}}],{{extra}}"label":"{{label}}"}""";
 
     public static StringContent Json(string body) => new(body, Encoding.UTF8, "application/json");
 }

@@ -3,9 +3,11 @@ import "@typespec/http";
 import "@typespec/streams";
 import "@typespec/events";
 import "@typespec/sse";
+import "@olivervea/typespec-csharp";
 
 using Http;
 using SSE;
+using Olve.CSharp;
 
 @service(#{ title: "Fixture" })
 @route("/api")
@@ -153,6 +155,35 @@ interface Shapes {
 interface Tags {
   /** Echoes a required `explode: false` list (`?names=a,b`). */
   @get echo(@query(#{ explode: false }) names: string[]): string[];
+}
+// #endregion
+
+// #region typed-ids
+/** A uuid on the wire. */
+@format("uuid")
+scalar Uuid extends string;
+
+/** A widget's id: `Id<Widget>` in C#, a uuid string on the wire. */
+@id(Widget)
+scalar WidgetId extends Uuid;
+
+/** A widget's id typed as the app's own record (`Id<WidgetRecord>`). */
+@id(Widget, "Olve.TypeSpec.Conformance.WidgetRecord")
+scalar StoredWidgetId extends Uuid;
+
+/** A link from one widget to others. */
+model WidgetLink {
+  from: WidgetId;
+  to: WidgetId[];
+  replaces?: WidgetId | null;
+  stored?: StoredWidgetId;
+  @minLength(1) label: string;
+}
+
+@route("/widget-links")
+interface WidgetLinks {
+  /** Links the widget in the path; `after` orders it after another link's widget. */
+  @post create(@path from: WidgetId, @query after?: WidgetId, @body link: WidgetLink): WidgetLink | BadRequest;
 }
 // #endregion
 

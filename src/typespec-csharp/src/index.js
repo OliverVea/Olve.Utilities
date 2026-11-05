@@ -21,6 +21,7 @@ import { collect } from "./collect.js";
 import { renderApi, renderJsonContext, renderModels } from "./render.js";
 
 export { $lib } from "./lib.js";
+export { $decorators, $onValidate } from "./decorators.js";
 
 export async function $onEmit(context) {
   const { program, options } = context;

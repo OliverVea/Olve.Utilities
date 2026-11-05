@@ -320,6 +320,48 @@ public abstract record WidgetEventsStreamResponse : IOperationResponse
 /// <summary>Streams widget events; `type` limits them to these event names.</summary>
 public interface IWidgetEventsStreamHandler : IOperationHandler<WidgetEventsStreamRequest, WidgetEventsStreamResponse>;
 
+/// <summary>Input of <c>WidgetLinks_create</c> (POST /api/widget-links/{from}).</summary>
+public sealed record WidgetLinksCreateRequest(Olve.Utilities.Ids.Id<Widget> From, Olve.Utilities.Ids.Id<Widget>? After, WidgetLink Body);
+
+/// <summary>The responses <c>WidgetLinks_create</c> declares; its handler returns one.</summary>
+public abstract record WidgetLinksCreateResponse : IOperationResponse
+{
+    private WidgetLinksCreateResponse()
+    {
+    }
+
+    /// <inheritdoc />
+    public abstract int Status { get; }
+
+    /// <inheritdoc />
+    public abstract IResult ToHttpResult();
+
+    /// <summary>200.</summary>
+    public sealed record Ok(WidgetLink Body) : WidgetLinksCreateResponse
+    {
+        /// <inheritdoc />
+        public override int Status => 200;
+
+        /// <inheritdoc />
+        public override IResult ToHttpResult() => new JsonResponse<WidgetLink>(Body, 200);
+    }
+
+    /// <summary>400.</summary>
+    public sealed record BadRequest(FixtureErrorEnvelope Body) : WidgetLinksCreateResponse
+    {
+        /// <inheritdoc />
+        public override int Status => 400;
+
+        /// <inheritdoc />
+        public override IResult ToHttpResult() => new JsonResponse<FixtureErrorEnvelope>(Body, 400);
+    }
+
+    public static implicit operator WidgetLinksCreateResponse(WidgetLink body) => new Ok(body);
+}
+
+/// <summary>Links the widget in the path; `after` orders it after another link's widget.</summary>
+public interface IWidgetLinksCreateHandler : IOperationHandler<WidgetLinksCreateRequest, WidgetLinksCreateResponse>;
+
 /// <summary>Input of <c>Widgets_create</c> (POST /api/widgets).</summary>
 public sealed record WidgetsCreateRequest(WidgetCreate Body);
 
@@ -511,6 +553,7 @@ public static class FixtureOperations
     public static readonly ApiOperation ShapesGet = new("Shapes_get", [200], [404]);
     public static readonly ApiOperation TagsEcho = new("Tags_echo", [200], []);
     public static readonly ApiOperation WidgetEventsStream = new("WidgetEvents_stream", [200], [400]);
+    public static readonly ApiOperation WidgetLinksCreate = new("WidgetLinks_create", [200], [400]);
     public static readonly ApiOperation WidgetsCreate = new("Widgets_create", [201, 202], [400]);
     public static readonly ApiOperation WidgetsDelete = new("Widgets_delete", [204], [404]);
     public static readonly ApiOperation WidgetsList = new("Widgets_list", [200], []);
@@ -528,6 +571,7 @@ public sealed class FixtureEndpoints
     public required RouteHandlerBuilder ShapesGet { get; init; }
     public required RouteHandlerBuilder TagsEcho { get; init; }
     public required RouteHandlerBuilder WidgetEventsStream { get; init; }
+    public required RouteHandlerBuilder WidgetLinksCreate { get; init; }
     public required RouteHandlerBuilder WidgetsCreate { get; init; }
     public required RouteHandlerBuilder WidgetsDelete { get; init; }
     public required RouteHandlerBuilder WidgetsList { get; init; }
@@ -547,6 +591,7 @@ public static class FixtureApi
         typeof(IShapesGetHandler),
         typeof(ITagsEchoHandler),
         typeof(IWidgetEventsStreamHandler),
+        typeof(IWidgetLinksCreateHandler),
         typeof(IWidgetsCreateHandler),
         typeof(IWidgetsDeleteHandler),
         typeof(IWidgetsListHandler),
@@ -633,6 +678,18 @@ public static class FixtureApi
             .WithName("WidgetEvents_stream")
             .WithMetadata(FixtureOperations.WidgetEventsStream)
             .Produces<WidgetEvent>(200, "text/event-stream")
+            .Produces<FixtureErrorEnvelope>(400),
+        WidgetLinksCreate = app.MapPost("/api/widget-links/{from}", async (
+                [FromServices] IWidgetLinksCreateHandler handler,
+                [FromRoute(Name = "from")] Olve.Utilities.Ids.Id<Widget> from,
+                [FromQuery(Name = "after")] Olve.Utilities.Ids.Id<Widget>? after,
+                [FromBody] WidgetLink body,
+                CancellationToken ct) =>
+                (await handler.HandleAsync(new WidgetLinksCreateRequest(from, after, body), ct)).ToHttpResult())
+            .WithName("WidgetLinks_create")
+            .WithMetadata(FixtureOperations.WidgetLinksCreate)
+            .WithRequestValidation<WidgetLink, WidgetLinkValidator>(FixtureOperations.WidgetLinksCreate)
+            .Produces<WidgetLink>(200)
             .Produces<FixtureErrorEnvelope>(400),
         WidgetsCreate = app.MapPost("/api/widgets", async (
                 [FromServices] IWidgetsCreateHandler handler,
