@@ -190,6 +190,25 @@ public sealed record WidgetCreate
     public required Shape Shape { get; init; }
 }
 
+/// <summary>A link from one widget to others.</summary>
+public sealed record WidgetLink
+{
+    [JsonPropertyName("from")]
+    public required Olve.Utilities.Ids.Id<Widget> From { get; init; }
+
+    [JsonPropertyName("to")]
+    public required IReadOnlyList<Olve.Utilities.Ids.Id<Widget>> To { get; init; }
+
+    [JsonPropertyName("replaces")]
+    public Olve.Utilities.Ids.Id<Widget>? Replaces { get; init; }
+
+    [JsonPropertyName("stored"), JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public Olve.Utilities.Ids.Id<Olve.TypeSpec.Conformance.WidgetRecord>? Stored { get; init; }
+
+    [JsonPropertyName("label")]
+    public required string Label { get; init; }
+}
+
 public sealed record WidgetRemoved : WidgetEvent
 {
     /// <inheritdoc />
@@ -258,6 +277,17 @@ public sealed class WidgetCreateValidator : IValidator<WidgetCreate>
         value.Weight < 0 ? new ResultProblem("'weight' must be at least 0.") : Result.Success(),
         value.Weight > 100 ? new ResultProblem("'weight' cannot exceed 100.") : Result.Success(),
         value.Shape is null ? new ResultProblem("'shape' is required.") : Result.Success(),
+    ]);
+}
+
+/// <summary>Validates <see cref="WidgetLink"/> against the spec's constraints.</summary>
+public sealed class WidgetLinkValidator : IValidator<WidgetLink>
+{
+    public Result Validate(WidgetLink value) => Result.Concat(
+    [
+        value.To is null ? new ResultProblem("'to' is required.") : Result.Success(),
+        value.Label is null ? new ResultProblem("'label' is required.") : Result.Success(),
+        value.Label is { Length: < 1 } ? new ResultProblem("'label' must be at least 1 character.") : Result.Success(),
     ]);
 }
 

@@ -53,6 +53,22 @@ public class GeneratedSurfaceTests(FixtureApp fixture)
     }
 
     [Test]
+    public async Task TypedIds_BindFromPathQueryAndBody_AndWriteAsUuids()
+    {
+        using var response = await fixture.CreateClient().PostAsync(
+            $"/api/widget-links/{ResponseConformanceTests.Ids.A}?after={ResponseConformanceTests.Ids.B}",
+            ResponseConformanceTests.Json(ResponseConformanceTests.LinkBody(extra: """ "replaces":null, """)));
+        var link = await Body(response);
+
+        await Assert.That((int)response.StatusCode).IsEqualTo(200);
+        await Assert.That(link.GetProperty("from").GetString()).IsEqualTo(ResponseConformanceTests.Ids.A);
+        await Assert.That(Joined(link.GetProperty("to").EnumerateArray().Select(e => e.GetString()!)))
+            .IsEqualTo(Joined([ResponseConformanceTests.Ids.B, ResponseConformanceTests.Ids.C]));
+        await Assert.That(link.GetProperty("replaces").ValueKind).IsEqualTo(JsonValueKind.Null);
+        await Assert.That(link.GetProperty("stored").GetString()).IsEqualTo(ResponseConformanceTests.Ids.A);
+    }
+
+    [Test]
     public async Task QueryAndHeaderParameters_Bind()
     {
         using var request = new HttpRequestMessage(HttpMethod.Get, "/api/widgets?color=green&limit=7");

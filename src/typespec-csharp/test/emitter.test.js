@@ -187,3 +187,36 @@ test("every declared response is a variant of the operation's response union", a
     /public sealed record NoContent\(\) : WidgetsDeleteResponse[\s\S]*?TypedResults\.StatusCode\(204\)/,
   );
 });
+
+test("@id types ids as Id<T>; untagged uuids stay Guid", async () => {
+  const { diagnostics, files } = await emit("ids-csharp");
+  assert.deepEqual(diagnosticCodes(diagnostics), []);
+  const models = files["IdsModels.g.cs"];
+  const api = files["IdsApi.g.cs"];
+  const id = (t) => `Olve.Utilities.Ids.Id<${t}>`;
+  for (const [source, member] of [
+    // the @@id augment on a scalar: the model's own id, and an array of them
+    [record(models, "Character"), `required ${id("Character")} Id `],
+    [record(models, "Sighting"), `required IReadOnlyList<${id("Character")}> By `],
+    // a tag on a property, and its `csharp` override (nullable as declared)
+    [record(models, "Sighting"), `required ${id("Character")} Seen `],
+    [record(models, "Sighting"), `public ${id("App.CharacterRecord")}? Witness `],
+    // untagged
+    [record(models, "Sighting"), "required Guid Plain "],
+    // a tagged path parameter, and a query parameter of a tagged scalar
+    [api, `record GetRequest(${id("Character")} Id, ${id("Character")}? By)`],
+  ])
+    assert.ok(source.includes(member), `expected '${member}' in:\n${source}`);
+  // Id<T> is a struct: required ids get no `is null` rule, and no JSON context root of their own.
+  assert.doesNotMatch(files["IdsJsonContext.g.cs"], /Olve\.Utilities\.Ids/);
+});
+
+test("@id on anything but a uuid-format string is an error", async () => {
+  const { diagnostics } = await emit("ids-invalid");
+  const message =
+    'error @olivervea/typespec-csharp/id-not-uuid: @id needs a uuid-format string (`@format("uuid") scalar … extends string`): Id<T> is backed by a Guid.';
+  assert.deepEqual(
+    diagnostics.map((d) => [d.target.name, `${d.severity} ${d.code}: ${d.message}`]).sort(),
+    ["NotUuid", "count", "email", "many"].map((name) => [name, message]),
+  );
+});

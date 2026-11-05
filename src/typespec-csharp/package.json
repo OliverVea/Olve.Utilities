@@ -14,10 +14,15 @@
     "node": ">=22"
   },
   "main": "src/index.js",
+  "tspMain": "lib/main.tsp",
   "exports": {
-    ".": "./src/index.js"
+    ".": {
+      "typespec": "./lib/main.tsp",
+      "default": "./src/index.js"
+    }
   },
   "files": [
+    "lib",
     "src",
     "README.md"
   ],

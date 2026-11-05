@@ -26,12 +26,14 @@ export function region(source, name) {
 export function declaration(source, name) {
   const lines = source.split("\n");
   const re = new RegExp(`^(public|internal) [^=(]*\\b${name}\\b`);
-  let start = lines.findIndex((l) => re.test(l));
-  if (start < 0) throw new Error(`no declaration '${name}'`);
+  const decl = lines.findIndex((l) => re.test(l));
+  if (decl < 0) throw new Error(`no declaration '${name}'`);
   // Attributes and doc comments directly above the declaration belong to it.
+  let start = decl;
   while (start > 0 && /^\s*(\[|\/\/\/)/.test(lines[start - 1])) start--;
+  // Braces are counted from the declaration itself: a doc comment may mention a route (`{id}`).
   let depth = 0;
-  for (let i = start; i < lines.length; i++) {
+  for (let i = decl; i < lines.length; i++) {
     for (const ch of lines[i]) {
       if (ch === "{") depth++;
       else if (ch === "}") depth--;
@@ -153,6 +155,21 @@ export async function buildExamples(files) {
       cs(region(handlers, "list")),
       "",
       cs(region(handlers, "parameters")),
+    ].join("\n"),
+
+    "typed-ids.md": [
+      header(
+        "Typed ids",
+        "Opt-in: a uuid is `Guid` unless tagged. `@id(Model)` (from `import \"@olivervea/typespec-csharp\"`, `using Olve.CSharp;`) on a uuid-format string scalar makes every property and path/query parameter of that scalar Olve.Utilities' `Id<T>`, nullable and arrays included; `T` is the model's generated record, or the C# type given as the second argument (the app's own record). It can also tag one property or parameter, or be applied from a C#-only file with `@@id(Scalar, Model)`. The wire is unchanged: a uuid string, `format: uuid` in OpenAPI, so keep `@format(\"uuid\")` on a base scalar. A value that isn't a uuid is a binding failure. `@id` on anything but a uuid-format string is an error; `explode: false` query lists of ids are reported as unsupported. The app references Olve.Utilities.",
+      ),
+      "## Contract\n",
+      tsp("typed-ids"),
+      "\n## Generated\n",
+      cs(declaration(models, "WidgetLink"), declaration(api, "WidgetLinksCreateRequest")),
+      "",
+      cs(endpoint(api, "WidgetLinksCreate")),
+      "\n## Hand-written handler\n\nConverting between id types is explicit: `new Id<WidgetRecord>(id.Value)`.\n",
+      cs(region(handlers, "typed-ids")),
     ].join("\n"),
 
     "validation-and-errors.md": [

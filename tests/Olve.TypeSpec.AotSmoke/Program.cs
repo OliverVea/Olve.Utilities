@@ -17,15 +17,19 @@ var address = app.Urls.First();
 using var client = new HttpClient { BaseAddress = new Uri(address) };
 
 const string widget = """{"serial":"SN-1","name":"w","priority":2,"description":"d","createdAt":"2026-01-01T00:00:00Z","shape":{"kind":"square","side":3}}""";
+const string IdA = "0b5c1d36-0f5e-4a8e-9b1a-6f3a2c1d0e01";
+const string IdB = "0b5c1d36-0f5e-4a8e-9b1a-6f3a2c1d0e02";
+const string link = $$"""{"from":"{{IdA}}","to":["{{IdA}}"],"stored":"{{IdB}}","label":"l"}""";
 var tooLong = widget.Replace("\"name\":\"w\"", $"\"name\":\"{new string('x', 51)}\"");
 
-// Request and response bodies, a union in both, the validator and error writer, and an event stream.
+// Request and response bodies, a union in both, the validator and error writer, an event stream, and typed ids.
 var checks = new (string Name, Func<Task<HttpResponseMessage>> Send, int Status, string Contains)[]
 {
     ("create a widget", () => client.PostAsync("/api/widgets", Json(widget)), 201, "\"kind\":\"square\""),
     ("validator failure", () => client.PostAsync("/api/widgets", Json(tooLong)), 400, FixtureErrors.InvalidRequest),
     ("get a shape", () => client.GetAsync("/api/shapes/c-1"), 200, "\"radius\":1.5"),
     ("stream events", () => client.GetAsync("/api/widget-events"), 200, "event: widget.changed"),
+    ("typed ids", () => client.PostAsync($"/api/widget-links/{IdA}?after={IdB}", Json(link)), 200, $"\"to\":[\"{IdB}\",\"{IdA}\"]"),
 };
 
 var failures = 0;
