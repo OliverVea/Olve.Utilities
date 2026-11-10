@@ -1,9 +1,9 @@
-name: PR to master
+name: PR to main
 
 on:
   pull_request:
     branches:
-      - master
+      - main
 
 env:
   DOTNET_VERSION: 10.0.403

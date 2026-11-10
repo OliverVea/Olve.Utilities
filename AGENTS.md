@@ -11,10 +11,10 @@
 - `Olve.Validation.SourceGeneration` includes `Olve.Validation.SourceGenerators` as a transitive analyzer so consumers get the generator automatically.
 - Run `dotnet docfx metadata docs/docfx.json` when source projects change to keep YAML up to date.
 - Keep this file updated as packages or build tooling change.
-- Version bump commits on `master` are automatically pushed to `develop` via the workflow.
+- Version bump commits on `main` are automatically pushed to `develop` via the workflow.
 - To run tests: `dotnet test --verbosity normal --logger "console;verbosity=minimal"`
 - Pull requests to `develop` run Ubuntu and Windows tests. Failures are informational only.
-- Pull requests to `master` build and run tests on Ubuntu and Windows. Merging is blocked if any job fails.
+- Pull requests to `main` build and run tests on Ubuntu and Windows. Merging is blocked if any job fails.
 - Source generator tests compile in-memory using `Microsoft.CodeAnalysis.CSharp`.
 - `build/main.py` defines a Dagger pipeline that restores, builds, tests, packs
   and generates DocFX using the `.NET` version from `DOTNET_VERSION`.
@@ -143,7 +143,7 @@ Code examples in package READMEs must be sourced from test files using [embedme]
    ```
    ````
 3. Running `npx embedme <README.md>` populates the code block with the referenced lines.
-4. CI runs `npx embedme <README.md> --verify` on PRs to master, failing if any snippet is out of sync.
+4. CI runs `npx embedme <README.md> --verify` on PRs to main, failing if any snippet is out of sync.
 
 ### Rules
 

@@ -1,9 +1,9 @@
-name: Push to master
+name: Push to main
 
 on:
   push:
     branches:
-      - master
+      - main
 
 env:
   DOTNET_VERSION: 10.0.403
@@ -95,13 +95,13 @@ jobs:
       changed: ${{ steps.version-changed.outputs.changed }}
 
     steps:
-      # Bump from the tip of master, not the triggering commit: a run queued behind another
+      # Bump from the tip of main, not the triggering commit: a run queued behind another
       # release must see that release's bump commit, or it re-bumps to the same version.
-      # master requires pull requests; the release deploy key is the ruleset's bypass for the bump commit.
+      # main requires pull requests; the release deploy key is the ruleset's bypass for the bump commit.
       - name: Check out
         uses: actions/checkout@v6
         with:
-          ref: master
+          ref: main
           fetch-depth: 0
           ssh-key: ${{ secrets.RELEASE_DEPLOY_KEY }}
 
@@ -120,7 +120,7 @@ jobs:
 
       - name: Push bump commit and tag
         if: "${{ steps.version-changed.outputs.changed == 'true' }}"
-        run: git push --atomic origin HEAD:master "v${{ steps.cz.outputs.version }}"
+        run: git push --atomic origin HEAD:main "v${{ steps.cz.outputs.version }}"
 
       - name: Release
         id: release
@@ -221,7 +221,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: ${{ needs.bump-version.outputs.changed == 'true' && format('v{0}', needs.bump-version.outputs.version) || 'master' }}
+          ref: ${{ needs.bump-version.outputs.changed == 'true' && format('v{0}', needs.bump-version.outputs.version) || 'main' }}
 
       - name: Install .NET
         uses: actions/setup-dotnet@v5
