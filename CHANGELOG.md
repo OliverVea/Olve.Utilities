@@ -1,3 +1,9 @@
+## v0.63.0 (2026-11-10)
+
+### Feat
+
+- **fuzzy**: Olve.Fuzzy, FluentFuzzy moved into Olve.Utilities
+
 ## v0.62.0 (2026-11-05)
 
 ### Feat
