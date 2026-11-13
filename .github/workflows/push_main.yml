@@ -162,21 +162,18 @@ jobs:
       - uses: actions/checkout@v6
         with:
           ref: v${{ needs.bump-version.outputs.version }}
-      - name: Get NuGet API key from OpenBao
-        id: nuget-secret
-        uses: ./.github/actions/openbao-secret
+      - name: Log in to NuGet (trusted publishing)
+        id: nuget-login
+        uses: NuGet/login@v1
         with:
-          role-id: ${{ secrets.OPENBAO_ROLE_ID }}
-          secret-id: ${{ secrets.OPENBAO_SECRET_ID }}
-          secret-path: external/data/nuget/api-key
-          secret-field: key
+          user: OliverVea
       - name: Publish ${{ matrix.id }} to NuGet
         uses: ./.github/actions/dotnet-publish
         with:
           project: ./src/${{ matrix.id }}
           package-name: ${{ matrix.id }}
           version: ${{ needs.bump-version.outputs.version }}
-          nuget-api-key: ${{ steps.nuget-secret.outputs.secret }}
+          nuget-api-key: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
   publish-emitter:
