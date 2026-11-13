@@ -12,20 +12,8 @@ public static class Path
     /// </summary>
     /// <param name="path">The string path to convert.</param>
     /// <returns>An instance of <see cref="IPurePath"/> representing the input path.</returns>
-    public static IPurePath CreatePure(string path)
-    {
-        if (OperatingSystem.IsLinux())
-        {
-            return CreatePureUnixPath(path);
-        }
-
-        if (OperatingSystem.IsWindows())
-        {
-            return CreatePureWindowsPath(path);
-        }
-        
-        return new UnsupportedPurePath();
-    }
+    public static IPurePath CreatePure(string path) =>
+        OperatingSystem.IsWindows() ? CreatePureWindowsPath(path) : CreatePureUnixPath(path);
 
     /// <summary>
     /// Creates a platform-specific pure path from the given string and platform.
@@ -52,20 +40,8 @@ public static class Path
     /// <param name="path">The string path to convert.</param>
     /// <param name="pathEnvironment">Optional environment to use for path resolution.</param>
     /// <returns>An instance of <see cref="IPath"/>.</returns>
-    public static IPath Create(string path, IPathEnvironment? pathEnvironment = null)
-    {
-        if (OperatingSystem.IsLinux())
-        {
-            return CreateUnixPath(path, pathEnvironment);
-        }
-
-        if (OperatingSystem.IsWindows())
-        {
-            return CreateWindowsPath(path, pathEnvironment);
-        }
-        
-        return new UnsupportedPath();
-    }
+    public static IPath Create(string path, IPathEnvironment? pathEnvironment = null) =>
+        OperatingSystem.IsWindows() ? CreateWindowsPath(path, pathEnvironment) : CreateUnixPath(path, pathEnvironment);
 
     /// <summary>
     /// Creates a platform-specific full path from the given string and platform.

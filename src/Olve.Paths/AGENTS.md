@@ -8,7 +8,7 @@ This file documents the design and usage of the **Olve.Paths** project. Keep it 
 
 ## Core Types
 
-- **Path** – static helper for creating `IPurePath` and `IPath` instances. Chooses Unix or Windows implementations based on `OperatingSystem` or `PathPlatform`.
+- **Path** – static helper for creating `IPurePath` and `IPath` instances. Chooses the Windows implementations on Windows and the Unix ones everywhere else (Linux, macOS, the browser), or by `PathPlatform`.
 - **IPurePath** – immutable representation of a path independent of the file system. Supports appending segments (`/` operator) and inspection of name, parent and platform.
 - **IPath** – extends `IPurePath` with access to the environment. Provides element type, absolute paths, children enumeration and existence checks.
 - **IPathEnvironment** – abstraction for environment dependent operations such as retrieving the current directory or executable path. `DefaultUnixPathEnvironment.Shared` is provided.
