@@ -1,3 +1,9 @@
+## v0.63.2 (2026-11-13)
+
+### Fix
+
+- **ci**: publish to NuGet with trusted publishing
+
 ## v0.63.1 (2026-11-13)
 
 ### Fix
