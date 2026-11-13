@@ -1,3 +1,9 @@
+## v0.63.1 (2026-11-13)
+
+### Fix
+
+- **paths**: Unix paths everywhere but Windows, so macOS and the browser get working paths
+
 ## v0.63.0 (2026-11-10)
 
 ### Feat
