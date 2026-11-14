@@ -2,8 +2,10 @@
 
 ## Commits
 - Short single subject line, conventional commit format. No verbose body.
-- PRs use rebase merge (no merge commits or squash).
 - PR descriptions link the issues they resolve with `Closes #N`, so issues don't outlive their fix.
+
+## Publishing
+- Agents land their own changes without review: open a PR to `main` (GitHub requires one) and, once its checks pass, merge it yourself with rebase merge (merge commits and squash are off).
 
 ## GitHub CLI
 - `gh issue view N` and `gh pr edit N` fail with a Projects (classic) deprecation error. Use `gh issue view N --json title,body,comments`, and `gh api -X PATCH repos/OliverVea/Olve.Utilities/pulls/N` for PR edits.
